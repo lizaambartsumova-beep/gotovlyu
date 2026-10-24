@@ -402,8 +402,12 @@ ul.cmts p{margin:0;font-size:.93rem;overflow-wrap:anywhere}
 .nhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .tipsec{display:flex;flex-direction:column;gap:10px}
 .tcards{display:flex;flex-direction:column;gap:8px}
-.tcard{background:var(--sun-soft);border-radius:var(--r-md);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.tcard h5{margin:0;font-family:var(--display);font-size:.95rem;font-weight:600;color:var(--sun-text);overflow-wrap:anywhere}
+.tcard{background:var(--soft);border-radius:var(--r-md);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tcard h5{margin:0;font-family:var(--display);font-size:.95rem;font-weight:600;color:var(--ink);overflow-wrap:anywhere}
+.tcard.hot{background:var(--sun-soft)}
+.tcard.hot h5{color:var(--sun-text)}
+.thot{align-self:flex-start;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;font:inherit;font-size:.78rem;font-weight:600;padding:2px 10px;cursor:pointer;margin-top:4px}
+.thot[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .tcard p{margin:0;font-size:.94rem;overflow-wrap:anywhere}
 .tcard.ai{background:var(--lime-soft)}
 .tcard.ai h5{color:var(--lime-text)}
@@ -553,7 +557,7 @@ ul.shop li.have .src{color:var(--bad)}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Фото"><button class="lbx" type="button" id="lbx" aria-label="Закрыть">✕</button><div class="lbin" id="lbin"><img id="lbimg" alt=""></div><p class="lbhint">Нажми на фото, чтобы приблизить</p></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="i18n.js?v=202610242039"></script>
+<script src="i18n.js?v=202610242055"></script>
 <script>
 const IC={
  star:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -863,7 +867,7 @@ async function saveEd(el){const r=recipes.find(x=>x.id===openId);if(!r||!db)retu
   else if(p.length===1){if(String(r[path]||"")===v)return;upd={[path]:v}}
   else if(p[0]==="st"){const a=[...(r.steps||[])];if(a[k]===v||!v)return;a[k]=v;upd={steps:a}}
   else if(p[0]==="stt"){const a=[...(r.stepTitles||[])];while(a.length<(r.steps||[]).length)a.push("");if((a[k]||"")===v)return;a[k]=v;upd={stepTitles:a}}
-  else if(p[0]==="tip"){const a=[...(r.tips||[])],t=splitTip(a[k]);if(p[2]==="t")t.title=v;else t.text=v;const nv=t.title?t.title+" | "+t.text:t.text;if(nv===a[k])return;a[k]=nv;upd={tips:a}}
+  else if(p[0]==="tip"){const a=[...(r.tips||[])],t=splitTip(a[k]);if(p[2]==="t")t.title=v;else t.text=v;const nv=joinTip(t);if(nv===a[k])return;a[k]=nv;upd={tips:a}}
   else if(p[0]==="gcap"){const g=[...(r.gallery||[])];if(!g[k]||(g[k].caption||"")===v)return;g[k]={...g[k],caption:v};upd={gallery:g}}
   else if(p[0]==="ing"){const a=(r.ingredients||[]).map(normIng);if(!a[k]||String(a[k][p[2]]||"")===v)return;a[k]={...a[k],[p[2]]:v};upd={ingredients:a.map(x=>cleanIng(normIng(cleanIng(x))))}}
   if(!upd)return;try{await db.collection("recipes").doc(r.id).update(upd);toast("Сохранено ✓")}catch(e){toast("Не сохранилось: "+(e.message||e.code))}}
@@ -973,6 +977,7 @@ function renderSheet(r){
     view.querySelectorAll("[data-sdel]").forEach(b=>b.onclick=()=>{const n=+b.dataset.sdel;if(!confirm("Удалить шаг "+(n+1)+"?"))return;editArr(r,x=>{const cut=a=>{a=[...(a||[])];a.splice(n,1);return a};return {steps:cut(x.steps),stepTitles:cut(x.stepTitles),stepPhotos:cut(x.stepPhotos)}})});
     view.querySelectorAll("[data-smv]").forEach(b=>b.onclick=()=>{const [n,d]=b.dataset.smv.split(":").map(Number),m=n+d;editArr(r,x=>{const L=(x.steps||[]).length;if(m<0||m>=L)return {};const sw=a=>{a=[...(a||[])];while(a.length<L)a.push("");[a[n],a[m]]=[a[m],a[n]];return a};return {steps:sw(x.steps),stepTitles:sw(x.stepTitles),stepPhotos:sw(x.stepPhotos)}});pasteStep=null});
     view.querySelectorAll("[data-idel]").forEach(b=>b.onclick=()=>{const n=+b.dataset.idel;editArr(r,x=>{const a=[...(x.ingredients||[])];a.splice(n,1);return {ingredients:a}})});
+    view.querySelectorAll("[data-thot]").forEach(b=>b.onclick=()=>{const n=+b.dataset.thot;editArr(r,x=>{const a=(x.tips||[]).map(splitTip);if(!a.some(t=>t.hot))a.forEach((t,i)=>{if(i<2)t.hot=true});a[n].hot=!a[n].hot;return {tips:a.map(joinTip)}})});
     view.querySelectorAll("[data-tdel]").forEach(b=>b.onclick=()=>{const n=+b.dataset.tdel;editArr(r,x=>{const a=[...(x.tips||[])];a.splice(n,1);return {tips:a}})});
     const wc=document.getElementById("wholeChk");if(wc)wc.onchange=()=>editArr(r,()=>({whole:wc.checked}));
     const au=document.getElementById("addUrl");if(au)au.onclick=()=>{showUrl=true;focusAfter="recipeUrl";render()};
@@ -1071,10 +1076,11 @@ async function saveNote(){const d=nDraft;if(!d||d.busy)return;const text=(d.text
     await db.collection("recipes/"+notesFor+"/notes").add(doc);nDraft=null;toast(d.kind==="win"?"Ура! 🎉":"Упс записан 🙈");drawNotes()}
   catch(e){d.busy=false;toast("Не получилось сохранить: "+(e.message||e.code));drawNotes()}}
 /* AI tips: built on demand from "Ожидание и реальность" posts and all comments; every quote must be an exact excerpt of its source */
-function splitTip(t){t=String(t||"");const i=t.indexOf(" | ");return i>0?{title:t.slice(0,i).trim(),text:t.slice(i+3).trim()}:{title:"",text:t.trim()}}
-function tipsHtml(r){const own=(r.tips||[]).map(splitTip),ai=((r.aiTips&&r.aiTips.items)||[]).filter(t=>t.tip);const can=!!sample&&!!db&&typeof ME!=="undefined"&&!!ME&&r.owner===ME.id;
+function splitTip(t){t=String(t||"");const hot=t.startsWith("!");if(hot)t=t.slice(1);const i=t.indexOf(" | ");return i>0?{title:t.slice(0,i).trim(),text:t.slice(i+3).trim(),hot}:{title:"",text:t.trim(),hot}}
+const joinTip=t=>(t.hot?"!":"")+(t.title?t.title+" | "+t.text:t.text);
+function tipsHtml(r){const own=(r.tips||[]).map(splitTip);if(!own.some(t=>t.hot))own.forEach((t,i)=>{if(i<2)t.hot=true});const ai=((r.aiTips&&r.aiTips.items)||[]).filter(t=>t.tip);const can=!!sample&&!!db&&typeof ME!=="undefined"&&!!ME&&r.owner===ME.id;
   if(!own.some(t=>t.text)&&!ai.length&&!can&&!editOn)return"";
-  const card=(t,aiItem,ix)=>editOn&&!aiItem?`<article class="tcard"><h5${ed("tip:"+ix+":t","Заголовок")}>${esc(t.title)}</h5><p${ed("tip:"+ix+":x","Совет")}>${esc(t.text)}</p><button class="idel tdel" type="button" data-tdel="${ix}" aria-label="Удалить совет">✕</button></article>`:`<article class="tcard${aiItem?" ai":""}">${t.title?`<h5>${esc(t.title)}</h5>`:""}<p>${esc(t.text)}</p>${aiItem&&aiItem.quote?`<p class="aq">«${esc(aiItem.quote)}» <a href="#${esc(aiItem.anchor)}" data-jump="${esc(aiItem.anchor)}">→ ${aiItem.anchor.startsWith("c-")?"к комментарию":"к публикации"}</a></p>`:""}${aiItem?`<span class="aib">✨ из отзывов</span>`:""}</article>`;
+  const card=(t,aiItem,ix)=>editOn&&!aiItem?`<article class="tcard${t.hot?" hot":""}"><h5${ed("tip:"+ix+":t","Заголовок")}>${esc(t.title)}</h5><p${ed("tip:"+ix+":x","Совет")}>${esc(t.text)}</p><button class="thot" type="button" data-thot="${ix}" aria-pressed="${!!t.hot}" title="${t.hot?"Убрать из важных":"Сделать важным"}">${t.hot?"★ Важно":"☆ Важно"}</button><button class="idel tdel" type="button" data-tdel="${ix}" aria-label="Удалить совет">✕</button></article>`:`<article class="tcard${aiItem?" ai":t.hot?" hot":""}">${t.title?`<h5>${esc(t.title)}</h5>`:""}<p>${esc(t.text)}</p>${aiItem&&aiItem.quote?`<p class="aq">«${esc(aiItem.quote)}» <a href="#${esc(aiItem.anchor)}" data-jump="${esc(aiItem.anchor)}">→ ${aiItem.anchor.startsWith("c-")?"к комментарию":"к публикации"}</a></p>`:""}${aiItem?`<span class="aib">✨ из отзывов</span>`:""}</article>`;
   return `<div class="tipsec"><p class="label" style="margin:0">Чтобы не испортить</p><div class="tcards">${own.map((t,ix)=>editOn||t.text?card(t,null,ix):"").join("")}${ai.map(i=>card({title:i.title||"",text:i.tip},i)).join("")}</div>
     ${editOn?`<button class="btn link addln" type="button" id="addTip">${IC.plus} Совет</button>`:""}${can?`<button class="btn link" type="button" id="aiTipsBtn" style="padding:4px 0;align-self:flex-start">${ai.length?"✨ Обновить советы из отзывов":"✨ Собрать советы из отзывов"}</button>`:""}</div>`}
 async function buildTips(r){const real=notes.filter(n=>n.kind==="real"),src=[];
@@ -1125,7 +1131,7 @@ function renderForm(r){
       <label for="f_storage">Хранение<textarea id="f_storage" style="min-height:70px">${esc(r.storage||"")}</textarea></label>
       <label for="f_notes">Заметки<textarea id="f_notes" style="min-height:70px">${esc(r.notes||"")}</textarea></label>
     </div>
-    <label for="f_tips">Чтобы не испортить <span class="hint">по одному совету в строке: «Заголовок | совет», например «Яблоки | Бери плотные и кисловатые»</span><textarea id="f_tips" style="min-height:90px">${esc((r.tips||[]).join("\n"))}</textarea></label>
+    <label for="f_tips">Чтобы не испортить <span class="hint">по одному совету в строке: «Заголовок | совет», например «Яблоки | Бери плотные и кисловатые». «!» в начале строки — важный совет, он выделится цветом</span><textarea id="f_tips" style="min-height:90px">${esc((r.tips||[]).join("\n"))}</textarea></label>
     <label style="flex-direction:row;align-items:center;gap:10px" for="f_std"><input id="f_std" type="checkbox" style="width:auto" ${r.standard?"checked":""}> Базовый рецепт (знаю наизусть — можно скрывать)</label>
     <label style="flex-direction:row;align-items:center;gap:10px" for="f_gentle"><input id="f_gentle" type="checkbox" style="width:auto" ${r.gentle?"checked":""}> 🌿 Бережно для желудка</label>
     <label style="flex-direction:row;align-items:center;gap:10px" for="f_easy"><input id="f_easy" type="checkbox" style="width:auto" ${r.easy?"checked":""}> Лёгкий рецепт</label>
@@ -1248,6 +1254,6 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
 };
 async function newRecipe(){try{toast("Создаю рецепт…");const ref=await db.collection("recipes").add({title:"Новый рецепт",status:"want",serves:2,ingredients:[],steps:[],stepTitles:[],tips:[],source:"",video:"",recipeUrl:"",photo:""});justCopied=ref.id;openId=ref.id;filter="all";render();window.scrollTo(0,0)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
 </script>
-<script src="backend.js?v=202610242039"></script>
+<script src="backend.js?v=202610242055"></script>
 
 </body></html>
