@@ -81,7 +81,7 @@ const UI = {
   "Не получилось сохранить план:": "Couldn't save the plan:",
   /* люди */
   "Позвать": "Invite", "Скопировать ссылку на сайт": "Copy the site link", "Ссылка на сайт скопирована — отправь друзьям": "Site link copied — send it to your friends", "Скопируй ссылку на сайт:": "Copy the site link:",
-  "Чьи рецепты": "Whose recipes", "Рецепты друзей": "Friends' recipes", "Метки": "Tags", "Изменить метки": "Change tags", "Метки рецепта": "Recipe tags", "Форма аватара": "Avatar shape", "Круг": "Circle", "Яблоко": "Apple", "Груша": "Pear", "Лимон": "Lemon", "Клубника": "Strawberry", "Тыква": "Pumpkin", "🗓 На этой неделе": "🗓 This week", "Меню на неделю видят только друзья, которые вошли.": "Only friends who are logged in can see the weekly menu.",
+  "Чьи рецепты": "Whose recipes", "Рецепты друзей": "Friends' recipes", "Метки": "Tags", "Без статуса": "No status", "＋ статус": "＋ status", "Изменить метки": "Change tags", "Метки рецепта": "Recipe tags", "Форма аватара": "Avatar shape", "Круг": "Circle", "Яблоко": "Apple", "Груша": "Pear", "Лимон": "Lemon", "Клубника": "Strawberry", "Тыква": "Pumpkin", "🗓 На этой неделе": "🗓 This week", "Меню на неделю видят только друзья, которые вошли.": "Only friends who are logged in can see the weekly menu.",
   "Меню пока пустое.": "The menu is empty for now.", "Составить меню →": "Plan the menu →", "Открыть меню и покупки →": "Open menu & shopping →",
   "На этой неделе пока ничего не запланировано.": "Nothing planned for this week yet.", "Изменить профиль": "Edit profile", "Пока нет рецептов.": "No recipes yet.",
   "Здесь появятся рецепты, которые ты добавишь.": "The recipes you add will appear here.", "получилось:": "worked out:",

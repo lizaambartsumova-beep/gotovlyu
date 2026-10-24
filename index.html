@@ -202,6 +202,8 @@ ol.fsteps li::before{content:counter(fs);flex:none;width:20px;height:20px;border
 .tagpop button.pill[aria-pressed="true"]{border-color:var(--ink);background:inherit;color:inherit;box-shadow:inset 0 0 0 1px var(--ink)}
 .tagpop button.pill.done{background:var(--lime-soft);color:var(--lime-text);border-color:transparent}
 .tagpop button.pill.plan{background:var(--sun-soft);color:var(--sun-text);border-color:transparent}
+.pill.none{background:none;color:var(--muted);border:1.5px dashed var(--line)}
+.tagpop button.pill.none{background:none;color:var(--muted);border:1.5px dashed var(--line)}
 .tagpop button.pill.want{background:var(--coral-soft);color:var(--coral-text);border-color:transparent}
 .tagpop button.pill[aria-pressed="true"]{border-color:var(--ink)}
 .tag{font-size:.78rem;color:var(--muted);background:var(--soft);border-radius:999px;padding:3px 10px}
@@ -551,7 +553,7 @@ ul.shop li.have .src{color:var(--bad)}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Фото"><button class="lbx" type="button" id="lbx" aria-label="Закрыть">✕</button><div class="lbin" id="lbin"><img id="lbimg" alt=""></div><p class="lbhint">Нажми на фото, чтобы приблизить</p></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="i18n.js?v=202610242015"></script>
+<script src="i18n.js?v=202610242022"></script>
 <script>
 const IC={
  star:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -567,8 +569,9 @@ const IC={
  x:'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
  share:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 15V3.5M7.5 8L12 3.5 16.5 8M5 12.5V19a1.5 1.5 0 001.5 1.5h11A1.5 1.5 0 0019 19v-6.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
  copy:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 012-2h8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'};
-const STATUS={done:"Получилось ✓",plan:"В плане",want:"Хочу попробовать"};
-const FILTERS=[["all","Все"],["done","Получилось"],["plan","В плане"],["want","Хочу попробовать"]];
+const STATUS={done:"Получилось ✓",want:"Хочу попробовать"};
+const SORD={done:0,want:1};const sOrd=r=>SORD[r.status]??2;
+const FILTERS=[["all","Все"],["done","Получилось"],["want","Хочу попробовать"]];
 let hideStd=false,onlyGentle=false,importing=null;try{hideStd=localStorage.getItem("hideStd")==="1";onlyGentle=localStorage.getItem("onlyGentle")==="1"}catch(e){}
 let planQ="",planHelp=false;
 let editOn=false, focusAfter=null, pendingRender=false, showUrl=false, moreOpen=false, justCopied=null;
@@ -721,7 +724,7 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
   view.querySelectorAll("[data-opt]").forEach(cb=>cb.onchange=async()=>{const s=new Set(plan.opt||[]);cb.checked?s.add(cb.dataset.opt):s.delete(cb.dataset.opt);plan={...plan,opt:[...s]};render();await savePlan(plan)});
   view.querySelectorAll("ul.shop input[data-k]").forEach(cb=>cb.onchange=async()=>{const k=cb.dataset.k,g=list.find(x=>x.key===k);if(g&&g.staple){const n=new Set(plan.need||[]);cb.checked?n.delete(k):n.add(k);plan={...plan,need:[...n]}}else{const s=new Set(plan.have||[]);cb.checked?s.add(k):s.delete(k);plan={...plan,have:[...s]}}cb.closest("li").classList.toggle("have",cb.checked);await savePlan(plan)});
 }
-function chipsHtml(){const counts={all:recipes.length,done:0,plan:0,want:0};recipes.forEach(r=>{if(counts[r.status]!=null)counts[r.status]++});
+function chipsHtml(){const counts={all:recipes.length,done:0,want:0};recipes.forEach(r=>{if(counts[r.status]!=null)counts[r.status]++});
   return `<div class="chips" role="group" aria-label="Фильтр">${FILTERS.map(([k,l])=>`<button class="chip" type="button" data-f="${k}" aria-pressed="${filter===k}">${l} <span class="n">${counts[k]}</span></button>`).join("")}${filter!=="week"?`<button class="chip gentle" type="button" id="genT" aria-pressed="${onlyGentle}">🌿 Бережно для желудка <span class="n">${recipes.filter(r=>r.gentle).length}</span></button><button class="chip std" type="button" id="stdT" aria-pressed="${hideStd}">${hideStd?"Базовые скрыты":"Скрыть базовые"} <span class="n">${recipes.filter(r=>r.standard).length}</span></button>`:""}</div>`}
 function bindChips(){view.querySelectorAll(".chip[data-f]").forEach(b=>b.onclick=()=>{filter=b.dataset.f;render()});const g=document.getElementById("genT");if(g)g.onclick=()=>{onlyGentle=!onlyGentle;try{localStorage.setItem("onlyGentle",onlyGentle?"1":"0")}catch(e){}render()};const t=document.getElementById("stdT");if(t)t.onclick=()=>{hideStd=!hideStd;try{localStorage.setItem("hideStd",hideStd?"1":"0")}catch(e){}render()}}
 /* the big featured card shows more of the recipe: key facts, products and the course of the steps */
@@ -781,7 +784,7 @@ function weekView(pd,own){const sl=pd.slots||{},t=id=>{const r=recipes.find(x=>x
   if(!days.length&&!favs.length)return own?`<p class="muted" style="margin:0">Меню пока пустое.</p><button class="btn link" type="button" data-goweek style="padding:4px 0">Составить меню →</button>`:`<p class="muted" style="margin:0">На этой неделе пока ничего не запланировано.</p>`;
   return `${days.length?`<div class="wdays">${days.join("")}</div>`:""}${favs.length?`<p class="wfav"><span class="muted">Хочется попробовать:</span> ${favs.join(" · ")}</p>`:""}${own?`<button class="btn link" type="button" data-goweek style="padding:8px 0 0">Открыть меню и покупки →</button>`:""}`}
 function renderPerson(uid){const p=profileOf(uid),pr=(typeof PROFILES!=="undefined"&&PROFILES[uid])||{},me=meNow();
-  const mine=recipes.filter(r=>r.owner===uid).sort((a,b)=>({plan:0,done:1,want:2}[a.status]-({plan:0,done:1,want:2}[b.status]))||String(a.title).localeCompare(b.title,"ru"));
+  const mine=recipes.filter(r=>r.owner===uid).sort((a,b)=>(sOrd(a)-sOrd(b))||String(a.title).localeCompare(b.title,"ru"));
   const done=mine.filter(r=>r.status==="done").length;let wk;
   if(!me)wk=`<p class="muted" style="margin:0 0 10px">Меню на неделю видят только друзья, которые вошли.</p><button class="btn primary" type="button" id="pLogin">Войти</button>`;
   else if(uid===me)wk=weekView(plan,true);
@@ -801,17 +804,18 @@ function renderPerson(uid){const p=profileOf(uid),pr=(typeof PROFILES!=="undefin
   view.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{if(db)togglePlan(b.dataset.plan)})}
 /* ---- быстрые метки: статус и флаги меняются прямо на карточке и в рецепте ---- */
 const FLAGS=[["gentle","🌿 бережно"],["easy","лёгкий"],["standard","базовый"]];
-function pillHtml(r,inCard){const mine=!!db&&meNow()&&r.owner===meNow();const t=STATUS[r.status]||"";
-  if(!mine)return `<span class="pill ${esc(r.status)}">${t}</span>`;
+function pillHtml(r,inCard){const mine=!!db&&meNow()&&r.owner===meNow();let t=STATUS[r.status]||"";
+  if(!mine)return t?`<span class="pill ${esc(r.status)}">${t}</span>`:"";
+  if(!t){r={...r,status:"none"};t="＋ статус"}
   return inCard?`<span class="pill ${esc(r.status)} tagbtn" role="button" tabindex="0" data-tagsfor="${esc(r.id)}" title="Изменить метки" aria-haspopup="dialog">${t}</span>`
     :`<button type="button" class="pill ${esc(r.status)} tagbtn" data-tagsfor="${esc(r.id)}" title="Изменить метки" aria-haspopup="dialog">${t}</button>`}
 let tagPop=null;
 function closeTags(){if(tagPop){tagPop.remove();tagPop=null}}
 function openTags(anchor,id){closeTags();const r=recipesRU.find(x=>x.id===id);if(!r)return;
   const el=document.createElement("div");el.className="tagpop";el.setAttribute("role","dialog");el.setAttribute("aria-label","Метки рецепта");
-  const draw=()=>{const cur=recipesRU.find(x=>x.id===id)||r;el.innerHTML=`<p>Статус</p><div class="row">${Object.entries(STATUS).map(([k,v])=>`<button type="button" class="pill ${k}" data-st="${k}" aria-pressed="${cur.status===k}">${v}</button>`).join("")}</div>
+  const draw=()=>{const cur=recipesRU.find(x=>x.id===id)||r;el.innerHTML=`<p>Статус</p><div class="row">${Object.entries(STATUS).map(([k,v])=>`<button type="button" class="pill ${k}" data-st="${k}" aria-pressed="${cur.status===k}">${v}</button>`).join("")}<button type="button" class="pill none" data-st="" aria-pressed="${!STATUS[cur.status]}">Без статуса</button></div>
     <p>Метки</p><div class="row">${FLAGS.map(([k,v])=>`<button type="button" data-fl="${k}" aria-pressed="${!!cur[k]}">${v}</button>`).join("")}</div>`;
-    el.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>save({status:b.dataset.st}));
+    el.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{const c=recipesRU.find(x=>x.id===id)||r;save({status:b.dataset.st&&c.status===b.dataset.st?"":b.dataset.st})});
     el.querySelectorAll("[data-fl]").forEach(b=>b.onclick=()=>{const c=recipesRU.find(x=>x.id===id)||r;save({[b.dataset.fl]:!c[b.dataset.fl]})})};
   const save=async upd=>{const c=recipesRU.find(x=>x.id===id);if(c)Object.assign(c,upd);draw();
     try{await db.collection("recipes").doc(id).update(upd);toast("Сохранено ✓")}catch(e){toast("Не получилось сохранить")}};
@@ -837,7 +841,7 @@ function cardHtml(r,ix,feat,hm,showBy){return `
 function renderList(){
   if(filter==="week") return renderPlan();
   let list=recipes.filter(r=>(filter==="all"||r.status===filter)&&!(hideStd&&r.standard)&&!(onlyGentle&&!r.gentle))
-    .sort((a,b)=>({plan:0,done:1,want:2}[a.status]-({plan:0,done:1,want:2}[b.status]))||String(a.title).localeCompare(b.title,"ru"));
+    .sort((a,b)=>(sOrd(a)-sOrd(b))||String(a.title).localeCompare(b.title,"ru"));
   const hm={};if(have.length){const need=Math.min(2,have.length);list.forEach(r=>hm[r.id]=haveMatch(r));
     list=list.filter(r=>hm[r.id].got.length>=need).sort((a,b)=>(hm[b.id].got.length-hm[a.id].got.length)||(hm[a.id].missing.length-hm[b.id].missing.length))}
   view.innerHTML=peopleRow()+haveBar()+chipsHtml()+(onlyGentle?'<p class="hint2" style="margin:-10px 0 16px">🌿 Запечённое или варёное, мало жира, без острого, мало кислого и сырого лука/чеснока. Это общие правила, а не медицинский совет: ориентируйся на то, как реагирует желудок.</p>':"")+
@@ -903,7 +907,7 @@ function renderSheet(r){
       ${canUp&&r.photo&&editOn?`<span class="phbtns"><label class="btn">${IC.cam} Заменить<input type="file" accept="image/*" data-mp hidden></label></span>`:""}</div>
     <div class="tile info">
       <div class="ract">${canW?`<button class="iconbtn${editOn?" on":""}" type="button" id="editBtn" title="${editOn?"Готово":"Изменить"}" aria-label="${editOn?"Готово":"Изменить"}" aria-pressed="${editOn}">${IC.edit}</button>`:""}<button class="iconbtn" type="button" id="shareBtn" title="Поделиться" aria-label="Поделиться">${IC.share}</button><button class="iconbtn" type="button" id="moreBtn" title="Ещё" aria-label="Ещё" aria-haspopup="menu" aria-expanded="${moreOpen}">⋯</button>
-        ${moreOpen?`<div class="rmenu" role="menu"><button type="button" role="menuitem" data-ma="copy">📋 Сделать копию${canW?"":" — чтобы изменить"}</button><button type="button" role="menuitem" data-ma="fav">${inPlan(r.id)?"★ Убрать из избранного недели":"☆ В избранное недели"}</button>${canW?`<p class="rmsep">Статус</p>${Object.entries(STATUS).map(([k,v])=>`<button type="button" role="menuitemradio" aria-checked="${r.status===k}" data-ma="st:${k}"><span class="ck">${r.status===k?"✓":""}</span>${v}</button>`).join("")}`:""}</div>`:""}</div>
+        ${moreOpen?`<div class="rmenu" role="menu"><button type="button" role="menuitem" data-ma="copy">📋 Сделать копию${canW?"":" — чтобы изменить"}</button><button type="button" role="menuitem" data-ma="fav">${inPlan(r.id)?"★ Убрать из избранного недели":"☆ В избранное недели"}</button>${canW?`<p class="rmsep">Статус</p>${[...Object.entries(STATUS),["","Без статуса"]].map(([k,v])=>{const on=(STATUS[r.status]?r.status:"")===k;return `<button type="button" role="menuitemradio" aria-checked="${on}" data-ma="st:${k}"><span class="ck">${on?"✓":""}</span>${v}</button>`}).join("")}`:""}</div>`:""}</div>
       <div class="meta">${pillHtml(r,false)}${r.gentle?'<span class="tag">🌿 бережно</span>':""}${r.standard?'<span class="tag">базовый</span>':""}${r.easy?'<span class="tag">лёгкий</span>':""}${r.servings||editOn?`<span class="tag"${ed("servings","порции")}>${esc(r.servings||"")}</span>`:""}${r.time||editOn?`<span class="tag">⏱ <span${ed("time","время")}>${esc(r.time||"")}</span></span>`:""}</div>
       <h2${ed("title","Название")}>${esc(r.title)}</h2>
       ${EN&&r._untr&&/[а-яё]/i.test(r.title||"")?`<p class="untr" data-nt>This recipe has no English version yet. <a href="https://translate.google.com/?sl=ru&tl=en&op=translate&text=${encodeURIComponent(recipeText(r).slice(0,4500))}" target="_blank" rel="noopener">Open it in Google Translate ↗</a></p>`:""}
@@ -1099,7 +1103,7 @@ function renderForm(r){
     <h2>${isNew?"Новый рецепт":"Изменить рецепт"}</h2>
     <div class="row">
       <label for="f_title">Название<input id="f_title" required value="${esc(r.title||"")}"></label>
-      <label for="f_status">Статус<select id="f_status">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${(r.status||"want")===k?"selected":""}>${v}</option>`).join("")}</select></label>
+      <label for="f_status">Статус<select id="f_status">${[...Object.entries(STATUS),["","Без статуса"]].map(([k,v])=>`<option value="${k}" ${(r.status||"")===k?"selected":""}>${v}</option>`).join("")}</select></label>
     </div>
     <div class="row">
       <label for="f_video">Ссылка на видео<input id="f_video" type="url" placeholder="https://…" value="${esc(r.video||"")}"></label>
@@ -1244,6 +1248,6 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
 };
 async function newRecipe(){try{toast("Создаю рецепт…");const ref=await db.collection("recipes").add({title:"Новый рецепт",status:"want",serves:2,ingredients:[],steps:[],stepTitles:[],tips:[],source:"",video:"",recipeUrl:"",photo:""});justCopied=ref.id;openId=ref.id;filter="all";render();window.scrollTo(0,0)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
 </script>
-<script src="backend.js?v=202610242015"></script>
+<script src="backend.js?v=202610242022"></script>
 
 </body></html>
