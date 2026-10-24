@@ -754,7 +754,7 @@ function recipeText(r){const L=[r.title||"Рецепт",""];const ing=(r.ingredi
   if((r.steps||[]).length){L.push("","Шаги:");r.steps.forEach((s,n)=>{const t=stepTitle(r,n);L.push((n+1)+". "+(t?t+": ":"")+s)})}
   if(r.video)L.push("","Видео: "+r.video);if(r.recipeUrl)L.push("Рецепт: "+r.recipeUrl);return L.join("\n")}
 async function shareRecipe(r){const url=location.origin+location.pathname+"#"+encodeURIComponent(r.id);
-  try{if(navigator.share){await navigator.share({title:r.title,text:r.title+" — рецепт на «Готовлю как умею»",url});return}}catch(e){if(e&&e.name==="AbortError")return}
+  try{if(navigator.share&&matchMedia("(pointer:coarse)").matches){await navigator.share({title:r.title,text:r.title+" — рецепт на «Готовлю как умею»",url});return}}catch(e){if(e&&e.name==="AbortError")return}
   try{await navigator.clipboard.writeText(url);toast("Ссылка на рецепт скопирована")}catch(e){prompt("Скопируй ссылку:",url)}}
 async function copyRecipe(r){if(!db)return;const keep=["ingredients","steps","stepTitles","stepPhotos","photo","ingPhoto","tips","oven","ovenNote","servings","time","before","done","storage","notes","video","recipeUrl","easy","gentle","gallery","source"];
   const d={};keep.forEach(k=>{if(r[k]!==undefined)d[k]=r[k]});d.title=(r.title||"Рецепт")+" (копия)";d.status="want";d.copiedFrom=r.id;
