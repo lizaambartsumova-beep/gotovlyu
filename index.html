@@ -746,7 +746,7 @@ function featDetails(r){const ing=(r.ingredients||[]).map(normIng).filter(i=>!i.
 const personPlans={};
 const meNow=()=>(typeof ME!=="undefined"&&ME)?ME.id:null;
 function pl(n,f){const a=n%10,b=n%100;return f[a===1&&b!==11?0:a>=2&&a<=4&&(b<10||b>=20)?1:2]}
-function peopleList(){const me=meNow();const ids=[...new Set(recipes.map(r=>r.owner).filter(Boolean))];if(me&&!ids.includes(me))ids.push(me);return ids.sort((a,b)=>(b===me)-(a===me))}
+function peopleList(){const me=meNow();const cnt={};recipes.forEach(r=>{if(r.owner)cnt[r.owner]=(cnt[r.owner]||0)+1});const ids=[...new Set([...Object.keys(cnt),...(typeof PROFILES!=="undefined"?Object.keys(PROFILES).filter(id=>PROFILES[id]&&PROFILES[id].name):[])])];if(me&&!ids.includes(me))ids.push(me);return ids.sort((a,b)=>((b===me)-(a===me))||((cnt[b]||0)-(cnt[a]||0)))}
 function byMini(r){if(!r.owner||typeof profileOf!=="function")return"";const p=profileOf(r.owner);return `<span class="cby"><img class="av" src="${esc(p.avatarUrl)}" alt="">${esc(p.name||"друг")}</span>`}
 function peopleRow(){if(typeof profileOf!=="function")return"";const ids=peopleList();if(!ids.length)return"";
   return `<div class="people" aria-label="Чьи рецепты">${ids.map(id=>{const p=profileOf(id);return `<button type="button" class="pp" data-person="${esc(id)}" title="Страничка: ${esc(p.name||"друг")}"><img src="${esc(p.avatarUrl)}" alt=""><span>${esc(p.name||"друг")}</span></button>`}).join("")}${ids.length<4?`<button type="button" class="pp inv" id="invBtn" title="Скопировать ссылку на сайт"><span class="plus">+</span><span>Позвать</span></button>`:""}</div>`}

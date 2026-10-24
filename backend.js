@@ -252,6 +252,8 @@ async function startWith(session) {
   try { await loadProfiles(); } catch (e) {}
   PROFILE = ME ? (PROFILES[ME.id] || { id: ME.id, name: (ME.user_metadata || {}).name || "", people: 2, country: "", currency: "EUR" }) : null;
   drawProfBtn();
+  /* новые друзья появляются сразу, без перезагрузки */
+  live("profiles", null, loadProfiles, () => { if (typeof render === "function") render(); }, () => {});
   window.__startApp({ db: sbDb, assets: ME ? assetsApi : null, sample: null, who: ME ? whoApi : guestWho });
   if (!ME) { const ib = document.getElementById("impBtn"); if (ib) ib.hidden = true; }
 }
