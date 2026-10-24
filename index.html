@@ -1,31 +1,1128 @@
-<!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Готовлю как умею</title>
+<meta name="description" content="Рецепты, меню на неделю и список покупок — вместе с друзьями.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;600&family=Unbounded:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;600;700&display=swap">
 <style>
-:root{--bg:#FAF7F1;--paper:#fff;--ink:#252525;--muted:#6F6A60;--coral:#F04D36}
-@media (prefers-color-scheme:dark){:root{--bg:#171614;--paper:#211F1C;--ink:#F2EEE6;--muted:#ABA497;--coral:#FF6A52}}
+/* Layout: calm bento — soft white tiles on a light warm ground; a recipe opens as a grid of tiles: photo, info, oven plate, products, visual steps */
+:root{
+  --bg:#FAF7F1; --paper:#FFFFFF; --soft:#F4EFE5; --ink:#252525; --muted:#6F6A60; --line:#E9E2D4;
+  --coral:#F04D36; --coral-ink:#FFFFFF; --coral-soft:#FDE5E0; --coral-text:#B32E1B;
+  --lime:#E6FF56; --lime-soft:#F1F9CC; --lime-text:#4A5800;
+  --sun:#F8D85B; --sun-soft:#FCF1C6; --sun-text:#765500;
+  --bad:#C4321F; --bad-soft:#FDE8E4;
+  --oven-bg:#252525; --oven-ink:#FAF7F1; --oven-num:#F8D85B;
+  --display:"Unbounded","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r-lg:26px; --r-md:18px; --r-sm:12px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#171614; --paper:#211F1C; --soft:#2A2723; --ink:#F2EEE6; --muted:#ABA497; --line:#38332D;
+  --coral:#FF6A52; --coral-ink:#1A0B07; --coral-soft:#3B201A; --coral-text:#FF9F8C;
+  --lime:#E6FF56; --lime-soft:#2B3214; --lime-text:#DAF36C;
+  --sun:#F8D85B; --sun-soft:#383017; --sun-text:#F4D46C;
+  --bad:#FF8A78; --bad-soft:#3A1E19;
+  --oven-bg:#0D0C0B; --oven-ink:#F2EEE6; --oven-num:#F8D85B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#171614; --paper:#211F1C; --soft:#2A2723; --ink:#F2EEE6; --muted:#ABA497; --line:#38332D;
+  --coral:#FF6A52; --coral-ink:#1A0B07; --coral-soft:#3B201A; --coral-text:#FF9F8C;
+  --lime:#E6FF56; --lime-soft:#2B3214; --lime-text:#DAF36C;
+  --sun:#F8D85B; --sun-soft:#383017; --sun-text:#F4D46C;
+  --bad:#FF8A78; --bad-soft:#3A1E19;
+  --oven-bg:#0D0C0B; --oven-ink:#F2EEE6; --oven-num:#F8D85B; color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font-family:"Onest",system-ui,sans-serif;padding:24px}
-main{max-width:560px;text-align:center}
-h1{font-family:"Unbounded",system-ui,sans-serif;font-size:clamp(2rem,7vw,3rem);margin:0 0 12px;display:inline-flex;gap:.3em;align-items:center}
-h1 svg{width:.95em;height:.84em;color:var(--coral)}
-.smoke{opacity:.55;animation:puff 2.4s ease-in-out infinite}
-@keyframes puff{50%{transform:translateY(-1.5px);opacity:.25}}
-@media (prefers-reduced-motion:reduce){.smoke{animation:none}}
-p{color:var(--muted);font-size:1.05rem;line-height:1.55;margin:0 0 8px}
-.soon{display:inline-block;margin-top:18px;background:var(--paper);border-radius:999px;padding:10px 20px;font-weight:600}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:1120px;margin:0 auto;padding-block:36px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.12;font-weight:600}
+button,select,input,textarea{font:inherit;color:inherit}
+.muted{color:var(--muted)}
+.hint2{font-size:.9rem;color:var(--muted);margin:0}
+.label{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 12px}
+:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+
+/* auth + profile */
+.auth{display:flex;flex-direction:column;gap:14px;background:var(--paper);border-radius:var(--r-lg);padding:28px;max-width:440px;margin:0 auto}
+.auth .seg{align-self:flex-start;background:var(--soft);margin:0}
+.auth label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.9rem;flex:1;min-width:0}
+.auth input,.auth select{border:1.5px solid transparent;border-radius:var(--r-sm);padding:11px 13px;background:var(--soft);font-weight:400;width:100%}
+.auth input:focus,.auth select:focus{border-color:var(--ink);outline:none}
+.auth .arow{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.aerr{margin:0;color:var(--bad);font-size:.9rem;min-height:1em}
+.pov{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px}
+.ppanel{width:100%;max-height:90vh;overflow:auto}
+.ppanel h2{font-size:1.4rem}
+.hbtns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.profbtn{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--paper);border-radius:999px;padding:5px 14px 5px 5px;cursor:pointer;font-weight:600;color:var(--ink)}
+.profbtn .av{width:32px;height:32px;border-radius:50%}
+.byline{margin:0;display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted)}
+.byline .av{width:24px;height:24px;border-radius:50%}
+.byline b{color:var(--ink)}
+/* header */
+header.top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;margin-bottom:28px}
+header.top h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:.3em}
+header.top h1 .star{width:.62em;height:.62em;color:var(--coral);flex:none}
+header.top h1 .pan{width:.95em;height:.84em}
+header.top h1 .pan .smoke{opacity:.55;animation:puff 2.4s ease-in-out infinite}
+@keyframes puff{0%,100%{transform:translateY(0);opacity:.55}50%{transform:translateY(-1.5px);opacity:.25}}
+@media (prefers-reduced-motion:reduce){header.top h1 .pan .smoke{animation:none}}
+header.top p{margin:8px 0 0;color:var(--muted);max-width:46ch}
+
+/* buttons */
+.btn{border:0;background:var(--soft);color:var(--ink);border-radius:999px;padding:10px 18px;font-weight:600;font-size:.95rem;cursor:pointer;display:inline-flex;gap:8px;align-items:center;text-decoration:none;transition:background .15s ease,transform .1s ease}
+.btn:hover{background:var(--line)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{background:var(--ink);opacity:.88}
+.btn.video{background:var(--coral);color:var(--coral-ink)}
+.btn.video:hover{background:var(--coral);opacity:.9}
+.btn.on{background:var(--sun-soft);color:var(--sun-text)}
+.btn.back{background:none;padding:6px 2px;color:var(--muted);margin-bottom:16px}
+.btn.back:hover{color:var(--ink);background:none}
+.btn.link{background:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:8px 6px}
+.btn.link:hover{color:var(--ink);background:none}
+.btn svg{flex:none}
+header.top .btn.primary{padding:13px 22px;font-size:1rem}
+
+/* main tabs: both identical */
+.seg{display:inline-flex;gap:6px;padding:6px;background:var(--paper);border-radius:999px;margin:0 0 22px;max-width:100%}
+.seg button{border:0;background:none;color:var(--muted);border-radius:999px;padding:10px 20px;font-weight:600;font-size:1rem;cursor:pointer;display:inline-flex;gap:10px;align-items:center;white-space:nowrap;transition:background .15s ease,color .15s ease}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-current="page"]{background:var(--ink);color:var(--paper)}
+.seg .cnt{font-size:.78rem;font-weight:700;font-variant-numeric:tabular-nums;min-width:24px;height:24px;border-radius:999px;display:inline-grid;place-items:center;padding:0 7px;background:var(--soft);color:var(--muted)}
+.seg button[aria-current="page"] .cnt{background:var(--lime);color:#252525}
+@media (max-width:480px){.seg{display:flex}.seg button{flex:1;justify-content:center;padding:10px 8px}}
+
+/* filter chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.chip{border:0;background:var(--paper);border-radius:999px;padding:8px 15px;cursor:pointer;font-weight:500;font-size:.92rem;display:inline-flex;gap:8px;align-items:center;color:var(--ink)}
+.chip:hover{background:var(--soft)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.chip .n{font-size:.8rem;opacity:.6;font-variant-numeric:tabular-nums}
+.chip.gentle[aria-pressed="true"]{background:var(--lime-soft);color:var(--lime-text)}
+.chip.std[aria-pressed="true"]{background:var(--sun-soft);color:var(--sun-text)}
+
+/* recipe grid (bento) */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;grid-auto-flow:dense}
+.card{position:relative;background:var(--paper);border-radius:var(--r-lg);padding:10px;display:flex;flex-direction:column;transition:transform .2s ease}
+.card:hover{transform:translateY(-3px)}
+.card .open{all:unset;display:flex;flex-direction:column;cursor:pointer;flex:1;border-radius:var(--r-md)}
+.card .open:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.ph{aspect-ratio:4/3;max-width:100%;width:100%;background:var(--soft);display:grid;place-items:center;overflow:hidden;border-radius:var(--r-md)}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph .glyph{font-family:var(--display);font-size:3rem;font-weight:700;color:var(--muted);opacity:.35}
+.card .body{padding:12px 8px 8px;display:flex;flex-direction:column;gap:8px;flex:1;min-width:0}
+.card h3{font-family:var(--body);font-size:1.15rem;font-weight:600;line-height:1.25}
+.ph.noph{background:linear-gradient(135deg,var(--lime-soft),var(--sun-soft))}
+.havebar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0 0 12px}
+.havelab{font-weight:600;font-size:.95rem;display:inline-flex;gap:6px;align-items:center}
+.havebox{flex:1;min-width:240px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--paper);border-radius:999px;padding:6px 8px 6px 14px;border:1.5px solid transparent}
+.havebox:focus-within{border-color:var(--ink)}
+.havebox input{flex:1;min-width:140px;border:0;background:none;padding:6px 4px;font-size:.95rem}
+.havebox input:focus{outline:none}
+.hchip{display:inline-flex;align-items:center;gap:4px;background:var(--ink);color:var(--paper);border-radius:999px;padding:4px 6px 4px 12px;font-size:.88rem;font-weight:600}
+.hchip button{border:0;background:none;color:inherit;cursor:pointer;font-size:.75rem;opacity:.8;padding:2px 4px}
+.havehint{margin:-4px 0 14px}
+.ingline.hv{white-space:normal;color:var(--ink)}
+.ingline{margin:0;font-size:.86rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fht{margin:0;font-size:.92rem;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.fvid{position:absolute;top:20px;left:20px;z-index:2;display:inline-flex;gap:6px;align-items:center;background:var(--paper);color:var(--ink);border-radius:999px;padding:8px 14px;font-weight:600;font-size:.9rem;text-decoration:none;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.fvid:hover{background:var(--soft)}
+.note.health{background:var(--lime-soft)}
+.note.health b{color:var(--lime-text)}
+.fdesc{margin:0;font-size:.92rem;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.finfo{display:flex;flex-wrap:wrap;gap:6px}
+.finfo span{font-size:.82rem;background:var(--soft);border-radius:999px;padding:4px 10px;font-variant-numeric:tabular-nums}
+.fblock{display:flex;flex-direction:column;gap:6px;min-width:0}
+.flab{margin:4px 0 0;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fchips{display:flex;flex-wrap:wrap;gap:5px}
+.fchips span{font-size:.84rem;border:1.5px solid var(--line);border-radius:999px;padding:2px 10px}
+.fchips .more{color:var(--muted);border-style:dashed}
+ol.fsteps{margin:0;padding:0;list-style:none;counter-reset:fs;display:flex;flex-direction:column;gap:4px}
+ol.fsteps li{counter-increment:fs;display:flex;gap:8px;align-items:center;font-size:.9rem;min-width:0}
+ol.fsteps li::before{content:counter(fs);flex:none;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:.7rem;font-weight:700}
+.fmore{margin:0 0 0 28px;font-size:.82rem;color:var(--muted)}
+@media (min-width:680px){
+  .card.feat{grid-column:span 2;grid-row:span 2}
+  .card.feat .ph{aspect-ratio:auto;flex:1;min-height:240px}
+  .card.feat .body{gap:12px;flex:none;padding:16px 12px 12px}
+  .card.feat .fdesc,.card.feat .fht{font-size:1rem}
+  .card.feat .fchips span{font-size:.9rem;padding:3px 12px}
+  .card.feat .flab{font-size:.74rem}
+  .card.feat h3{font-family:var(--display);font-size:1.5rem;font-weight:600}
+}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pill{font-size:.78rem;font-weight:600;border-radius:999px;padding:3px 10px}
+.pill.done{background:var(--lime-soft);color:var(--lime-text)}
+.pill.plan{background:var(--sun-soft);color:var(--sun-text)}
+.pill.want{background:var(--coral-soft);color:var(--coral-text)}
+.tag{font-size:.78rem;color:var(--muted);background:var(--soft);border-radius:999px;padding:3px 10px}
+.ovenline{font-size:.86rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.favbtn{position:absolute;top:20px;right:20px;width:40px;height:40px;border-radius:50%;border:0;background:var(--paper);color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.favbtn.on{background:var(--sun);color:#252525}
+.empty{padding:48px 20px;text-align:center;color:var(--muted);background:var(--paper);border-radius:var(--r-lg)}
+
+/* recipe sheet (bento tiles) */
+.sheet{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;align-items:start}
+.tile{background:var(--paper);border-radius:var(--r-lg);padding:24px;min-width:0}
+.tile.photo{grid-column:span 3;grid-row:span 2;align-self:stretch;padding:0;overflow:hidden;min-height:320px;background:var(--soft);display:grid;place-items:center}
+.tile.photo img{width:100%;height:100%;object-fit:cover}
+/* photo follows the height of the info + oven tiles instead of stretching the row */
+.tile.photo{position:relative;min-height:240px}
+.tile.photo img{position:absolute;inset:0;display:block}
+.tile.photo .glyph{font-family:var(--display);font-size:5rem;font-weight:700;color:var(--muted);opacity:.3}
+.tile.info{grid-column:span 3;display:flex;flex-direction:column;gap:14px}
+.sheet:not(:has(.oven)) .tile.info{grid-row:span 2;align-self:stretch}
+.tile.info h2{font-size:clamp(1.5rem,3.4vw,2.2rem)}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.tile.oven{grid-column:span 3;background:var(--oven-bg);color:var(--oven-ink);display:flex;flex-direction:column;gap:6px}
+.tile.oven .ol{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;opacity:.7;font-weight:600}
+.tile.oven b{font-family:var(--display);font-size:clamp(1.6rem,4vw,2.3rem);font-weight:600;color:var(--oven-num);font-variant-numeric:tabular-nums;line-height:1.15}
+.tile.oven small{font-size:.92rem;opacity:.85}
+.col.side{grid-column:span 2;display:flex;flex-direction:column;gap:14px;min-width:0}
+.steps-tile{grid-column:span 4}
+.gallery,.tools{grid-column:1/-1}
+@media (max-width:820px){
+  .sheet{grid-template-columns:minmax(0,1fr)}
+  .sheet>*{grid-column:1/-1!important;grid-row:auto!important}
+  .tile.photo{min-height:0;aspect-ratio:4/3;max-width:100%}
+}
+ul.ing{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+/* products: main line = name + amount; second line = German name, notes, "optional" — always wraps, never pushes the layout */
+ul.ing li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 14px;align-items:start;padding:10px 0;border-bottom:1px solid var(--soft)}
+ul.ing li:last-child{border-bottom:0}
+ul.ing .nm{min-width:0;overflow-wrap:anywhere;font-weight:500;line-height:1.35}
+ul.ing .sub{display:block;font-size:.82rem;color:var(--muted);font-weight:400;line-height:1.35;margin-top:3px}
+ul.ing .sub i{font-style:normal}
+ul.ing .optp{display:inline-block;font-size:.72rem;font-weight:600;border-radius:999px;padding:1px 8px;background:var(--soft);color:var(--muted);margin-left:4px;vertical-align:1px}
+ul.ing .amt{text-align:right;max-width:8.5em;font-size:.93rem;font-weight:600;line-height:1.35;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+ul.ing .dots{display:flex;justify-content:flex-end;gap:3px;margin-top:5px;color:var(--muted)}
+ul.ing .dots svg{display:block}
+.ing-grp{margin:16px 0 2px;padding-top:12px;border-top:1px dashed var(--line)}
+.ing-grp .label{margin:0}
+.note{background:var(--soft);border-radius:var(--r-md);padding:16px 18px;font-size:.95rem}
+.note b{display:block;font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.note.blue{background:var(--paper)}
+.tips{background:var(--sun-soft);border-radius:var(--r-md);padding:16px 18px;font-size:.95rem}
+.tips b{display:block;font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sun-text)}
+.tips ul{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+
+/* visual steps */
+ol.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+ol.steps li{background:var(--soft);border-radius:var(--r-md);padding:10px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.sfig{position:relative}
+.sfig a{display:block;border-radius:var(--r-sm);overflow:hidden;aspect-ratio:4/3;max-width:100%}
+.sfig img{width:100%;height:100%;object-fit:cover;display:block}
+.sact{position:absolute;top:8px;width:34px;height:34px;border-radius:50%;border:0;background:var(--paper);color:var(--ink);display:grid;place-items:center;cursor:pointer;font-size:.85rem}
+label.sact{right:48px}
+button.sact.x{right:8px}
+.shead{display:flex;gap:10px;align-items:center;padding:2px 4px 0;min-width:0}
+.shead h4{margin:0;font-family:var(--display);font-size:1.02rem;font-weight:600;line-height:1.2;overflow-wrap:anywhere;min-width:0}
+.sdesc{margin:0;padding:0 4px 4px;font-size:.98rem;line-height:1.5}
+.shead .num{flex:none;width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-family:var(--display);font-size:.88rem;font-weight:600}
+.stxt p{margin:4px 0 0;font-size:1rem}
+.sadd{align-self:flex-start;margin:0 4px 4px;display:inline-flex;gap:6px;align-items:center;font-size:.84rem;font-weight:600;color:var(--muted);border:1.5px dashed var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;background:var(--paper)}
+.sadd:hover{color:var(--ink);border-color:var(--ink)}
+ol.steps li{position:relative}
+ol.steps.pastable li{cursor:pointer;transition:box-shadow .15s ease}
+ol.steps.pastable li:hover{box-shadow:inset 0 0 0 1.5px var(--line)}
+ol.steps li.pt,.tile.photo.pt{box-shadow:0 0 0 2.5px var(--ink)!important}
+ol.steps li.pt .sadd{border-color:var(--ink);color:var(--ink)}
+.ptchip{display:none}
+.pt>.ptchip{display:inline-flex;position:absolute;top:10px;left:10px;z-index:2;background:var(--ink);color:var(--paper);font-size:.76rem;font-weight:600;border-radius:999px;padding:4px 10px;pointer-events:none}
+.tile.photo{cursor:default}
+.tile.photo .phadd{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--paper);z-index:2}
+.tile.photo .phbtns{position:absolute;bottom:12px;right:12px;display:flex;gap:6px;z-index:2}
+.tile.photo .phbtns .btn{background:var(--paper)}
+.editing .tile.photo{cursor:pointer}
+.tile.info{position:relative}
+.tile.info .meta{padding-right:130px}
+.ract{position:absolute;top:16px;right:16px;display:flex;gap:6px;z-index:4}
+.iconbtn{width:38px;height:38px;border-radius:50%;border:0;background:var(--soft);color:var(--ink);display:grid;place-items:center;cursor:pointer;font-size:1.15rem;line-height:1}
+.iconbtn:hover{background:var(--line)}
+.iconbtn.on{background:var(--ink);color:var(--paper)}
+.rmenu{position:absolute;top:46px;right:0;min-width:230px;background:var(--paper);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:6px;display:flex;flex-direction:column}
+.rmenu button{border:0;background:none;text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:500;display:flex;gap:6px;align-items:center}
+.rmenu button:hover{background:var(--soft)}
+.rmenu .ck{width:1em;display:inline-block}
+.rmsep{margin:6px 12px 2px;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;border-top:1px solid var(--soft);padding-top:8px}
+.copyof a{color:var(--ink);font-weight:600}
+.editbar{position:sticky;top:8px;z-index:6;display:flex;gap:10px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--ink);color:var(--paper);border-radius:var(--r-md);padding:10px 12px 10px 18px;margin-bottom:14px;font-size:.92rem}
+.editbar .eb-btns{display:flex;gap:6px;align-items:center}
+.editbar .btn.link{color:var(--paper);opacity:.85}
+.editbar .btn.primary{background:var(--lime);color:#252525}
+.editing [data-ed]{border-radius:6px;outline:1.5px dashed var(--line);outline-offset:3px;cursor:text;min-width:2ch;display:inline-block}
+.editing p[data-ed],.editing h2[data-ed],.editing h4[data-ed],.editing h5[data-ed],.editing b[data-ed],.editing small[data-ed],.editing .note>span[data-ed]{display:block}
+.editing [data-ed]:hover{outline-color:var(--muted)}
+.editing [data-ed]:focus{outline:2px solid var(--ink)}
+.editing .tile.oven [data-ed]:focus{outline-color:var(--oven-num)}
+.editing [data-ed]:empty::before{content:attr(data-ph);color:var(--muted);opacity:.75}
+.smove{display:inline-flex;gap:2px;margin-left:auto}
+.smove button{border:0;background:var(--paper);color:var(--ink);width:28px;height:28px;border-radius:8px;cursor:pointer;font-weight:700}
+.smove button:disabled{opacity:.3;cursor:default}
+.smove+.sdel{margin-left:2px}
+.srcline a{color:var(--ink);font-weight:600;text-underline-offset:3px;white-space:nowrap}
+.shead .sdel,.idel{margin-left:auto;border:0;background:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:2px 6px;border-radius:6px}
+.shead .sdel:hover,.idel:hover{color:var(--bad);background:var(--bad-soft)}
+.tcard{position:relative}.tcard .tdel{position:absolute;top:6px;right:6px}
+.addln{align-self:flex-start;padding:8px 2px;margin-top:6px}
+.elink{margin:0;font-size:.9rem;color:var(--muted);overflow-wrap:anywhere}
+.gal figure{position:relative}
+.ingph a img,.sfig a img{cursor:zoom-in}
+.gal .gimg{display:block;aspect-ratio:3/4;max-width:100%;border-radius:var(--r-md);overflow:hidden;background:var(--soft)}
+.gal .gimg img{width:100%;height:100%;object-fit:cover}
+.editing .tile.photo img[data-zoom],.editing .sfig img,.editing .ingph img{cursor:pointer}
+.lb{position:fixed;inset:0;z-index:50;background:rgba(10,10,10,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
+.lb[hidden]{display:none!important}
+.lbin{max-width:100%;max-height:calc(100% - 40px);overflow:auto;display:flex;align-items:center;justify-content:center}
+.lbin img{max-width:100%;max-height:calc(100vh - 90px);object-fit:contain;cursor:zoom-in;border-radius:8px;display:block}
+.lbin.z{align-items:flex-start;justify-content:flex-start}
+.lbin.z img{max-width:none;max-height:none;cursor:zoom-out}
+.lbx{position:absolute;top:max(14px,env(safe-area-inset-top));right:16px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;font-size:1.1rem;cursor:pointer}
+.lbhint{color:rgba(255,255,255,.6);font-size:.82rem;margin:10px 0 0}
+.ingph{position:relative;margin:0 0 22px;border-radius:var(--r-md);overflow:hidden;background:var(--soft)}
+.ingph a{display:block}
+.ingph img{display:block;width:100%;height:auto}
+.editing .ingph{cursor:pointer}
+.ingph.pt{box-shadow:0 0 0 2.5px var(--ink)}
+.sadd.ingadd{margin:0 0 18px}
+.galadd{min-height:120px;aspect-ratio:3/4;border-radius:var(--r-md);border:1.5px dashed var(--line);display:grid;place-items:center;align-content:center;gap:6px;color:var(--muted);cursor:pointer;font-weight:600}
+.pastehint{margin:-4px 0 12px}
+.photos h3{font-size:1.25rem}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.pth{background:var(--soft);border-radius:var(--r-md);padding:8px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.pth[data-pick]{cursor:pointer}
+.pth.pt{box-shadow:inset 0 0 0 2.5px var(--ink)}
+.pth img,.pth .pe{width:100%;aspect-ratio:4/3;max-width:100%;object-fit:cover;border-radius:var(--r-sm);display:grid;place-items:center;background:var(--paper);color:var(--muted)}
+.pth .pl2{font-size:.85rem;font-weight:600}
+.pth .pbtns{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.pth .pbtns .btn{padding:6px 12px;font-size:.84rem;background:var(--paper)}
+.pth .pbtns .btn.link{background:none;padding:6px 4px}
+.photos .addtile{width:auto;height:auto;min-height:120px;border-radius:var(--r-md);border:1.5px dashed var(--line);display:grid;place-items:center;color:var(--muted);cursor:pointer;font-weight:600;font-size:.9rem}
+.photos kbd{font:inherit;font-size:.8rem;font-weight:600;background:var(--soft);border-radius:6px;padding:1px 6px}
+.pastehint kbd{font:inherit;font-size:.8rem;font-weight:600;background:var(--soft);border-radius:6px;padding:1px 6px}
+
+.gallery{display:flex;flex-direction:column;gap:12px}
+/* "Получилось" + "Ожидание и реальность": shared notes from everyone the bank is shared with */
+.nsec{grid-column:span 3;display:flex;flex-direction:column;gap:14px}
+.nsec.win{background:var(--lime-soft)}
+.nsec.real{background:var(--coral-soft)}
+.nsec h3{font-family:var(--display);font-size:1.25rem;font-weight:600;display:flex;gap:10px;align-items:center}
+.nsec h3 .em{font-size:1.5rem;line-height:1}
+.nsec .sub0{margin:-6px 0 0;font-size:.92rem;color:var(--muted)}
+.nlist{display:flex;flex-direction:column;gap:12px}
+.post{background:var(--paper);border-radius:var(--r-md);display:flex;flex-direction:column;min-width:0;position:relative;overflow:hidden}
+.phd{display:flex;align-items:center;gap:10px;padding:10px 12px;min-width:0}
+.av{width:32px;height:32px;border-radius:50%;object-fit:cover;flex:none;background:var(--soft)}
+.av0{display:inline-block}
+.who{min-width:0;font-size:.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who .when{color:var(--muted)}
+.more{margin-left:auto;border:0;background:none;font-size:1.3rem;line-height:1;padding:4px 8px;cursor:pointer;color:var(--ink);border-radius:8px}
+.more:hover{background:var(--soft)}
+.sheetmenu{position:absolute;top:48px;right:10px;z-index:3;background:var(--paper);border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);display:flex;flex-direction:column;min-width:180px;overflow:hidden}
+.sheetmenu button{border:0;background:none;padding:12px 16px;text-align:center;cursor:pointer;font-weight:500;border-bottom:1px solid var(--soft)}
+.sheetmenu button:last-child{border-bottom:0}
+.sheetmenu .danger{color:var(--bad);font-weight:700}
+.pimg{display:block;aspect-ratio:1/1;max-width:100%;background:var(--soft)}
+.pimg img{width:100%;height:100%;object-fit:cover;display:block}
+.acts{display:flex;gap:6px;padding:6px 8px 0}
+.acts button{border:0;background:none;padding:6px;cursor:pointer;color:var(--ink);display:grid;place-items:center;border-radius:50%;transition:transform .12s ease}
+.acts button:active{transform:scale(.85)}
+.acts .lk.on{color:#ED4956;--hf:#ED4956}
+.lkn{margin:2px 14px 0;font-weight:700;font-size:.9rem}
+.cap{margin:4px 14px 0;font-size:.97rem;overflow-wrap:anywhere;white-space:pre-line}
+.post .why{margin:8px 14px 0;padding:10px 12px;border-radius:var(--r-sm);background:var(--sun-soft);font-size:.93rem;overflow-wrap:anywhere;white-space:pre-line}
+.post .why b{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sun-text);margin-bottom:2px}
+.allc{border:0;background:none;color:var(--muted);padding:6px 14px 0;text-align:left;cursor:pointer;font-size:.9rem}
+ul.cmts{list-style:none;margin:6px 0 0;padding:0 14px;display:flex;flex-direction:column;gap:8px}
+ul.cmts li{display:flex;gap:8px;align-items:flex-start;border-radius:10px;min-width:0}
+ul.cmts .av{width:24px;height:24px}
+ul.cmts li>div{min-width:0}
+ul.cmts p{margin:0;font-size:.93rem;overflow-wrap:anywhere}
+.cmeta{font-size:.76rem;color:var(--muted)}
+.cmeta button{border:0;background:none;padding:0;color:var(--muted);cursor:pointer;font-size:.76rem;font-weight:600}
+.cadd{display:flex;gap:8px;align-items:center;border-top:1px solid var(--soft);margin-top:10px;padding:8px 14px}
+.cadd input{flex:1;min-width:0;border:0;background:none;padding:6px 0;font-size:.93rem}
+.cadd input:focus{outline:none}
+.cadd button{border:0;background:none;color:#0095F6;font-weight:700;cursor:pointer;font-size:.9rem}
+.cadd button:disabled{opacity:.4;cursor:default}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--coral)}100%{box-shadow:0 0 0 3px transparent}}
+.flash{animation:flash 2s ease}
+.nhead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tipsec{display:flex;flex-direction:column;gap:10px}
+.tcards{display:flex;flex-direction:column;gap:8px}
+.tcard{background:var(--sun-soft);border-radius:var(--r-md);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tcard h5{margin:0;font-family:var(--display);font-size:.95rem;font-weight:600;color:var(--sun-text);overflow-wrap:anywhere}
+.tcard p{margin:0;font-size:.94rem;overflow-wrap:anywhere}
+.tcard.ai{background:var(--lime-soft)}
+.tcard.ai h5{color:var(--lime-text)}
+.tcard .aq{font-size:.85rem;color:var(--muted)}
+.tcard .aq a{color:var(--ink);font-weight:600}
+.tcard .aib{align-self:flex-start;font-size:.72rem;font-weight:600;border-radius:999px;padding:1px 8px;background:var(--paper);color:var(--lime-text)}
+.tips.ai{background:var(--lime-soft)}
+.tips.ai b{color:var(--lime-text)}
+.tips.ai .aq{display:block;font-size:.85rem;color:var(--muted);margin-top:2px}
+.tips.ai .aq a{color:var(--ink);font-weight:600}
+.ncard{background:var(--paper);border-radius:var(--r-md);padding:10px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ncard>a{display:block;border-radius:var(--r-sm);overflow:hidden;aspect-ratio:4/3;max-width:100%}
+.ncard>a img{width:100%;height:100%;object-fit:cover;display:block}
+.ncard .nt{margin:0;padding:0 4px;font-size:1rem;overflow-wrap:anywhere;white-space:pre-line}
+.ncard .why{margin:0 4px;padding:10px 12px;border-radius:var(--r-sm);background:var(--sun-soft);font-size:.94rem;overflow-wrap:anywhere;white-space:pre-line}
+.ncard .why b{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sun-text);margin-bottom:2px}
+.nfoot{display:flex;align-items:center;gap:8px;padding:0 4px 2px;font-size:.84rem;color:var(--muted);min-width:0}
+.nfoot img{width:24px;height:24px;border-radius:50%;object-fit:cover;flex:none}
+.nfoot .nm2{font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nfoot button{margin-left:auto;border:0;background:none;color:var(--muted);cursor:pointer;font-size:.84rem;text-decoration:underline;text-underline-offset:3px}
+.nempty{margin:0;font-size:.95rem;color:var(--muted)}
+.nform{background:var(--paper);border-radius:var(--r-md);padding:14px;display:flex;flex-direction:column;gap:10px}
+.nform label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.88rem}
+.nform textarea{border:1.5px solid transparent;border-radius:var(--r-sm);padding:10px 12px;background:var(--soft);min-height:76px;resize:vertical;width:100%;font-weight:400}
+.nform textarea:focus{border-color:var(--ink);outline:none}
+.nform .nph{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.nform .nph img{width:72px;height:72px;object-fit:cover;border-radius:var(--r-sm)}
+.nform .row3{display:flex;gap:8px;flex-wrap:wrap}
+.nadd{align-self:flex-start}
+.nsec .nadd{background:var(--ink);color:var(--paper)}
+.nsec .nadd:hover{background:var(--ink);opacity:.88}
+@media (max-width:820px){.nsec{grid-column:1/-1}}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gal figure{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.gal a{display:block;aspect-ratio:3/4;max-width:100%;border-radius:var(--r-md);overflow:hidden;background:var(--soft)}
+.gal img{width:100%;height:100%;object-fit:cover}
+.gal figcaption{font-size:.85rem;color:var(--muted)}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:16px 20px}
+.tools select{border:0;border-radius:999px;padding:10px 14px;background:var(--soft)}
+
+/* forms: edit + import */
+form.edit,.imp{display:grid;gap:16px;background:var(--paper);border-radius:var(--r-lg);padding:28px}
+form.edit h2,.imp h2{font-size:1.6rem}
+form.edit .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+form.edit label,.imp label,.fld{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:.9rem;min-width:0}
+form.edit input,form.edit textarea,form.edit select,.imp input,.imp textarea{border:1.5px solid transparent;border-radius:var(--r-sm);padding:11px 13px;background:var(--soft);font-weight:400;width:100%}
+form.edit input:focus,form.edit textarea:focus,.imp input:focus,.imp textarea:focus{border-color:var(--ink);outline:none}
+form.edit textarea{min-height:120px;resize:vertical}
+.imp textarea{min-height:150px}
+.hint{font-weight:400;color:var(--muted);font-size:.84rem}
+.drop{display:flex;flex-wrap:wrap;gap:12px;margin-top:4px}
+.drop .th{position:relative;width:96px;height:96px}
+.drop .th img{width:100%;height:100%;object-fit:cover;border-radius:var(--r-md)}
+.drop .th button{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:50%;border:0;background:var(--ink);color:var(--paper);cursor:pointer;font-size:.75rem}
+.imp .addtile{width:96px;height:96px;border-radius:var(--r-md);border:1.5px dashed var(--line);background:var(--soft);display:grid;place-items:center;align-content:center;gap:6px;color:var(--muted);cursor:pointer;font-weight:600;font-size:.82rem}
+.imp .addtile:hover{border-color:var(--ink);color:var(--ink)}
+.addtile .pl{width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center}
+
+/* week + shopping */
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:22px}
+@media (max-width:900px){.week{grid-template-columns:1fr}}
+.day{background:var(--paper);border-radius:var(--r-md);padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.day.today{box-shadow:inset 0 0 0 2px var(--ink)}
+.day h3{font-size:1rem;display:flex;justify-content:space-between;gap:6px;align-items:baseline}
+.day h3 small{font-family:var(--body);font-size:.78rem;color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+@media (max-width:900px){.day .slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}}
+.slot{border:1.5px dashed var(--line);border-radius:var(--r-sm);padding:7px;min-height:60px;display:flex;flex-direction:column;gap:5px;cursor:pointer;margin-bottom:6px;min-width:0}
+.slot .sl{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.slot.over,.slot.target{border-color:var(--ink);background:var(--lime-soft)}
+.chipr{display:flex;align-items:center;gap:6px;background:var(--soft);border-radius:10px;padding:4px 6px;font-size:.82rem;font-weight:600;cursor:grab;min-width:0}
+.chipr img,.chipr .mini{width:24px;height:24px;border-radius:7px;object-fit:cover;flex:none;background:var(--line);display:grid;place-items:center;font-size:.75rem;color:var(--muted)}
+.chipr span.n2{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chipr.sel{outline:2.5px solid var(--coral);outline-offset:1px}
+.chipr button{border:0;background:none;cursor:pointer;color:var(--muted);padding:0 2px;font-size:.9rem}
+.pool{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.phint{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.qbtn{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);color:var(--muted);font-weight:700;font-size:.78rem;cursor:pointer;line-height:1;display:inline-grid;place-items:center}
+.qbtn[aria-expanded="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.phelp{margin:4px 0 0;max-width:60ch}
+.ghost{display:flex;align-items:center;gap:6px;border:1.5px dashed var(--muted);border-radius:10px;padding:4px 6px;font-size:.82rem;font-weight:600;opacity:.55;min-width:0;pointer-events:none;animation:ghostdrop 3.2s ease-in-out infinite}
+.ghost img,.ghost .mini{width:24px;height:24px;border-radius:7px;object-fit:cover;flex:none;background:var(--line);display:grid;place-items:center;font-size:.75rem}
+.ghost .n2{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ghost .gtag{font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+@keyframes ghostdrop{0%{transform:translateY(-26px);opacity:0}25%{transform:translateY(0);opacity:.6}75%{transform:translateY(0);opacity:.6}100%{transform:translateY(0);opacity:0}}
+@media (prefers-reduced-motion:reduce){.ghost{animation:none}}
+.ingh{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.stp{display:inline-flex;align-items:center;gap:2px;background:var(--soft);border-radius:999px;padding:3px}
+.stp button{width:30px;height:30px;border-radius:50%;border:0;background:var(--paper);color:var(--ink);font-size:1.05rem;font-weight:700;cursor:pointer;line-height:1}
+.stp button:disabled{opacity:.35;cursor:default}
+.stp span{padding:0 8px;font-size:.88rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.stp.sm button{width:26px;height:26px;font-size:.95rem}
+.stp.sm span{padding:0 6px;font-weight:700}
+.people{display:flex;align-items:center;gap:10px;font-weight:600}
+.wholechk{display:flex;gap:8px;align-items:flex-start;font-size:.84rem;color:var(--muted);margin:0 0 10px;cursor:pointer}
+.wholechk input{margin-top:3px}
+.srv{margin:0 0 6px;font-size:.84rem;color:var(--muted)}
+.linkbtn{border:0;background:none;padding:0;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:inherit}
+.psearch{margin:4px 0 8px;max-width:460px}
+.psearch input{width:100%;border:1.5px solid transparent;border-radius:999px;padding:10px 16px;background:var(--paper);font-size:.95rem}
+.psearch input:focus{outline:none;border-color:var(--ink)}
+.pool .chipr{font-size:.9rem;padding:6px 10px;background:var(--paper)}
+.qadd{border:1.5px dashed var(--line);background:none;border-radius:999px;padding:2px 9px;cursor:pointer;color:var(--muted);font-size:.8rem;align-self:flex-start}
+.qform{display:flex;flex-direction:column;gap:6px}
+.qform input,.qform textarea{font-size:.85rem;border:0;border-radius:10px;padding:7px 9px;background:var(--soft);width:100%}
+.qform textarea{min-height:60px}
+.qform .row2{display:flex;gap:6px;flex-wrap:wrap}
+.qform button{font-size:.8rem;padding:6px 11px}
+.planwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px}
+@media (max-width:760px){.planwrap{grid-template-columns:1fr}}
+.panel{background:var(--paper);border-radius:var(--r-lg);padding:24px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel h2{font-size:1.35rem}
+.prow{display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--soft);padding:8px 0}
+.prow img,.prow .mini{width:52px;height:52px;border-radius:14px;object-fit:cover;flex:none;background:var(--soft);display:grid;place-items:center;font-family:var(--display);color:var(--muted)}
+.prow .t{flex:1;min-width:0;font-weight:600;cursor:pointer}
+.xbtn{border:0;background:var(--soft);border-radius:50%;width:32px;height:32px;cursor:pointer;flex:none}
+ul.shop{list-style:none;margin:0;padding:0}
+ul.shop li label{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--soft);cursor:pointer}
+ul.shop input{width:18px;height:18px;margin-top:4px;accent-color:var(--ink)}
+ul.shop .q{font-size:.9rem;white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+ul.shop .src{display:block;font-size:.8rem;color:var(--muted);font-weight:400}
+ul.shop li.have .nm,ul.shop li.have .q{text-decoration:line-through;color:var(--bad)}
+ul.shop li.have .src{color:var(--bad)}
+.optbox{border-top:1px solid var(--line);margin-top:6px;padding-top:14px}
+.optbox h3{font-size:1.05rem}
+.tpl{margin-top:16px}
+.tplrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--soft)}
+.tplrow .t{flex:1;min-width:140px;font-weight:600}
+.tplrow .t small{display:block;color:var(--muted);font-weight:400;font-size:.82rem}
+.tplsave{display:flex;gap:8px;flex-wrap:wrap}
+.tplsave input{flex:1;min-width:180px;border:0;border-radius:999px;padding:10px 16px;background:var(--soft)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:11px 20px;border-radius:999px;font-weight:600;z-index:20}
+@media (prefers-reduced-motion:reduce){.card,.btn{transition:none}.card:hover{transform:none}}
 </style>
-</head>
-<body>
-<main>
-  <h1>Готовлю как умею<svg viewBox="0 0 34 30" aria-hidden="true"><path class="smoke" d="M10.5 12.5c-2-2 2-3.2 0-5.6s1.6-3.6 0-5.4M16.5 12.5c-2-2 2-3.2 0-5.6s1.6-3.6 0-5.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2.5 16h22v1.2a8.3 8.3 0 01-8.3 8.3h-5.4a8.3 8.3 0 01-8.3-8.3z" fill="currentColor"/><path d="M24.5 17.5h7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></h1>
-  <p>Рецепты, которые получились и не очень, меню на неделю и список покупок. Готовим, делимся с друзьями и учимся на своих «упсах».</p>
-  <span class="soon">Скоро открытие 🍳</span>
-</main>
-</body>
-</html>
+
+<div class="wrap" id="app">
+  <header class="top">
+    <div>
+      <h1>Готовлю как умею<svg class="star pan" viewBox="0 0 34 30" aria-hidden="true"><path class="smoke" d="M10.5 12.5c-2-2 2-3.2 0-5.6s1.6-3.6 0-5.4M16.5 12.5c-2-2 2-3.2 0-5.6s1.6-3.6 0-5.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2.5 16h22v1.2a8.3 8.3 0 01-8.3 8.3h-5.4a8.3 8.3 0 01-8.3-8.3z" fill="currentColor"/><path d="M24.5 17.5h7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></h1>
+      <p>Рецепты, которые получились и не очень, меню на неделю и список покупок. Готовим, делимся с друзьями и учимся на своих «упсах».</p>
+    </div>
+    <div class="hbtns"><button class="btn primary" id="impBtn" type="button" hidden></button><button class="profbtn" id="profBtn" type="button" hidden aria-label="Профиль"></button></div>
+  </header>
+  <nav id="nav" aria-label="Разделы"></nav>
+  <div id="view"><div class="empty">Загружаю рецепты…</div></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Фото"><button class="lbx" type="button" id="lbx" aria-label="Закрыть">✕</button><div class="lbin" id="lbin"><img id="lbimg" alt=""></div><p class="lbhint">Нажми на фото, чтобы приблизить</p></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const IC={
+ star:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+ starF:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+ play:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>',
+ spark:'<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" fill="currentColor"/></svg>',
+ plus:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+ cam:'<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+ edit:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+ back:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ book:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M5 4.5h9a3 3 0 013 3V20H8a3 3 0 01-3-3zM17 7.5h2V20h-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
+ cal:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+ x:'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+ share:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 15V3.5M7.5 8L12 3.5 16.5 8M5 12.5V19a1.5 1.5 0 001.5 1.5h11A1.5 1.5 0 0019 19v-6.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ copy:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="8" y="8" width="11" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 012-2h8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'};
+const STATUS={done:"Получилось ✓",plan:"В плане",want:"Хочу попробовать"};
+const FILTERS=[["all","Все"],["done","Получилось"],["plan","В плане"],["want","Хочу попробовать"]];
+let hideStd=false,onlyGentle=false,importing=null;try{hideStd=localStorage.getItem("hideStd")==="1";onlyGentle=localStorage.getItem("onlyGentle")==="1"}catch(e){}
+let planQ="",planHelp=false;
+let editOn=false, focusAfter=null, pendingRender=false, showUrl=false, moreOpen=false, justCopied=null;
+let sample=null, pasteStep=null, pasteFor=null, who=null, notes=[], notesFor=null, nDraft=null;
+let db=null, assets=null, recipes=[], filter="all", openId=null, editing=null, plan={ids:[],have:[],need:[],slots:{}}, sel=null, quickSlot=null, templates=[], tplConfirm=null;
+const view=document.getElementById("view");
+try{const h=decodeURIComponent(location.hash.slice(1)); if(h) openId=h;}catch(e){}
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
+function photo(r){return r.photo?`<img src="${esc(blobUrl(r.photo))}" alt="${esc(r.title)}">`:`<span class="glyph">${esc((r.title||"?").slice(0,1))}</span>`}
+/* Ingredient model: {name, de, amount, note, optional, group}. Old rows ("Яблоки (Äpfel)" / "3–4 шт. (~500 г), лучше кисловатые") are split on the fly. */
+function normIng(i){
+  let name=String(i.name||"").trim(),amount=String(i.amount||"").trim(),de=String(i.de||"").trim(),optional=!!i.optional,group=String(i.group||"").trim();
+  const notes=i.note?[String(i.note).trim()]:[];
+  if(/по желанию/i.test(amount)){optional=true;amount=amount.replace(/,?\s*по желанию/i,"").trim()}
+  if(/по желанию/i.test(name)){optional=true;name=name.replace(/,?\s*по желанию/i,"").trim()}
+  const m=name.match(/\s*\(([^()]*)\)\s*$/);
+  if(m){const inner=m[1].trim();name=name.slice(0,m.index).trim();if(!/[а-яё]/i.test(inner)&&!de)de=inner;else notes.unshift(inner)}
+  const gm=name.match(/^(.*?)\s+(для формы|для смазывания формы)$/i);
+  if(gm&&!group){group="Для формы";name=gm[1]}
+  const ci=amount.indexOf(", ");
+  if(ci>0){notes.push(amount.slice(ci+2).trim());amount=amount.slice(0,ci).trim()}
+  const pm=amount.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+  if(pm&&pm[1]){notes.unshift(pm[2].trim());amount=pm[1].trim()}
+  return {...i,name,de,amount,note:notes.filter(Boolean).join(" · "),optional,group};
+}
+const EGG='<svg width="10" height="13" viewBox="0 0 10 13" aria-hidden="true"><path d="M5 .8C2.7.8.8 4.7.8 7.8A4.2 4.2 0 005 12.2a4.2 4.2 0 004.2-4.4C9.2 4.7 7.3.8 5 .8z" fill="var(--sun-soft)" stroke="currentColor" stroke-width="1"/></svg>';
+const DOT='<svg width="9" height="9" viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="4" fill="var(--soft)" stroke="currentColor" stroke-width="1"/></svg>';
+function countViz(i){const m=String(i.amount).match(/^(\d)\s*шт\.?$/);if(!m)return"";const n=+m[1];if(n<1||n>6)return"";const g=/яйц|яйко|eier|\bei\b/i.test(i.name+" "+i.de)?EGG:DOT;return `<span class="dots" aria-hidden="true">${g.repeat(n)}</span>`}
+function ingLi(i){if(editOn)return `<li><span class="nm"><span${ed(`ing:${i._ix}:name`,"Продукт")}>${esc(i.name)}</span><span class="sub"><i${ed(`ing:${i._ix}:de`,"по-немецки")}>${esc(i.de)}</i> · <span${ed(`ing:${i._ix}:note`,"пояснение")}>${esc(i.note)}</span></span></span><span class="amt"><span${ed(`ing:${i._ix}:amount`,"кол-во")}>${esc(i.amount||"")}</span><button class="idel" type="button" data-idel="${i._ix}" aria-label="Удалить продукт">✕</button></span></li>`;
+  const sub=[i.de?`<i>${esc(i.de)}</i>`:"",i.note?esc(i.note):""].filter(Boolean).join(" · ");
+  return `<li><span class="nm">${esc(i.name)}${i.optional?'<span class="optp">по желанию</span>':""}${sub?`<span class="sub">${sub}</span>`:""}</span><span class="amt">${esc(i.amount||"")}${countViz(i)}</span></li>`}
+function ingHtml(list,fac){const n=list.map((x,ix)=>{const o={...normIng(x),_ix:ix};if(fac&&!editOn)o.amount=scaleAmt(o.amount,fac);return o}),main=n.filter(i=>!i.group),groups=[...new Set(n.filter(i=>i.group).map(i=>i.group))];
+  return (main.length?`<ul class="ing">${main.map(ingLi).join("")}</ul>`:"")+groups.map(g=>`<div class="ing-grp"><p class="label">${esc(g)}</p><ul class="ing">${n.filter(i=>i.group===g).map(ingLi).join("")}</ul></div>`).join("")}
+function ingToLine(i){i=normIng(i);let s=(i.group?i.group+": ":"")+i.name+(i.de?` (${i.de})`:"");if(i.amount||i.note||i.optional)s+=" — "+(i.amount||"?");if(i.note)s+=" — "+i.note;if(i.optional)s+=(i.note?", ":" — ")+"по желанию";return s}
+function lineToIng(s){let group="";const gm=s.match(/^(Для [^:]{2,20}):\s*/i);if(gm){group=gm[1].charAt(0).toUpperCase()+gm[1].slice(1);s=s.slice(gm[0].length)}
+  const p=s.split(/\s+[—–]\s+|\s+-\s+/);let optional=false;const strip=t=>{if(/по желанию/i.test(t)){optional=true;return t.replace(/,?\s*по желанию/i,"").trim()}return t.trim()};
+  const name=strip(p[0]),amount=strip(p[1]||""),note=strip(p.slice(2).join(" — "));
+  const r=normIng({name,amount:amount==="?"?"":amount,note,optional,group});const o={name:r.name,amount:r.amount};if(r.de)o.de=r.de;if(r.note)o.note=r.note;if(r.optional)o.optional=true;if(r.group)o.group=r.group;return o}
+/* Portions: each recipe has `serves` (how many portions the amounts are for). Amounts with numbers are rescaled;
+   "щепотка", "по вкусу" etc. stay as they are. */
+const FR={"½":.5,"¼":.25,"¾":.75,"⅓":1/3,"⅔":2/3,"⅛":.125};
+function fmtNum(x,unit){const u=String(unit||"").toLowerCase();
+  if(/^(г|мл)/.test(u)){const r=x>=50?Math.round(x/5)*5:x>=10?Math.round(x):Math.round(x*10)/10;return String(r).replace(".",",")}
+  if(/^(кг|л|дл)/.test(u))return String(Math.round(x*10)/10).replace(".",",");
+  const st=/^(шт|зубч|ломт|лист|банк|рулон|пакет|кочан|кусоч)/.test(u)?2:4;const q=Math.max(1/st,Math.round(x*st)/st),w=Math.floor(q),f=q-w,fs=f===.25?"¼":f===.5?"½":f===.75?"¾":"";return (w?String(w):"")+fs||"0"}
+function scaleAmt(a,f){a=String(a||"");if(!a||Math.abs(f-1)<1e-6)return a;
+  return a.replace(/(\d+(?:[.,]\d+)?)?\s?([½¼¾⅓⅔⅛])?(?:\s*[–-]\s*(\d+(?:[.,]\d+)?)?([½¼¾⅓⅔⅛])?)?(\s*[a-zа-яё.]+)?/gi,(m,n1,f1,n2,f2,unit)=>{
+    if(n1==null&&f1==null)return m;const v1=(n1?parseFloat(n1.replace(",",".")):0)+(f1?FR[f1]:0);const has2=n2!=null||f2!=null;const v2=has2?(n2?parseFloat(n2.replace(",",".")):0)+(f2?FR[f2]:0):null;
+    const u=(unit||"").trim();const a1=fmtNum(v1*f,u);const a2=has2?fmtNum(v2*f,u):null;return (a2&&a2!==a1?a1+"–"+a2:a1)+(u?" "+u:"")})}
+function baseServes(r){const n=parseInt(r.serves,10);return n>0?n:null}
+const unitWord=(n,r)=>{const u=r&&r.servesUnit;if(u)return u;const m=n%10,h=n%100;return m===1&&h!==11?"порцию":(m>=2&&m<=4&&(h<12||h>14))?"порции":"порций"};
+let viewServes={};try{viewServes=JSON.parse(localStorage.getItem("viewServes")||"{}")}catch(e){}
+function slotCount(id){return Object.values(plan.slots||{}).reduce((n,a)=>n+((a||[]).includes(id)?1:0),0)}
+function planDefault(r){const b=baseServes(r);if(!b)return null;const need=(plan.people||2)*Math.max(1,slotCount(r.id));
+  return r.whole?b*Math.max(1,Math.ceil(need/b)):need}   /* whole bakes: one more form only when one isn't enough */
+function planPortions(r){return (plan.portions&&plan.portions[r.id])||planDefault(r)}
+function curServes(r){const b=baseServes(r);if(!b)return null;if(scheduled().includes(r.id))return planPortions(r);return viewServes[r.id]||b}
+function hostOf(u){try{return new URL(u).hostname.replace(/^www\./,"")}catch(e){return "ссылка"}}
+function linkBtns(r){
+  let h="";
+  if(r.video) h+=`<a class="btn video" href="${esc(r.video)}" target="_blank" rel="noopener">${IC.play} Смотреть видео</a>`;
+  return h;
+}
+
+function inPlan(id){return (plan.ids||[]).includes(id)}
+function scheduled(){const out=[];Object.values(plan.slots||{}).forEach(a=>(a||[]).forEach(id=>{if(!out.includes(id)&&recipes.some(r=>r.id===id))out.push(id)}));return out}
+async function savePlan(next){if(!db)return;try{await db.doc("plan/week").set({ids:next.ids||[],have:next.have||[],need:next.need||[],slots:next.slots||{},opt:next.opt||[],portions:next.portions||{},people:next.people||2})}catch(e){toast("Не получилось сохранить план: "+(e.message||e.code))}}
+async function togglePlan(id){const was=inPlan(id);const ids=was?plan.ids.filter(x=>x!==id):[...(plan.ids||[]),id];plan={...plan,ids};render();await savePlan(plan);toast(inPlan(id)?"Добавлено в избранное недели":"Убрано из избранного")}
+function parseAmt(a){const m=String(a||"").replace(/(\d),(\d)/g,"$1.$2").match(/(\d+(?:\.\d+)?)\s*(кг|г|мл|л|шт\.?|ст\.\s?л\.|ч\.\s?л\.)/i);if(!m)return null;let q=+m[1],u=m[2].toLowerCase().replace(/\s/g,"");if(u==="кг"){q*=1000;u="г"}if(u==="л"){q*=1000;u="мл"}if(u.startsWith("шт"))u="шт.";if(u==="ст.л.")u="ст. л.";if(u==="ч.л.")u="ч. л.";return{q,u,approx:/[~–-]/.test(String(a))}}
+function ingKey(n){return String(n||"").toLowerCase().replace(/\(.*?\)/g,"").replace(/ё/g,"е").trim()}
+function fmtQ(q,u){if(u==="г"&&q>=1000)return (Math.round(q/100)/10).toString().replace(".",",")+" кг";if(u==="мл"&&q>=1000)return (Math.round(q/100)/10).toString().replace(".",",")+" л";return (Math.round(q*10)/10).toString().replace(".",",")+" "+u}
+const SKIP=new Set(["вода"]);
+const STAPLES=new Set(["перец","черный перец","перец черный","молотый перец","черный молотый перец","молотый черный перец"]);
+function isStaple(k){return STAPLES.has(k)||k.startsWith("соль")}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function splitIng(i){const n=String(i.name||""),a=String(i.amount||"").trim();if(n.includes(",")&&!/\d/.test(a)){const parts=n.replace(/\(.*?\)/g,"").split(/\s*,\s*|\s+и\s+/).map(s=>s.trim()).filter(Boolean);if(parts.length>1&&parts.every(p=>p.split(/\s+/).length<=3))return parts.map(p=>({...i,name:cap(p),amount:a}))}return [i]}
+function haveSet(list){const need=new Set(plan.need||[]),s=new Set(plan.have||[]);list.forEach(g=>{if(g.staple&&!need.has(g.key))s.add(g.key)});return s}
+function isOpt(i){return !!i.optional||/по желанию/i.test(String(i.amount||"")+" "+String(i.name||""))}
+function shoppingList(optional){const inc=new Set(plan.opt||[]);const map=new Map();scheduled().forEach(id=>{const r=recipes.find(x=>x.id===id);if(!r)return;const b=baseServes(r),fac=b?planPortions(r)/b:1;(r.ingredients||[]).map(normIng).map(i=>({...i,amount:scaleAmt(i.amount,fac)})).flatMap(splitIng).forEach(i=>{const k=ingKey(i.name);if(!k||SKIP.has(k))return;const o=isOpt(i);if(optional?!o:(o&&!inc.has(k)))return;if(!map.has(k))map.set(k,{key:k,name:String(i.name).replace(/\s*\(.*?\)\s*/g," ").trim(),sums:{},other:[],from:[],approx:false,staple:isStaple(k)});const g=map.get(k);const p=parseAmt(i.amount);if(p){g.sums[p.u]=(g.sums[p.u]||0)+p.q;if(p.approx)g.approx=true}else if(i.amount)g.other.push(String(i.amount).replace(/,?\s*по желанию/i,"").trim()||"по желанию");if(!g.from.includes(r.title))g.from.push(r.title)})});return [...map.values()].sort((a,b)=>a.name.localeCompare(b.name,"ru"))}
+async function loadTpl(id){const t=templates.find(x=>x.id===id);if(!t)return;const sl={};for(const k in (t.slots||{}))sl[k]=(t.slots[k]||[]).filter(rid=>recipes.some(r=>r.id===rid));plan={...plan,slots:sl,opt:t.opt||[],have:[],need:[]};tplConfirm=null;render();await savePlan(plan);toast("Неделя «"+t.name+"» загружена")}
+function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan.opt||[]);const chosen=scheduled().map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const favs=(plan.ids||[]).map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const allR=[...recipes].sort((a,b)=>String(a.title).localeCompare(b.title,'ru'));const list=shoppingList(false);const have=haveSet(list);
+  const DAYS=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],MEALS=[["b","Завтрак"],["l","Обед"],["d","Ужин"]];
+  const now=new Date(),mon=new Date(now);mon.setHours(0,0,0,0);mon.setDate(now.getDate()-((now.getDay()+6)%7));
+  const slots=plan.slots||{};
+  const chip=(id,where)=>{const r=recipes.find(x=>x.id===id);if(!r)return"";return `<div class="chipr ${sel&&sel.id===id&&sel.from===where?"sel":""}" draggable="true" data-chip="${esc(id)}" data-from="${esc(where)}">${r.photo?`<img src="${esc(blobUrl(r.photo))}" alt="">`:`<span class="mini">${esc(r.title.slice(0,1))}</span>`}<span class="n2">${esc(r.title)}</span>${where!=="pool"?`<button type="button" data-unslot="${esc(where)}|${esc(id)}" aria-label="Убрать">✕</button>`:""}</div>`};
+  const empty=!scheduled().length,ex=recipes.find(x=>x.id==="buckwheat-egg")||favs[0]||recipes[0];
+  const ghost=empty&&ex?`<div class="ghost" aria-hidden="true">${ex.photo?`<img src="${esc(blobUrl(ex.photo))}" alt="">`:`<span class="mini">${esc(ex.title.slice(0,1))}</span>`}<span class="n2">${esc(ex.title)}</span><span class="gtag">пример</span></div>`:"";
+  const weekHtml=`<p class="hint2 phint">Перетащи блюдо в день · на телефоне: нажми на блюдо, потом на ячейку <button class="qbtn" type="button" id="planHelp" aria-expanded="${planHelp}" aria-label="Как это работает">?</button></p>
+   ${planHelp?`<p class="hint2 phelp">Всё, что стоит в расписании, попадает в список покупок. Одно блюдо можно поставить в несколько ячеек, например котлеты на два ужина: оно готовится один раз, а продуктов берётся на все приёмы.</p>`:""}
+   <p class="label" style="margin:10px 0 0">★ Избранное для этой недели</p>
+   <div class="pool">${favs.length?favs.map(r=>chip(r.id,"pool")).join(""):'<span class="hint2">Пусто. Нажми ☆ на карточке рецепта в списке — он появится здесь.</span>'}</div>
+   <div class="psearch"><input id="planQ" type="search" autocomplete="off" placeholder="Найти рецепт: название или продукт…" value="${esc(planQ)}" aria-label="Найти рецепт"></div>
+   ${(()=>{const q=planQ.trim(),nq=nrm(q).trim();const res=q?allR.filter(r=>nrm(r.title).includes(nq)||(r.ingredients||[]).map(normIng).some(i=>ingHits(i,q))).slice(0,12):allR.filter(r=>r.status==="want").slice(0,12);
+     return `<p class="label" style="margin:2px 0 0">${q?`Найдено: ${res.length}`:"Хочу попробовать"}</p><div class="pool all">${res.length?res.map(r=>chip(r.id,"pool")).join(""):`<span class="hint2">${q?"Ничего не нашлось.":"Пока пусто."}</span>`}</div>`})()}
+   <div class="week">${DAYS.map((d,i)=>{const dt=new Date(mon);dt.setDate(mon.getDate()+i);const isT=dt.toDateString()===now.toDateString();
+     return `<div class="day ${isT?"today":""}"><h3>${d}<small>${dt.getDate()}.${String(dt.getMonth()+1).padStart(2,"0")}</small></h3><div class="slots">${MEALS.map(([m,ml])=>{const key=i+"-"+m;return `<div class="slot ${sel?"target":""}" data-slot="${key}"><span class="sl">${ml}</span>${key==="0-b"?ghost:""}${(slots[key]||[]).map(id=>chip(id,key)).join("")}${quickSlot===key?`<div class="qform" data-qf="${key}"><input id="q_t" placeholder="Название, напр. Омлет"><textarea id="q_i" placeholder="Продукты (по желанию), по одному в строке: Яйца — 2 шт."></textarea><div class="row2"><button class="btn primary" type="button" id="q_ok">Добавить</button><button class="btn" type="button" id="q_no">Отмена</button></div></div>`:(sel?"":`<button class="qadd" type="button" data-qadd="${key}">＋ своё блюдо</button>`)}</div>`}).join("")}</div></div>`}).join("")}</div>`;
+  view.innerHTML=weekHtml+`<div class="planwrap">
+  <section class="panel"><h2>В расписании</h2><div class="people"><span>Нас</span><span class="stp" role="group" aria-label="Сколько человек"><button type="button" data-ppl="-1" aria-label="Меньше" ${(plan.people||2)<=1?"disabled":""}>−</button><span><b>${plan.people||2}</b> ${(()=>{const n=plan.people||2,m=n%10,h=n%100;return m===1&&h!==11?"человек":(m>=2&&m<=4&&(h<12||h>14))?"человека":"человек"})()}</span><button type="button" data-ppl="1" aria-label="Больше">+</button></span></div>
+   ${chosen.length?'<p class="hint2" style="margin:0">Число у блюда — порции для закупки: люди × сколько раз блюдо стоит в меню. Пироги и киши — целыми формами: вторая добавится, только когда одной не хватит на всех.</p>':""}
+   ${chosen.length?chosen.map(r=>`<div class="prow">${r.photo?`<img src="${esc(blobUrl(r.photo))}" alt="">`:`<span class="mini">${esc(r.title.slice(0,1))}</span>`}<span class="t" data-open="${esc(r.id)}">${esc(r.title)}</span>${baseServes(r)?`<span class="stp sm" role="group" aria-label="Порции: ${esc(r.title)}"><button type="button" data-pp="${esc(r.id)}|-1" aria-label="Меньше">−</button><span>${planPortions(r)}${r.whole&&planPortions(r)>baseServes(r)&&planPortions(r)%baseServes(r)===0?` <small class="muted">· ${planPortions(r)/baseServes(r)} формы</small>`:""}</span><button type="button" data-pp="${esc(r.id)}|1" aria-label="Больше">+</button></span>`:""}<button class="xbtn" type="button" data-rm="${esc(r.id)}" aria-label="Убрать ${esc(r.title)} из расписания">✕</button></div>`).join(""):'<p class="muted">Пока пусто. Перетащи блюдо в любой день.</p>'}
+   ${chosen.length?'<button class="btn link" type="button" id="clearPlan">Очистить неделю</button>':""}
+  </section>
+  <section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Что купить</h2>${list.length?`<button class="btn" type="button" id="copyList">${IC.copy} Скопировать</button>`:""}</div><textarea id="copyArea" hidden readonly style="width:100%;min-height:160px;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:10px;background:var(--bg)"></textarea>
+   <p class="muted" style="margin:0">Одинаковые продукты сложены. Отметь то, что уже есть дома: продукт <span style="color:var(--bad);text-decoration:line-through">зачеркнётся</span> и не попадёт в скопированный список. Соль и перец уже зачёркнуты — сними отметку, если нужно купить.</p>
+   ${list.length?`<ul class="shop">${list.map(g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");return `<li class="${have.has(g.key)?"have":""}"><label><input type="checkbox" data-k="${esc(g.key)}" ${have.has(g.key)?"checked":""}><span class="nm">${esc(g.name)}<span class="src">${esc(g.from.join(", "))}</span></span><span class="q">${g.approx?"≈ ":""}${esc(q)}</span></label></li>`}).join("")}</ul>`:'<p class="muted">Список появится, когда поставишь блюда в расписание.</p>'}
+      ${optList.length?`<div class="optbox"><h3>По желанию</h3><p class="muted" style="margin:4px 0 8px">Отметь, что включить в список покупок — отмеченное добавится выше.</p><ul class="shop">${optList.map(g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");return `<li><label><input type="checkbox" data-opt="${esc(g.key)}" ${incOpt.has(g.key)?"checked":""}><span class="nm">${esc(g.name)}<span class="src">${esc(g.from.join(", "))}</span></span><span class="q">${esc(q)}</span></label></li>`}).join("")}</ul></div>`:""}
+  </section></div>
+  <section class="panel tpl"><h2>Сохранённые недели</h2>
+   <p class="muted" style="margin:0">Сохрани удачное расписание, чтобы в другой раз загрузить его одним нажатием.</p>
+   <div class="tplsave"><input id="tplName" placeholder="Название, напр. «Обычная неделя»" maxlength="60"><button class="btn primary" type="button" id="tplSave" ${scheduled().length?"":"disabled"}>Сохранить эту неделю</button></div>
+   ${templates.length?templates.map(t=>{const n=new Set(Object.values(t.slots||{}).flat()).size;return `<div class="tplrow"><span class="t">${esc(t.name)}<small>${n} ${n===1?"блюдо":(n>1&&n<5?"блюда":"блюд")}${t.created?" · "+esc(new Date(t.created).toLocaleDateString("ru-RU")):""}</small></span>${tplConfirm===t.id?`<span class="muted" style="font-size:.88rem">Заменить текущую неделю?</span><button class="btn primary" type="button" data-tplyes="${esc(t.id)}">Да, загрузить</button><button class="btn link" type="button" data-tplno>Отмена</button>`:`<button class="btn" type="button" data-tplload="${esc(t.id)}">Загрузить</button><button class="btn link" type="button" data-tpldel="${esc(t.id)}">Удалить</button>`}</div>`}).join(""):'<p class="muted">Пока нет сохранённых недель.</p>'}
+  </section>`;
+  bindChips();
+  view.querySelectorAll("[data-ppl]").forEach(b=>b.onclick=async()=>{plan={...plan,people:Math.max(1,(plan.people||2)+(+b.dataset.ppl))};render();await savePlan(plan)});
+  view.querySelectorAll("[data-pp]").forEach(b=>b.onclick=async()=>{const [id,d]=b.dataset.pp.split("|");const r=recipes.find(x=>x.id===id);if(!r)return;const n=Math.max(1,planPortions(r)+(+d));const po={...(plan.portions||{})};if(n===planDefault(r))delete po[id];else po[id]=n;plan={...plan,portions:po};render();await savePlan(plan)});
+  const ph=document.getElementById("planHelp");if(ph)ph.onclick=()=>{planHelp=!planHelp;render()};
+  const pq=document.getElementById("planQ");if(pq){pq.oninput=()=>{planQ=pq.value;clearTimeout(pq._t);pq._t=setTimeout(()=>{render();const n=document.getElementById("planQ");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}},180)}}
+  const ts=document.getElementById("tplSave");if(ts)ts.onclick=async()=>{const name=(document.getElementById("tplName").value.trim())||("Неделя от "+mon.toLocaleDateString("ru-RU"));try{await db.collection("templates").add({name,slots:plan.slots||{},opt:plan.opt||[],created:Date.now()});toast("Неделя сохранена")}catch(e){toast("Не получилось сохранить: "+(e.message||e.code))}};
+  view.querySelectorAll("[data-tplload]").forEach(b=>b.onclick=()=>{if(!scheduled().length){loadTpl(b.dataset.tplload)}else{tplConfirm=b.dataset.tplload;render()}});
+  view.querySelectorAll("[data-tplyes]").forEach(b=>b.onclick=()=>loadTpl(b.dataset.tplyes));
+  view.querySelectorAll("[data-tplno]").forEach(b=>b.onclick=()=>{tplConfirm=null;render()});
+  view.querySelectorAll("[data-tpldel]").forEach(b=>b.onclick=async()=>{try{await db.collection("templates").doc(b.dataset.tpldel).delete();toast("Удалено")}catch(e){toast("Не получилось удалить")}});
+  const place=async(id,from,to)=>{const sl={...(plan.slots||{})};if(from&&from!=="pool"){sl[from]=(sl[from]||[]).filter((x,ix,arr)=>!(x===id&&ix===arr.indexOf(id)))}
+    if(to){sl[to]=[...(sl[to]||[]),id]}plan={...plan,slots:sl};sel=null;render();await savePlan(plan)};
+  view.querySelectorAll("[data-chip]").forEach(c=>{
+    c.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",c.dataset.chip+"|"+c.dataset.from)});
+    c.addEventListener("click",e=>{if(e.target.closest("[data-unslot]"))return;e.stopPropagation();sel=(sel&&sel.id===c.dataset.chip&&sel.from===c.dataset.from)?null:{id:c.dataset.chip,from:c.dataset.from};render()})});
+  view.querySelectorAll("[data-slot]").forEach(z=>{
+    z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("over")});
+    z.addEventListener("dragleave",()=>z.classList.remove("over"));
+    z.addEventListener("drop",e=>{e.preventDefault();const [id,from]=e.dataTransfer.getData("text/plain").split("|");if(id&&from!==z.dataset.slot)place(id,from,z.dataset.slot)});
+    z.addEventListener("click",()=>{if(sel&&sel.from!==z.dataset.slot)place(sel.id,sel.from,z.dataset.slot)})});
+  view.querySelectorAll("[data-qadd]").forEach(b=>b.onclick=e=>{e.stopPropagation();quickSlot=b.dataset.qadd;render();const t=document.getElementById("q_t");if(t)t.focus()});
+  const qf=document.querySelector("[data-qf]");if(qf){qf.addEventListener("click",e=>e.stopPropagation());
+    document.getElementById("q_no").onclick=()=>{quickSlot=null;render()};
+    document.getElementById("q_ok").onclick=async()=>{const t=document.getElementById("q_t").value.trim();if(!t){toast("Напиши название");return}
+      const ing=document.getElementById("q_i").value.split("\n").map(x=>x.trim()).filter(Boolean).map(lineToIng);
+      const key=quickSlot;try{const ref=await db.collection("recipes").add({title:t,status:"done",standard:true,easy:true,source:"Быстро добавлено из расписания.",ingredients:ing,steps:[],photo:"",video:"",recipeUrl:"",oven:"",ovenNote:"",tips:[]});
+        quickSlot=null;await place(ref.id,null,key);toast("Добавлено в расписание и в базовые")}catch(err){toast("Не получилось: "+(err.message||err.code))}}}
+  view.querySelectorAll("[data-unslot]").forEach(b=>b.onclick=e=>{e.stopPropagation();const [k,id]=b.dataset.unslot.split("|");place(id,k,null)});
+  view.querySelectorAll("[data-rm]").forEach(b=>b.onclick=async()=>{const id=b.dataset.rm;const sl={...(plan.slots||{})};for(const k in sl)sl[k]=sl[k].filter(x=>x!==id);plan={...plan,slots:sl};render();await savePlan(plan);toast("Убрано из расписания")});
+  view.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{openId=b.dataset.open;filter="all";render();window.scrollTo(0,0)});
+  const cp=document.getElementById("clearPlan");if(cp)cp.onclick=async()=>{plan={...plan,have:[],need:[],slots:{}};render();await savePlan(plan);toast("Неделя очищена")};
+  const cl=document.getElementById("copyList");if(cl)cl.onclick=async()=>{const all=shoppingList(false);const have=haveSet(all);const txt=all.filter(g=>!have.has(g.key)).map(g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");return g.name+(q?" — "+(g.approx?"≈ ":"")+q:"")}).join("\n");
+    try{await navigator.clipboard.writeText(txt);toast("Список скопирован")}catch(e){const ta=document.getElementById("copyArea");ta.hidden=false;ta.value=txt;ta.focus();ta.select();toast("Выделено — нажми «Копировать»")}};
+  view.querySelectorAll("[data-opt]").forEach(cb=>cb.onchange=async()=>{const s=new Set(plan.opt||[]);cb.checked?s.add(cb.dataset.opt):s.delete(cb.dataset.opt);plan={...plan,opt:[...s]};render();await savePlan(plan)});
+  view.querySelectorAll("ul.shop input[data-k]").forEach(cb=>cb.onchange=async()=>{const k=cb.dataset.k,g=list.find(x=>x.key===k);if(g&&g.staple){const n=new Set(plan.need||[]);cb.checked?n.delete(k):n.add(k);plan={...plan,need:[...n]}}else{const s=new Set(plan.have||[]);cb.checked?s.add(k):s.delete(k);plan={...plan,have:[...s]}}cb.closest("li").classList.toggle("have",cb.checked);await savePlan(plan)});
+}
+function chipsHtml(){const counts={all:recipes.length,done:0,plan:0,want:0};recipes.forEach(r=>{if(counts[r.status]!=null)counts[r.status]++});
+  return `<div class="chips" role="group" aria-label="Фильтр">${FILTERS.map(([k,l])=>`<button class="chip" type="button" data-f="${k}" aria-pressed="${filter===k}">${l} <span class="n">${counts[k]}</span></button>`).join("")}${filter!=="week"?`<button class="chip gentle" type="button" id="genT" aria-pressed="${onlyGentle}">🌿 Бережно для желудка <span class="n">${recipes.filter(r=>r.gentle).length}</span></button><button class="chip std" type="button" id="stdT" aria-pressed="${hideStd}">${hideStd?"Базовые скрыты":"Скрыть базовые"} <span class="n">${recipes.filter(r=>r.standard).length}</span></button>`:""}</div>`}
+function bindChips(){view.querySelectorAll(".chip[data-f]").forEach(b=>b.onclick=()=>{filter=b.dataset.f;render()});const g=document.getElementById("genT");if(g)g.onclick=()=>{onlyGentle=!onlyGentle;try{localStorage.setItem("onlyGentle",onlyGentle?"1":"0")}catch(e){}render()};const t=document.getElementById("stdT");if(t)t.onclick=()=>{hideStd=!hideStd;try{localStorage.setItem("hideStd",hideStd?"1":"0")}catch(e){}render()}}
+/* the big featured card shows more of the recipe: key facts, products and the course of the steps */
+/* the big featured card keeps the photo on top and adds "Чем полезно" + products under the title */
+/* "Что есть дома": match by word stems (картошка ~ картофель), count only MAIN ingredients as missing.
+   Not main: salt/pepper/water/oil, optional items, "для формы/подачи", and small amounts (ч. л., щепотка, зубчик, по вкусу, ≤3 ст. л.) — sauce bits never hide a recipe. */
+let have=[];try{have=JSON.parse(localStorage.getItem("have")||"[]")}catch(e){}
+const SYN={"курица":["куриц","курин"],"курочка":["куриц","курин"],"помидор":["помид","томат","черри"],"томаты":["помид","томат","черри"],"картошка":["карто"],"яйцо":["яйц"],"яйца":["яйц"],"рыба":["рыб","пангас","лосос","тунец","треск"],"мясо":["фарш","говяд","свин","курин","куриц","бекон"]};
+const nrm=w=>String(w||"").toLowerCase().replace(/ё/g,"е").replace(/[^a-zа-яäöüß\s-]/gi," ");
+const stemW=w=>w.length<=3?w:w.slice(0,Math.min(5,w.length-1));
+const stemsOf=t=>nrm(t).split(/[\s-]+/).filter(x=>x.length>=3).map(stemW);
+const qStems=q=>{const k=nrm(q).trim();return SYN[k]||stemsOf(k)};
+function ingMain(i){const n=nrm(i.name).trim(),a=String(i.amount||"");
+  if(i.optional||i.group)return false;if(/^(соль|перец|вода|специи|растительное масло|оливковое масло|масло|зелень)/.test(n))return false;
+  if(/ч\.\s?л|щепот|по вкусу|немного|зубч|для подачи|для обвалки|для жарки|горст/i.test(a))return false;
+  const sp=a.match(/^(\d+(?:[.,]\d+)?)(?:\s*[–-]\s*(\d+))?\s*ст\.\s?л/);if(sp&&parseFloat(sp[2]||sp[1])<=3)return false;return true}
+function ingHits(i,q){const qs=qStems(q),is=stemsOf(i.name+" "+(i.de||""));return qs.some(x=>is.some(y=>y.startsWith(x)||x.startsWith(y)))}
+function haveMatch(r){const ing=(r.ingredients||[]).map(normIng);const got=have.filter(q=>ing.some(i=>ingHits(i,q)));
+  const missing=ing.filter(i=>ingMain(i)&&!have.some(q=>ingHits(i,q)));return {got,missing}}
+function haveBar(){const names=[...new Set(recipes.flatMap(r=>(r.ingredients||[]).map(normIng).filter(ingMain).map(i=>i.name.toLowerCase())))].sort((a,b)=>a.localeCompare(b,"ru"));
+  return `<div class="havebar"><label for="haveIn" class="havelab"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="5.5" y="2.5" width="13" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 9.5h13M8.5 5.5v2M8.5 12.5v3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Что есть дома</label><div class="havebox">${have.map((h,ix)=>`<span class="hchip">${esc(h)}<button type="button" data-hx="${ix}" aria-label="Убрать ${esc(h)}">✕</button></span>`).join("")}<input id="haveIn" list="ingList" autocomplete="off" placeholder="${have.length?"ещё продукт…":"например: картошка, сметана"}"></div>${have.length?`<button class="btn link" type="button" id="haveClr">Сбросить</button>`:""}</div>
+    <datalist id="ingList">${names.map(n=>`<option value="${esc(n)}">`).join("")}</datalist>
+    ${have.length?`<p class="hint2 havehint">Сверху — где совпало больше всего. Соль, специи и мелочи вроде чеснока или лимона для соуса не считаются.</p>`:""}`}
+function bindHave(){const inp=document.getElementById("haveIn");if(!inp)return;const save=()=>{try{localStorage.setItem("have",JSON.stringify(have))}catch(e){}};
+  const add=v=>{v.split(",").map(x=>x.trim()).filter(Boolean).forEach(x=>{if(!have.some(h=>h.toLowerCase()===x.toLowerCase()))have.push(x)});save();render();const n=document.getElementById("haveIn");if(n)n.focus()};
+  inp.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===",")&&inp.value.trim()){e.preventDefault();add(inp.value)}else if(e.key==="Backspace"&&!inp.value&&have.length){have.pop();save();render();const n=document.getElementById("haveIn");if(n)n.focus()}});
+  inp.addEventListener("change",()=>{if(inp.value.trim())add(inp.value)});
+  view.querySelectorAll("[data-hx]").forEach(b=>b.onclick=()=>{have.splice(+b.dataset.hx,1);save();render()});
+  const c=document.getElementById("haveClr");if(c)c.onclick=()=>{have=[];save();render()}}
+/* small cards: one muted line with the main products, never more than one line */
+function ingLine(r){const ing=(r.ingredients||[]).map(normIng).filter(i=>!i.group&&i.name&&!/^(соль|перец|вода)/i.test(i.name)&&!i.optional);
+  if(!ing.length)return"";const shown=ing.slice(0,4).map(i=>i.name);return `<p class="ingline">${esc(shown.join(" · "))}${ing.length>4?` <span>+${ing.length-4}</span>`:""}</p>`}
+function featDetails(r){const ing=(r.ingredients||[]).map(normIng).filter(i=>!i.group&&i.name);
+  return `${r.source?`<p class="fdesc">${esc(r.source)}</p>`:""}
+    ${r.health?`<div class="fblock"><p class="flab">Чем полезно</p><p class="fht">${esc(r.health)}</p></div>`:""}
+    ${ing.length?`<div class="fblock"><p class="flab">Продукты</p><div class="fchips">${ing.slice(0,8).map(i=>`<span>${esc(i.name)}</span>`).join("")}${ing.length>8?`<span class="more">+${ing.length-8}</span>`:""}</div></div>`:""}`}
+function renderList(){
+  if(filter==="week") return renderPlan();
+  let list=recipes.filter(r=>(filter==="all"||r.status===filter)&&!(hideStd&&r.standard)&&!(onlyGentle&&!r.gentle))
+    .sort((a,b)=>({plan:0,done:1,want:2}[a.status]-({plan:0,done:1,want:2}[b.status]))||String(a.title).localeCompare(b.title,"ru"));
+  const hm={};if(have.length){const need=Math.min(2,have.length);list.forEach(r=>hm[r.id]=haveMatch(r));
+    list=list.filter(r=>hm[r.id].got.length>=need).sort((a,b)=>(hm[b.id].got.length-hm[a.id].got.length)||(hm[a.id].missing.length-hm[b.id].missing.length))}
+  view.innerHTML=haveBar()+chipsHtml()+(onlyGentle?'<p class="hint2" style="margin:-10px 0 16px">🌿 Запечённое или варёное, мало жира, без острого, мало кислого и сырого лука/чеснока. Это общие правила, а не медицинский совет: ориентируйся на то, как реагирует желудок.</p>':"")+
+   (list.length?`<div class="grid">${list.map((r,ix)=>`
+    <div class="card${ix===0&&list.length>2?" feat":""}"><button class="open" type="button" data-id="${esc(r.id)}">
+      <div class="ph${!r.photo&&!r.ingPhoto?" noph":""}">${ix===0&&list.length>2&&!r.photo&&r.ingPhoto?`<img src="${esc(blobUrl(r.ingPhoto))}" alt="${esc(r.title)}">`:photo(r)}</div>
+      <div class="body">
+        <h3>${esc(r.title)}</h3>
+        <div class="meta"><span class="pill ${esc(r.status)}">${STATUS[r.status]||""}</span>${r.gentle?'<span class="tag">🌿 бережно</span>':""}${r.standard?'<span class="tag">базовый</span>':""}${r.easy?'<span class="tag">лёгкий</span>':""}${r.video?'<span class="tag">▶ видео</span>':""}</div>
+        ${hm[r.id]?`<p class="ingline hv">✓ ${esc(hm[r.id].got.join(", "))} · ${hm[r.id].missing.length?`докупить ${hm[r.id].missing.length}: ${esc(hm[r.id].missing.slice(0,3).map(i=>i.name).join(", "))}${hm[r.id].missing.length>3?"…":""}`:"всё есть 🎉"}</p>`:""}
+        ${ix===0&&list.length>2?featDetails(r):`${hm[r.id]?"":ingLine(r)}${r.oven?`<div class="ovenline">🔥 ${esc(r.oven)}</div>`:""}`}
+      </div></button>
+      ${ix===0&&list.length>2&&r.video?`<a class="fvid" href="${esc(r.video)}" target="_blank" rel="noopener" aria-label="Смотреть видео: ${esc(r.title)}">${IC.play} Видео</a>`:""}
+      <button class="favbtn ${inPlan(r.id)?"on":""}" type="button" data-plan="${esc(r.id)}" aria-pressed="${inPlan(r.id)}" title="${inPlan(r.id)?"В избранном недели":"В избранное недели"}" aria-label="${inPlan(r.id)?"Убрать из избранного недели":"В избранное недели"}">${inPlan(r.id)?IC.starF:IC.star}</button>
+    </div>`).join("")}</div>`:`<div class="empty">${have.length?"С этими продуктами пока ничего не нашлось. Попробуй убрать один из них.":recipes.length?"В этом разделе пока пусто.":"Рецептов пока нет. Нажми «Новый рецепт», чтобы добавить первый."}</div>`);
+  bindChips();bindHave();
+  view.querySelectorAll(".card .open").forEach(c=>c.onclick=()=>{openId=c.dataset.id;render();window.scrollTo(0,0)});
+  view.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{if(!db){toast("Войди в claude.ai, чтобы планировать");return}togglePlan(b.dataset.plan)});
+}
+
+function stepTitle(r,n){return String((r.stepTitles||[])[n]||"").trim()}
+/* Inline editing: in edit mode the sheet looks the same; text becomes editable in place and photo controls appear. */
+function ed(path,ph){return editOn?` data-ed="${path}" data-ph="${esc(ph||"")}" contenteditable="plaintext-only" spellcheck="true"`:""}
+function stepCard(r,n,s){const t=stepTitle(r,n);let d=String(s);if(t&&d.toLowerCase().startsWith(t.toLowerCase()+":"))d=d.slice(t.length+1).trim();
+  return `<div class="shead"><span class="num">${n+1}</span>${editOn?`<h4${ed("stt:"+n,"Заголовок")}>${esc(t)}</h4><span class="smove"><button type="button" data-smv="${n}:-1" aria-label="Шаг ${n+1} выше" title="Выше" ${n===0?"disabled":""}>↑</button><button type="button" data-smv="${n}:1" aria-label="Шаг ${n+1} ниже" title="Ниже" ${n===((r.steps||[]).length-1)?"disabled":""}>↓</button></span><button class="sdel" type="button" data-sdel="${n}" aria-label="Удалить шаг ${n+1}" title="Удалить шаг">✕</button>`:(t?`<h4>${esc(t)}</h4>`:"")}</div><p class="sdesc"${ed("st:"+n,"Что сделать")}>${esc(d)}</p>`}
+function stepToLine(r,s,n){const t=stepTitle(r,n);return t?`${t} | ${s}`:s}
+function cleanIng(i){const o={name:i.name||"",amount:i.amount||""};if(i.de)o.de=i.de;if(i.note)o.note=i.note;if(i.optional)o.optional=true;if(i.group)o.group=i.group;return o}
+async function saveEd(el){const r=recipes.find(x=>x.id===openId);if(!r||!db)return;const path=el.dataset.ed,v=el.textContent.replace(/ /g," ").trim(),p=path.split(":"),k=+p[1];let upd=null;
+  if(path==="serves"){const n=parseInt(v,10);if(!(n>0)||n===baseServes(r))return;upd={serves:n}}
+  else if(p.length===1){if(String(r[path]||"")===v)return;upd={[path]:v}}
+  else if(p[0]==="st"){const a=[...(r.steps||[])];if(a[k]===v||!v)return;a[k]=v;upd={steps:a}}
+  else if(p[0]==="stt"){const a=[...(r.stepTitles||[])];while(a.length<(r.steps||[]).length)a.push("");if((a[k]||"")===v)return;a[k]=v;upd={stepTitles:a}}
+  else if(p[0]==="tip"){const a=[...(r.tips||[])],t=splitTip(a[k]);if(p[2]==="t")t.title=v;else t.text=v;const nv=t.title?t.title+" | "+t.text:t.text;if(nv===a[k])return;a[k]=nv;upd={tips:a}}
+  else if(p[0]==="gcap"){const g=[...(r.gallery||[])];if(!g[k]||(g[k].caption||"")===v)return;g[k]={...g[k],caption:v};upd={gallery:g}}
+  else if(p[0]==="ing"){const a=(r.ingredients||[]).map(normIng);if(!a[k]||String(a[k][p[2]]||"")===v)return;a[k]={...a[k],[p[2]]:v};upd={ingredients:a.map(x=>cleanIng(normIng(cleanIng(x))))}}
+  if(!upd)return;try{await db.collection("recipes").doc(r.id).update(upd);toast("Сохранено ✓")}catch(e){toast("Не сохранилось: "+(e.message||e.code))}}
+async function editArr(r,fn,focus){try{const upd=fn(r);if(focus)focusAfter=focus;await db.collection("recipes").doc(r.id).update(upd)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
+function recipeText(r){const L=[r.title||"Рецепт",""];const ing=(r.ingredients||[]).map(normIng);
+  if(ing.length){L.push("Продукты:");ing.forEach(i=>L.push("• "+i.name+(i.amount?" — "+i.amount:"")+(i.note?" ("+i.note+")":"")))}
+  if(r.oven)L.push("","🔥 "+r.oven);
+  if((r.steps||[]).length){L.push("","Шаги:");r.steps.forEach((s,n)=>{const t=stepTitle(r,n);L.push((n+1)+". "+(t?t+": ":"")+s)})}
+  if(r.video)L.push("","Видео: "+r.video);if(r.recipeUrl)L.push("Рецепт: "+r.recipeUrl);return L.join("\n")}
+async function shareRecipe(r){const url=location.origin+location.pathname+"#"+encodeURIComponent(r.id);
+  try{if(navigator.share){await navigator.share({title:r.title,text:r.title+" — рецепт на «Готовлю как умею»",url});return}}catch(e){if(e&&e.name==="AbortError")return}
+  try{await navigator.clipboard.writeText(url);toast("Ссылка на рецепт скопирована")}catch(e){prompt("Скопируй ссылку:",url)}}
+async function copyRecipe(r){if(!db)return;const keep=["ingredients","steps","stepTitles","stepPhotos","photo","ingPhoto","tips","oven","ovenNote","servings","time","before","done","storage","notes","video","recipeUrl","easy","gentle","gallery","source"];
+  const d={};keep.forEach(k=>{if(r[k]!==undefined)d[k]=r[k]});d.title=(r.title||"Рецепт")+" (копия)";d.status="want";d.copiedFrom=r.id;
+  const by=who?await who.id().catch(()=>null):null;if(by)d.by=by;
+  try{toast("Создаю копию…");const ref=await db.collection("recipes").add(d);justCopied=ref.id;openId=ref.id;render();window.scrollTo(0,0);toast("Копия готова — можно менять")}catch(e){toast("Не получилось: "+(e.message||e.code))}}
+async function setPhoto(r,which,file){if(!assets||!db)return;try{let id="";if(file){toast("Загружаю фото…");id=(await assets.upload(file)).id}
+    const cur=recipes.find(x=>x.id===r.id)||r;let upd;
+    if(which==="main")upd={photo:id};
+    else if(which==="ing")upd={ingPhoto:id};
+    else if(typeof which==="number"){const a=[...(cur.stepPhotos||[])];while(a.length<=which)a.push("");a[which]=id;upd={stepPhotos:a}}
+    else if(which==="gal"){upd={gallery:[...(cur.gallery||[]),{id,caption:""}]}}
+    else if(String(which).startsWith("g")){const g=[...(cur.gallery||[])];g.splice(+String(which).slice(1),1);upd={gallery:g}}
+    pasteStep=null;await db.collection("recipes").doc(r.id).update(upd);toast(file?"Фото сохранено ✓":"Фото убрано")}
+  catch(e){toast("Фото не загрузилось: "+(e.message||e.code))}}
+function renderSheet(r){
+  if(pasteFor!==r.id){pasteFor=r.id;pasteStep=null;editOn=justCopied===r.id;moreOpen=false;if(editOn)justCopied=null}
+  const ing=(r.ingredients||[]),sp=r.stepPhotos||[],canUp=!!(assets&&db);
+  const meIdNow=(typeof ME!=="undefined"&&ME)?ME.id:null;const canW=!!db&&!!meIdNow&&r.owner===meIdNow;
+  const box=(f,label,cls)=>(r[f]||editOn)?`<div class="note${cls?" "+cls:""}"><b>${label}</b><span${ed(f,"Пусто — нажми, чтобы написать")}>${esc(r[f]||"")}</span></div>`:"";
+  const side=[box("health","💚 Чем полезно","health"),box("before","Заранее","blue"),tipsHtml(r),box("done","Как понять, что готово","blue"),box("storage","Хранение","blue"),box("notes","Заметки","")].join("");
+  const chip=has=>`<span class="ptchip">Ctrl+V — ${has?"заменить фото":"вставить фото"}</span>`;
+  const steps=(r.steps||[]).map((s,n)=>`<li data-step="${n}" class="${editOn&&pasteStep===n?"pt":""}">${canUp&&editOn?chip(!!sp[n]):""}${sp[n]?`<div class="sfig"><a href="${esc(blobUrl(sp[n]))}" target="_blank" rel="noopener"><img src="${esc(blobUrl(sp[n]))}" alt="Шаг ${n+1}" loading="lazy"></a>${editOn&&canUp?`<label class="sact" title="Заменить фото">${IC.cam}<input type="file" accept="image/*" data-si="${n}" hidden></label><button class="sact x" type="button" data-sx="${n}" aria-label="Убрать фото шага ${n+1}">${IC.x}</button>`:""}</div>`:""}${stepCard(r,n,s)}${!sp[n]&&canUp&&editOn?`<label class="sadd">${IC.plus} Фото шага<input type="file" accept="image/*" data-si="${n}" hidden></label>`:""}</li>`).join("");
+  const gal=r.gallery||[];
+  view.innerHTML=`
+  <button class="btn back" type="button" id="back">${IC.back} Все рецепты</button>
+  ${editOn?`<div class="editbar" role="status"><span>✏️ <b>Редактирование.</b> Нажми на любой текст, чтобы изменить. Фото: выдели карточку и нажми Ctrl+V.</span><span class="eb-btns"><button class="btn link" type="button" id="allFields">Все поля</button><button class="btn primary" type="button" id="editDone">Готово</button></span></div>`:""}
+  <article class="sheet${editOn?" editing":""}">
+    <div class="tile photo${pasteStep==="main"?" pt":""}" id="mainPh">${canUp&&editOn?chip(!!r.photo):""}${photo(r)}
+      ${canUp&&editOn&&!r.photo?`<label class="btn phadd">${IC.cam} Фото блюда<input type="file" accept="image/*" data-mp hidden></label>`:""}
+      ${canUp&&r.photo&&editOn?`<span class="phbtns"><label class="btn">${IC.cam} Заменить<input type="file" accept="image/*" data-mp hidden></label></span>`:""}</div>
+    <div class="tile info">
+      <div class="ract">${canW?`<button class="iconbtn${editOn?" on":""}" type="button" id="editBtn" title="${editOn?"Готово":"Изменить"}" aria-label="${editOn?"Готово":"Изменить"}" aria-pressed="${editOn}">${IC.edit}</button>`:""}<button class="iconbtn" type="button" id="shareBtn" title="Поделиться" aria-label="Поделиться">${IC.share}</button><button class="iconbtn" type="button" id="moreBtn" title="Ещё" aria-label="Ещё" aria-haspopup="menu" aria-expanded="${moreOpen}">⋯</button>
+        ${moreOpen?`<div class="rmenu" role="menu"><button type="button" role="menuitem" data-ma="copy">📋 Сделать копию${canW?"":" — чтобы изменить"}</button><button type="button" role="menuitem" data-ma="fav">${inPlan(r.id)?"★ Убрать из избранного недели":"☆ В избранное недели"}</button>${canW?`<p class="rmsep">Статус</p>${Object.entries(STATUS).map(([k,v])=>`<button type="button" role="menuitemradio" aria-checked="${r.status===k}" data-ma="st:${k}"><span class="ck">${r.status===k?"✓":""}</span>${v}</button>`).join("")}`:""}</div>`:""}</div>
+      <div class="meta"><span class="pill ${esc(r.status)}">${STATUS[r.status]||""}</span>${r.easy?'<span class="tag">лёгкий</span>':""}${r.servings||editOn?`<span class="tag"${ed("servings","порции")}>${esc(r.servings||"")}</span>`:""}${r.time||editOn?`<span class="tag">⏱ <span${ed("time","время")}>${esc(r.time||"")}</span></span>`:""}</div>
+      <h2${ed("title","Название")}>${esc(r.title)}</h2>
+      ${r.owner&&typeof profileOf==="function"?(()=>{const p=profileOf(r.owner);return `<p class="byline"><img class="av" src="${esc(p.avatarUrl)}" alt="">Рецепт от <b>${esc(p.name||"друга")}</b></p>`})():""}
+      ${r.copiedFrom&&!editOn?(()=>{const o=recipes.find(x=>x.id===r.copiedFrom);return o?`<p class="hint2 copyof">Копия рецепта <a href="#" data-openr="${esc(o.id)}">«${esc(o.title)}»</a></p>`:""})():""}
+      ${editOn?`<p class="muted" style="margin:0"${ed("source","Откуда рецепт, что я поменяла")}>${esc(r.source||"")}</p>`:(r.source||r.recipeUrl?`<p class="muted srcline" style="margin:0">${esc(r.source||"")}${r.recipeUrl?`${r.source?" ":""}<a href="${esc(r.recipeUrl)}" target="_blank" rel="noopener">Рецепт: ${esc(hostOf(r.recipeUrl))} ↗</a>`:""}</p>`:"")}
+      ${editOn?`<p class="elink">▶ Видео: <span${ed("video","вставь ссылку")}>${esc(r.video||"")}</span></p>${r.recipeUrl||showUrl?`<p class="elink">🔗 Рецепт: <span${ed("recipeUrl","вставь ссылку на рецепт")}>${esc(r.recipeUrl||"")}</span>${r.recipeUrl?` <button class="idel" type="button" id="urlDel" aria-label="Убрать ссылку">✕</button>`:""}</p>`:`<button class="btn link addln" type="button" id="addUrl" style="margin:0;padding:2px 0">🔗 Добавить ссылку на рецепт</button>`}`:`<div class="links">${linkBtns(r)}</div>${!r.video&&canW?`<p class="hint2">Видео пока нет — добавь ссылку в «Изменить».</p>`:""}`}
+    </div>
+    ${r.oven||editOn?`<div class="tile oven"><span class="ol">🔥 Духовка</span><b${ed("oven","180 °C · 30 мин")}>${esc(r.oven||"")}</b>${r.ovenNote||editOn?`<small${ed("ovenNote","режим, уровень")}>${esc(r.ovenNote||"")}</small>`:""}</div>`:""}
+    <div class="col side">
+      <div class="tile">${(()=>{const b=baseServes(r),c=curServes(r);
+        if(editOn)return `<p class="label">Продукты</p><p class="srv">Рецепт на <b${ed("serves","4")}>${b||""}</b> ${b?unitWord(b,r):"порций"}${r.servings?` · <span class="muted">${esc(r.servings)}</span>`:""}</p><label class="wholechk"><input type="checkbox" id="wholeChk" ${r.whole?"checked":""}> Готовится целиком (пирог, киш, торт) — в меню не делится на людей</label>`;
+        return `<div class="ingh"><p class="label" style="margin:0">Продукты</p>${b?`<div class="stp" role="group" aria-label="Количество порций"><button type="button" data-srv="-1" aria-label="Меньше порций" ${c<=1?"disabled":""}>−</button><span><b>${c}</b> ${unitWord(c,r)}</span><button type="button" data-srv="1" aria-label="Больше порций">+</button></div>`:""}</div>
+          ${b?`<p class="srv">Рецепт на ${b} ${unitWord(b,r)}${r.servings?` · ${esc(r.servings)}`:""}${c!==b?` · <button type="button" class="linkbtn" data-srv="reset">как в рецепте</button>`:""}${scheduled().includes(r.id)?` · <span>в меню на неделю</span>`:""}</p>`:(r.servings?`<p class="srv">${esc(r.servings)}</p>`:"")}`})()}
+      ${ing.length?ingHtml(ing,baseServes(r)?curServes(r)/baseServes(r):1):'<p class="muted">Список ещё не заполнен.</p>'}
+      ${editOn?`<button class="btn link addln" type="button" id="addIng">${IC.plus} Продукт</button>`:""}
+      </div>
+      ${side}
+    </div>
+    <div class="tile steps-tile">
+      ${r.ingPhoto?`<p class="label">Ингредиенты</p><figure class="ingph${pasteStep==="ing"?" pt":""}" id="ingPh">${canUp&&editOn?chip(true):""}<a href="${esc(blobUrl(r.ingPhoto))}" target="_blank" rel="noopener"><img src="${esc(blobUrl(r.ingPhoto))}" alt="Ингредиенты: ${esc(r.title)}" loading="lazy"></a>${editOn&&canUp?`<label class="sact" title="Заменить фото">${IC.cam}<input type="file" accept="image/*" data-ip hidden></label><button class="sact x" type="button" data-ipx aria-label="Убрать фото ингредиентов">${IC.x}</button>`:""}</figure>`:(canUp&&editOn?`<label class="sadd ingadd">${IC.plus} Фото ингредиентов<input type="file" accept="image/*" data-ip hidden></label>`:"")}
+      <p class="label">Шаги</p>
+      ${(r.steps||[]).length?`<ol class="steps${canUp&&editOn?" pastable":""}">${steps}</ol>`:'<p class="muted">Шаги ещё не записаны.</p>'}
+      ${editOn?`<button class="btn link addln" type="button" id="addStep">${IC.plus} Шаг</button>`:""}
+    </div>
+    ${gal.length||(editOn&&canUp)?`<div class="tile gallery"><p class="label">Фото процесса</p><div class="gal">${gal.map((g,ix)=>`<figure><span class="gimg"><img src="${esc(blobUrl(g.id))}" alt="${esc(g.caption||r.title)}" loading="lazy"></span>${editOn?`<button class="sact x" type="button" data-gx="${ix}" aria-label="Убрать фото">${IC.x}</button>`:""}${editOn?`<figcaption${ed("gcap:"+ix,"подпись")}>${esc(g.caption||"")}</figcaption>`:(g.caption?`<figcaption>${esc(g.caption)}</figcaption>`:"")}</figure>`).join("")}${editOn&&canUp?`<label class="addtile galadd">${IC.plus} Добавить<input type="file" accept="image/*" multiple data-ga hidden></label>`:""}</div></div>`:""}
+    <section class="tile nsec win" id="nWin"></section>
+    <section class="tile nsec real" id="nReal"></section>
+  </article>`;
+  watchNotes(r.id);drawNotes();
+  const atb=document.getElementById("aiTipsBtn");if(atb)atb.onclick=()=>buildTips(r);
+  view.querySelectorAll("[data-jump]").forEach(a=>a.onclick=async e=>{e.preventDefault();const id=a.dataset.jump;let t=document.getElementById(id);
+    if(!t&&id.startsWith("c-")){const c=cmts.find(x=>"c-"+x.id===id);if(c){openAll.add(c.note);await drawNotes();t=document.getElementById(id)}}
+    if(!t){toast("Этот отзыв уже удалён");return}t.scrollIntoView({behavior:"smooth",block:"center"});t.classList.remove("flash");void t.offsetWidth;t.classList.add("flash")});
+  const clearSel=()=>view.querySelectorAll(".pt").forEach(x=>x.classList.remove("pt"));
+  if(canUp&&editOn){view.querySelectorAll("ol.steps li[data-step]").forEach(li=>li.addEventListener("click",e=>{if(e.target.closest("button,label,input,[contenteditable]"))return;if(e.target.closest("a"))e.preventDefault();const n=+li.dataset.step;pasteStep=pasteStep===n?null:n;clearSel();if(pasteStep!==null)li.classList.add("pt")}));
+    const mp=document.getElementById("mainPh");if(mp)mp.addEventListener("click",e=>{if(e.target.closest("a,button,label,input"))return;pasteStep=pasteStep==="main"?null:"main";clearSel();if(pasteStep==="main")mp.classList.add("pt")})}
+  document.getElementById("back").onclick=()=>{openId=null;editOn=false;try{history.replaceState(null,"",location.pathname)}catch(e){};render()};
+  const eb=document.getElementById("editBtn");
+  const toggleEdit=()=>{editOn=!editOn;pasteStep=null;showUrl=false;moreOpen=false;render()};
+  document.getElementById("moreBtn").onclick=e=>{e.stopPropagation();moreOpen=!moreOpen;render()};
+  document.getElementById("shareBtn").onclick=()=>shareRecipe(r);
+  view.querySelectorAll("[data-ma]").forEach(b=>b.onclick=async()=>{const a=b.dataset.ma;moreOpen=false;
+    if(a==="copy")return copyRecipe(r);
+    if(a==="fav"){render();if(db)togglePlan(r.id);return}
+    if(a.startsWith("st:")){render();try{await db.collection("recipes").doc(r.id).update({status:a.slice(3)});toast("Статус сохранён")}catch(e){toast("Не получилось сохранить")}}});
+  view.querySelectorAll("[data-srv]").forEach(b=>b.onclick=async()=>{const base=baseServes(r);if(!base)return;const v=b.dataset.srv;let n=v==="reset"?base:Math.max(1,curServes(r)+(+v));
+    viewServes[r.id]=n;try{localStorage.setItem("viewServes",JSON.stringify(viewServes))}catch(e){}
+    if(scheduled().includes(r.id)){const po={...(plan.portions||{})};if(n===planDefault(r))delete po[r.id];else po[r.id]=n;plan={...plan,portions:po};savePlan(plan)}render()});
+  view.querySelectorAll("[data-openr]").forEach(a=>a.onclick=e=>{e.preventDefault();openId=a.dataset.openr;render();window.scrollTo(0,0)});
+  if(eb)eb.onclick=toggleEdit;const ed2=document.getElementById("editDone");if(ed2)ed2.onclick=toggleEdit;
+  const af=document.getElementById("allFields");if(af)af.onclick=()=>{editOn=false;editing=recipes.find(x=>x.id===r.id)||r;render()};
+  view.querySelectorAll("input[data-si]").forEach(inp=>inp.onchange=()=>{if(inp.files[0])setPhoto(r,+inp.dataset.si,inp.files[0])});
+  view.querySelectorAll("input[data-ip]").forEach(inp=>inp.onchange=()=>{if(inp.files[0])setPhoto(r,"ing",inp.files[0])});
+  view.querySelectorAll("[data-ipx]").forEach(b=>b.onclick=()=>setPhoto(r,"ing",null));
+  const ip=document.getElementById("ingPh");if(ip&&editOn&&canUp)ip.addEventListener("click",e=>{if(e.target.closest("button,label,input"))return;e.preventDefault();pasteStep=pasteStep==="ing"?null:"ing";clearSel();if(pasteStep==="ing")ip.classList.add("pt")});
+  view.querySelectorAll("input[data-mp]").forEach(inp=>inp.onchange=()=>{if(inp.files[0])setPhoto(r,"main",inp.files[0])});
+  view.querySelectorAll("[data-sx]").forEach(b=>b.onclick=()=>setPhoto(r,+b.dataset.sx,null));
+  view.querySelectorAll("[data-gx]").forEach(b=>b.onclick=()=>setPhoto(r,"g"+b.dataset.gx,null));
+  view.querySelectorAll("input[data-ga]").forEach(inp=>inp.onchange=async()=>{for(const f of [...inp.files])await setPhoto(r,"gal",f)});
+  if(editOn){
+    view.querySelectorAll("[data-sdel]").forEach(b=>b.onclick=()=>{const n=+b.dataset.sdel;if(!confirm("Удалить шаг "+(n+1)+"?"))return;editArr(r,x=>{const cut=a=>{a=[...(a||[])];a.splice(n,1);return a};return {steps:cut(x.steps),stepTitles:cut(x.stepTitles),stepPhotos:cut(x.stepPhotos)}})});
+    view.querySelectorAll("[data-smv]").forEach(b=>b.onclick=()=>{const [n,d]=b.dataset.smv.split(":").map(Number),m=n+d;editArr(r,x=>{const L=(x.steps||[]).length;if(m<0||m>=L)return {};const sw=a=>{a=[...(a||[])];while(a.length<L)a.push("");[a[n],a[m]]=[a[m],a[n]];return a};return {steps:sw(x.steps),stepTitles:sw(x.stepTitles),stepPhotos:sw(x.stepPhotos)}});pasteStep=null});
+    view.querySelectorAll("[data-idel]").forEach(b=>b.onclick=()=>{const n=+b.dataset.idel;editArr(r,x=>{const a=[...(x.ingredients||[])];a.splice(n,1);return {ingredients:a}})});
+    view.querySelectorAll("[data-tdel]").forEach(b=>b.onclick=()=>{const n=+b.dataset.tdel;editArr(r,x=>{const a=[...(x.tips||[])];a.splice(n,1);return {tips:a}})});
+    const wc=document.getElementById("wholeChk");if(wc)wc.onchange=()=>editArr(r,()=>({whole:wc.checked}));
+    const au=document.getElementById("addUrl");if(au)au.onclick=()=>{showUrl=true;focusAfter="recipeUrl";render()};
+    const ud=document.getElementById("urlDel");if(ud)ud.onclick=()=>{showUrl=false;editArr(r,()=>({recipeUrl:""}))};
+    const as=document.getElementById("addStep");if(as)as.onclick=()=>{const n=(r.steps||[]).length;editArr(r,x=>{const t=[...(x.stepTitles||[])];while(t.length<n)t.push("");t.push("");return {steps:[...(x.steps||[]),"Новый шаг"],stepTitles:t}},"st:"+n)};
+    const ai=document.getElementById("addIng");if(ai)ai.onclick=()=>{const n=(r.ingredients||[]).length;editArr(r,x=>({ingredients:[...(x.ingredients||[]),{name:"Новый продукт",amount:""}]}),"ing:"+n+":name")};
+    const at=document.getElementById("addTip");if(at)at.onclick=()=>{const n=(r.tips||[]).length;editArr(r,x=>({tips:[...(x.tips||[]),"Новый совет | Что сделать"]}),"tip:"+n+":t")};
+    if(focusAfter){const el=view.querySelector(`[data-ed="${focusAfter}"]`);focusAfter=null;if(el){el.focus();const s=getSelection(),rg=document.createRange();rg.selectNodeContents(el);s.removeAllRanges();s.addRange(rg)}}}
+}
+
+/* Photos are managed in edit mode; changes save immediately (independent of the text form). */
+function photoSecHtml(r){const sp=r.stepPhotos||[],steps=r.steps||[],gal=r.gallery||[];
+  const th=(id,label,act)=>`<div class="pth ${pasteStep!==null&&act==="s"+pasteStep?"pt":""}" ${act[0]==="s"?`data-pick="${act.slice(1)}"`:""}>${id?`<img src="${esc(blobUrl(id))}" alt="">`:`<span class="pe">${IC.cam}</span>`}<span class="pl2">${label}</span><span class="pbtns"><label class="btn">${id?"Заменить":"Добавить"}<input type="file" accept="image/*" data-up="${act}" hidden></label>${id?`<button class="btn link" type="button" data-del="${act}">Убрать</button>`:""}</span></div>`;
+  return `<h3>Фото</h3><p class="hint2">Сохраняются сразу. Можно вставить через <kbd>Ctrl</kbd>+<kbd>V</kbd>: нажми на шаг и вставь.</p>
+  <p class="label" style="margin:6px 0 0">Главное фото</p><div class="pgrid">${th(r.photo,"Обложка","main")}</div>
+  ${steps.length?`<p class="label" style="margin:6px 0 0">Фото шагов</p><div class="pgrid">${steps.map((_,n)=>th(sp[n],"Шаг "+(n+1),"s"+n)).join("")}</div>`:""}
+  <p class="label" style="margin:6px 0 0">Фото процесса</p><div class="pgrid">${gal.map((g,ix)=>th(g.id,"Фото "+(ix+1),"g"+ix)).join("")}<label class="addtile">${IC.plus} Добавить<input type="file" accept="image/*" multiple data-up="gadd" hidden></label></div>`}
+async function photoAct(act,files){const r=editing;if(!r||!r.id||!assets||!db)return;
+  try{let upd={};
+    if(act==="gadd"){toast("Загружаю фото…");const add=[];for(const f of files){const a=await assets.upload(f);add.push({id:a.id,caption:""})}upd.gallery=[...(r.gallery||[]),...add]}
+    else{const kind=act[0]==="s"?"s":act[0]==="g"?"g":"m",n=kind==="m"?0:+act.slice(1);let id="";
+      if(files){toast("Загружаю фото…");id=(await assets.upload(files[0])).id}
+      if(kind==="m")upd.photo=id;
+      else if(kind==="s"){const arr=[...(r.stepPhotos||[])];while(arr.length<=n)arr.push("");arr[n]=id;upd.stepPhotos=arr}
+      else{const g=[...(r.gallery||[])];if(id)g[n]={...g[n],id};else g.splice(n,1);upd.gallery=g}}
+    await db.collection("recipes").doc(r.id).update(upd);editing={...editing,...upd};pasteStep=null;drawPhotoSec();toast(files?"Фото сохранено":"Фото убрано")}
+  catch(e){toast("Не получилось: "+(e.message||e.code))}}
+function drawPhotoSec(){const el=document.getElementById("photoSec");if(!el||!editing)return;el.innerHTML=photoSecHtml(editing);
+  el.querySelectorAll("input[data-up]").forEach(i=>i.onchange=()=>{if(i.files.length)photoAct(i.dataset.up,[...i.files])});
+  el.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>photoAct(b.dataset.del,null));
+  el.querySelectorAll("[data-pick]").forEach(d=>d.addEventListener("click",e=>{if(e.target.closest("label,button,input"))return;const n=+d.dataset.pick;pasteStep=pasteStep===n?null:n;el.querySelectorAll(".pth.pt").forEach(x=>x.classList.remove("pt"));if(pasteStep!==null){d.classList.add("pt");toast("Шаг "+(n+1)+" выбран — нажми Ctrl+V")}}))}
+
+const NK={win:{em:"🎉",title:"Получилось!",sub:"Покажи, что вышло: фото и пара слов.",btn:"🎉 Похвастаться",empty:"Пока никто не хвастался. Приготовь и покажи! 🍰",ph:"Что получилось? Что понравилось?"},
+  real:{em:"🙈",title:"Ожидание и реальность",sub:"Упс! Что пошло не по плану и почему. Фото провалов особенно ценятся 😅",btn:"🙈 Упс, рассказать",empty:"Пока без «упс». Если что-то пошло не так — покажи, разберёмся 🕵️",ph:"Что вышло не так, как ожидалось?"}};
+const HEART='<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.2-9.2C1.6 8 3.6 4.5 7.1 4.5c2 0 3.5 1.1 4.9 2.9 1.4-1.8 2.9-2.9 4.9-2.9 3.5 0 5.5 3.5 4.3 6.8-1.7 4.6-9.2 9.2-9.2 9.2z" fill="var(--hf,none)" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>';
+const BUBBLE='<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M20.5 11.5a8.5 8.5 0 01-12.6 7.4L3.5 20.5l1.6-4.2A8.5 8.5 0 1120.5 11.5z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></svg>';
+let cmts=[],likes=[],cDraft={},openMenu=null,openAll=new Set(),meId=null,nUnsubs=[];
+function watchNotes(id){if(!db||notesFor===id)return;nUnsubs.forEach(u=>{try{u()}catch(e){}});notesFor=id;notes=[];cmts=[];likes=[];nDraft=null;cDraft={};openMenu=null;openAll=new Set();
+  const base="recipes/"+id+"/";
+  nUnsubs=[db.collection(base+"notes").onSnapshot(sn=>{notes=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.at||0)-(a.at||0));drawNotes()},()=>{}),
+    db.collection(base+"comments").onSnapshot(sn=>{cmts=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.at||0)-(b.at||0));drawNotes()},()=>{}),
+    db.collection(base+"likes").onSnapshot(sn=>{likes=sn.docs.map(d=>({id:d.id,...d.data()}));drawNotes()},()=>{})]}
+const fmtD=t=>t?new Date(t).toLocaleDateString("ru-RU",{day:"numeric",month:"short"}):"";
+async function drawNotes(){if(!openId||editing||importing)return;
+  if(who&&!meId)meId=await who.id().catch(()=>null);
+  const canW=!!db&&!(who&&who.can&&who.can("data.write")===false),canAdm=(()=>{const cr=recipes.find(x=>x.id===openId);return !!(cr&&typeof ME!=="undefined"&&ME&&cr.owner===ME.id)})();
+  const ids=[...new Set([...notes,...cmts].map(n=>n.by).filter(Boolean))];const ps=ids.length&&who?await who.profiles(ids).catch(()=>({})):{};
+  const av=by=>{const p=by&&ps[by];return p&&p.avatarUrl?`<img class="av" src="${esc(p.avatarUrl)}" alt="">`:`<span class="av av0" aria-hidden="true"></span>`};
+  const nm=by=>`<b class="nm2" data-by="${esc(by||"")}"></b>`;
+  const mine=by=>canAdm||(meId&&by===meId);
+  const focusedC=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.cin:null;
+  for(const kind of ["win","real"]){const el=document.getElementById(kind==="win"?"nWin":"nReal");if(!el)continue;const k=NK[kind],list=notes.filter(n=>n.kind===kind),dr=nDraft&&nDraft.kind===kind?nDraft:null;
+    const post=n=>{const lk=likes.filter(l=>l.note===n.id),liked=meId&&lk.some(l=>l.by===meId),cs=cmts.filter(c=>c.note===n.id),showAll=openAll.has(n.id)||cs.length<=2,vis=showAll?cs:cs.slice(-2);
+      return `<article class="post" id="p-${esc(n.id)}"><header class="phd">${av(n.by)}<span class="who">${n.by?nm(n.by):""}<span class="when">${n.by?" · ":""}${esc(fmtD(n.at))}</span></span>
+        ${canW&&mine(n.by)?`<button class="more" type="button" data-more="${esc(n.id)}" aria-label="Ещё">⋯</button>`:""}</header>
+        ${openMenu===n.id?`<div class="sheetmenu" role="menu"><button type="button" class="danger" data-ndel="${esc(n.id)}">Удалить</button><button type="button" data-mclose>Отмена</button></div>`:""}
+        ${n.photo?`<div class="pimg"><img src="${esc(blobUrl(n.photo))}" alt="" loading="lazy"></div>`:""}
+        <div class="acts">${canW?`<button type="button" class="lk${liked?" on":""}" data-like="${esc(n.id)}" aria-pressed="${!!liked}" aria-label="Нравится">${HEART}</button><button type="button" data-cfocus="${esc(n.id)}" aria-label="Комментировать">${BUBBLE}</button>`:""}</div>
+        ${lk.length?`<p class="lkn">${lk.length} ${lk.length===1?"отметка «нравится»":"отметок «нравится»"}</p>`:""}
+        ${n.text?`<p class="cap">${n.by?nm(n.by)+" ":""}${esc(n.text)}</p>`:""}
+        ${cs.length>2&&!showAll?`<button type="button" class="allc" data-allc="${esc(n.id)}">Посмотреть все комментарии (${cs.length})</button>`:""}
+        ${vis.length?`<ul class="cmts">${vis.map(c=>`<li id="c-${esc(c.id)}">${av(c.by)}<div><p>${c.by?nm(c.by)+" ":""}${esc(c.text)}</p><span class="cmeta">${esc(fmtD(c.at))}${canW&&mine(c.by)?` · <button type="button" data-cdel="${esc(c.id)}">Удалить</button>`:""}</span></div></li>`).join("")}</ul>`:""}
+        ${canW?`<form class="cadd" data-cadd="${esc(n.id)}"><input data-cin="${esc(n.id)}" placeholder="Добавьте комментарий…" maxlength="1000" value="${esc(cDraft[n.id]||"")}" aria-label="Комментарий"><button type="submit" ${cDraft[n.id]?"":"disabled"}>Опубликовать</button></form>`:""}
+      </article>`};
+    el.innerHTML=`<div class="nhead"><h3><span class="em" aria-hidden="true">${k.em}</span>${k.title}</h3>${canW&&!dr?`<button class="btn nadd" type="button" data-nadd="${kind}">${k.btn}</button>`:""}</div><p class="sub0">${k.sub}</p>
+      ${dr?`<div class="nform"><label>${kind==="win"?"Комментарий":"Что вышло"}<textarea data-nf="text" placeholder="${k.ph}">${esc(dr.text||"")}</textarea></label>
+        ${assets?`<div class="nph">${dr.url?`<img src="${dr.url}" alt="">`:""}<label class="btn">${IC.cam} ${dr.file?"Другое фото":"Фото"}<input type="file" accept="image/*" data-nf="file" hidden></label><span class="hint">или вставь Ctrl+V</span></div>`:""}
+        <div class="row3"><button class="btn primary" type="button" data-nsave>${dr.busy?"Публикую…":"Опубликовать"}</button><button class="btn link" type="button" data-ncancel>Отмена</button></div></div>`:""}
+      <div class="nlist">${list.length?list.map(post).join(""):(dr?"":`<p class="nempty">${k.empty}</p>`)}</div>`;
+    el.querySelectorAll(".nm2[data-by]").forEach(x=>{const q=ps[x.dataset.by];x.textContent=(q&&q.name)||"Кто-то"});
+    el.querySelectorAll("[data-nadd]").forEach(b=>b.onclick=()=>{nDraft={kind:b.dataset.nadd,text:"",cause:""};drawNotes().then(()=>{const t=el.querySelector("textarea");if(t)t.focus()})});
+    el.querySelectorAll("textarea[data-nf]").forEach(t=>t.oninput=()=>{if(nDraft)nDraft[t.dataset.nf]=t.value});
+    const fi=el.querySelector("input[data-nf=file]");if(fi)fi.onchange=()=>{if(fi.files[0])setDraftFile(fi.files[0])};
+    const fm=el.querySelector(".nform");if(fm)fm.addEventListener("paste",e=>{const f=[...(e.clipboardData?.items||[])].find(it=>it.kind==="file"&&it.type.startsWith("image/"))?.getAsFile();if(f){e.preventDefault();e.stopPropagation();setDraftFile(f)}});
+    el.querySelectorAll("[data-ncancel]").forEach(b=>b.onclick=()=>{nDraft=null;drawNotes()});
+    el.querySelectorAll("[data-nsave]").forEach(b=>b.onclick=saveNote);
+    el.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{openMenu=openMenu===b.dataset.more?null:b.dataset.more;drawNotes()});
+    el.querySelectorAll("[data-mclose]").forEach(b=>b.onclick=()=>{openMenu=null;drawNotes()});
+    el.querySelectorAll("[data-ndel]").forEach(b=>b.onclick=async()=>{const nid=b.dataset.ndel;openMenu=null;try{await db.collection("recipes/"+notesFor+"/notes").doc(nid).delete();
+      for(const c of cmts.filter(c=>c.note===nid))await db.collection("recipes/"+notesFor+"/comments").doc(c.id).delete().catch(()=>{});
+      for(const l of likes.filter(l=>l.note===nid))await db.collection("recipes/"+notesFor+"/likes").doc(l.id).delete().catch(()=>{});toast("Публикация удалена")}catch(e){toast("Не получилось удалить")}});
+    el.querySelectorAll("[data-like]").forEach(b=>b.onclick=async()=>{if(!meId){toast("Войди в claude.ai, чтобы ставить лайки");return}const nid=b.dataset.like,lid=nid+"__"+meId,ref=db.collection("recipes/"+notesFor+"/likes").doc(lid);
+      try{if(likes.some(l=>l.id===lid))await ref.delete();else await ref.set({note:nid,by:meId,at:Date.now()})}catch(e){toast("Не получилось")}});
+    el.querySelectorAll("[data-cfocus]").forEach(b=>b.onclick=()=>{const i=el.querySelector(`input[data-cin="${b.dataset.cfocus}"]`);if(i)i.focus()});
+    el.querySelectorAll("[data-allc]").forEach(b=>b.onclick=()=>{openAll.add(b.dataset.allc);drawNotes()});
+    el.querySelectorAll("input[data-cin]").forEach(i=>i.oninput=()=>{cDraft[i.dataset.cin]=i.value;const s=i.form.querySelector("button");s.disabled=!i.value.trim()});
+    el.querySelectorAll("form[data-cadd]").forEach(f=>f.onsubmit=async e=>{e.preventDefault();const nid=f.dataset.cadd,t=(cDraft[nid]||"").trim();if(!t)return;
+      try{const doc={note:nid,text:t,at:Date.now()};if(meId)doc.by=meId;cDraft[nid]="";await db.collection("recipes/"+notesFor+"/comments").add(doc)}catch(err){cDraft[nid]=t;toast("Не получилось: "+(err.message||err.code));drawNotes()}});
+    el.querySelectorAll("[data-cdel]").forEach(b=>b.onclick=async()=>{try{await db.collection("recipes/"+notesFor+"/comments").doc(b.dataset.cdel).delete()}catch(e){toast("Не получилось удалить")}});
+    if(focusedC){const i=el.querySelector(`input[data-cin="${focusedC}"]`);if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}}}
+function setDraftFile(f){if(!nDraft)return;if(nDraft.url)try{URL.revokeObjectURL(nDraft.url)}catch(e){};nDraft.file=f;nDraft.url=URL.createObjectURL(f);drawNotes()}
+async function saveNote(){const d=nDraft;if(!d||d.busy)return;const text=(d.text||"").trim();if(!text&&!d.file){toast("Напиши пару слов или добавь фото");return}
+  d.busy=true;drawNotes();
+  try{let photo="";if(d.file&&assets)photo=(await assets.upload(d.file)).id;const by=who?await who.id().catch(()=>null):null;
+    const doc={kind:d.kind,text,at:Date.now(),photo};if(by)doc.by=by;
+    await db.collection("recipes/"+notesFor+"/notes").add(doc);nDraft=null;toast(d.kind==="win"?"Ура! 🎉":"Упс записан 🙈");drawNotes()}
+  catch(e){d.busy=false;toast("Не получилось сохранить: "+(e.message||e.code));drawNotes()}}
+/* AI tips: built on demand from "Ожидание и реальность" posts and all comments; every quote must be an exact excerpt of its source */
+function splitTip(t){t=String(t||"");const i=t.indexOf(" | ");return i>0?{title:t.slice(0,i).trim(),text:t.slice(i+3).trim()}:{title:"",text:t.trim()}}
+function tipsHtml(r){const own=(r.tips||[]).map(splitTip),ai=((r.aiTips&&r.aiTips.items)||[]).filter(t=>t.tip);const can=!!sample&&!!db&&typeof ME!=="undefined"&&!!ME&&r.owner===ME.id;
+  if(!own.some(t=>t.text)&&!ai.length&&!can&&!editOn)return"";
+  const card=(t,aiItem,ix)=>editOn&&!aiItem?`<article class="tcard"><h5${ed("tip:"+ix+":t","Заголовок")}>${esc(t.title)}</h5><p${ed("tip:"+ix+":x","Совет")}>${esc(t.text)}</p><button class="idel tdel" type="button" data-tdel="${ix}" aria-label="Удалить совет">✕</button></article>`:`<article class="tcard${aiItem?" ai":""}">${t.title?`<h5>${esc(t.title)}</h5>`:""}<p>${esc(t.text)}</p>${aiItem&&aiItem.quote?`<p class="aq">«${esc(aiItem.quote)}» <a href="#${esc(aiItem.anchor)}" data-jump="${esc(aiItem.anchor)}">→ ${aiItem.anchor.startsWith("c-")?"к комментарию":"к публикации"}</a></p>`:""}${aiItem?`<span class="aib">✨ из отзывов</span>`:""}</article>`;
+  return `<div class="tipsec"><p class="label" style="margin:0">Чтобы не испортить</p><div class="tcards">${own.map((t,ix)=>editOn||t.text?card(t,null,ix):"").join("")}${ai.map(i=>card({title:i.title||"",text:i.tip},i)).join("")}</div>
+    ${editOn?`<button class="btn link addln" type="button" id="addTip">${IC.plus} Совет</button>`:""}${can?`<button class="btn link" type="button" id="aiTipsBtn" style="padding:4px 0;align-self:flex-start">${ai.length?"✨ Обновить советы из отзывов":"✨ Собрать советы из отзывов"}</button>`:""}</div>`}
+async function buildTips(r){const real=notes.filter(n=>n.kind==="real"),src=[];
+  real.forEach(n=>src.push({ref:"p-"+n.id,type:"упс",text:[n.text,n.cause].filter(Boolean).join(" Причина: ")}));
+  cmts.forEach(c=>src.push({ref:"c-"+c.id,type:"комментарий",text:c.text}));
+  if(!src.length){toast("Пока нечего собирать — нет «упсов» и комментариев");return}
+  const b=document.getElementById("aiTipsBtn");if(b){b.disabled=true;b.textContent="Собираю…"}
+  try{const out=await sample.json(`Ты помогаешь вести банк рецептов. Рецепт: «${r.title}». Ниже — отзывы людей, которые его готовили: «упсы» (что пошло не так) и комментарии.
+Сделай 2–5 коротких практичных советов на русском: что может пойти не так и как этого избежать. Только то, что действительно следует из отзывов, ничего не выдумывай. Не повторяй одно и то же.
+Не повторяй советы, которые уже есть в рецепте:
+${(r.tips||[]).map(t=>"- "+splitTip(t).text).join("\n")||"(нет)"}
+У каждого совета — заголовок из 1–4 ключевых слов (например «Влажный низ», «Сухой верх»).
+К каждому совету приложи дословную цитату (до 15 слов, точный кусок текста без изменений) из одного отзыва и его ref.
+Ответь ТОЛЬКО JSON: {"tips":[{"title":"…","tip":"…","quote":"…","ref":"…"}]}
+Отзывы:
+${src.map(s=>`[${s.ref}] (${s.type}) ${s.text}`).join("\n")}`,{modelTier:"default",cache:false});
+    const items=((out&&out.tips)||[]).map(t=>{const s=src.find(x=>x.ref===t.ref);const q=String(t.quote||"").trim().replace(/^[«"]|[»"]$/g,"");return {title:String(t.title||"").trim(),tip:String(t.tip||"").trim(),quote:s&&q&&s.text.includes(q)?q:"",anchor:s?s.ref:""}}).filter(t=>t.tip).slice(0,5);
+    await db.collection("recipes").doc(r.id).update({aiTips:{items,at:Date.now()}});toast("Советы обновлены ✨")}
+  catch(e){toast(e.code==="not_granted"?"Нужно разрешить странице обращаться к Claude":"Не получилось: "+(e.message||e.code));if(b){b.disabled=false;b.textContent="✨ Собрать советы"}}}
+function renderForm(r){
+  const isNew=!r.id;
+  const ing=(r.ingredients||[]).map(ingToLine).join("\n");
+  view.innerHTML=`
+  <button class="btn back" type="button" id="cancel">${IC.back} Назад</button>
+  <form class="edit" id="f">
+    <h2>${isNew?"Новый рецепт":"Изменить рецепт"}</h2>
+    <div class="row">
+      <label for="f_title">Название<input id="f_title" required value="${esc(r.title||"")}"></label>
+      <label for="f_status">Статус<select id="f_status">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${(r.status||"want")===k?"selected":""}>${v}</option>`).join("")}</select></label>
+    </div>
+    <div class="row">
+      <label for="f_video">Ссылка на видео<input id="f_video" type="url" placeholder="https://…" value="${esc(r.video||"")}"></label>
+      <label for="f_url">Ссылка на рецепт<input id="f_url" type="url" placeholder="https://…" value="${esc(r.recipeUrl||"")}"></label>
+    </div>
+    <div class="row">
+      <label for="f_oven">Духовка<input id="f_oven" placeholder="190 °C · 45 мин" value="${esc(r.oven||"")}"></label>
+      <label for="f_ovenn">Режим и уровень<input id="f_ovenn" placeholder="верх/низ нагрев · средний уровень" value="${esc(r.ovenNote||"")}"></label>
+      <label for="f_serv">Порции<input id="f_serv" value="${esc(r.servings||"")}"></label>
+      <label for="f_time">Время<input id="f_time" value="${esc(r.time||"")}"></label>
+    </div>
+    <label for="f_ing">Продукты <span class="hint">по одному в строке: «Продукт (по-немецки) — количество — пояснение». Например: «Яблоки (Äpfel) — 3–4 шт. — лучше кисловатые», «Изюм — 100 г, по желанию», «Для формы: Сливочное масло — 1 ч. л.»</span><textarea id="f_ing">${esc(ing)}</textarea></label>
+    <label for="f_steps">Шаги <span class="hint">один шаг — одна строка: «Заголовок | что сделать». Заголовок — 1–2 слова, что берём в руки: «Яблоки | Помой яблоки и нарежь дольками»</span><textarea id="f_steps" style="min-height:180px">${esc((r.steps||[]).map((s,n)=>stepToLine(r,s,n)).join("\n"))}</textarea></label>
+    <div class="row">
+      <label for="f_before">Заранее<textarea id="f_before" style="min-height:70px">${esc(r.before||"")}</textarea></label>
+      <label for="f_done">Как понять, что готово<textarea id="f_done" style="min-height:70px">${esc(r.done||"")}</textarea></label>
+    </div>
+    <div class="row">
+      <label for="f_storage">Хранение<textarea id="f_storage" style="min-height:70px">${esc(r.storage||"")}</textarea></label>
+      <label for="f_notes">Заметки<textarea id="f_notes" style="min-height:70px">${esc(r.notes||"")}</textarea></label>
+    </div>
+    <label for="f_tips">Чтобы не испортить <span class="hint">по одному совету в строке: «Заголовок | совет», например «Яблоки | Бери плотные и кисловатые»</span><textarea id="f_tips" style="min-height:90px">${esc((r.tips||[]).join("\n"))}</textarea></label>
+    <label style="flex-direction:row;align-items:center;gap:10px" for="f_std"><input id="f_std" type="checkbox" style="width:auto" ${r.standard?"checked":""}> Базовый рецепт (знаю наизусть — можно скрывать)</label>
+    <label style="flex-direction:row;align-items:center;gap:10px" for="f_gentle"><input id="f_gentle" type="checkbox" style="width:auto" ${r.gentle?"checked":""}> 🌿 Бережно для желудка</label>
+    <label style="flex-direction:row;align-items:center;gap:10px" for="f_easy"><input id="f_easy" type="checkbox" style="width:auto" ${r.easy?"checked":""}> Лёгкий рецепт</label>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" type="submit">Сохранить</button></div>
+  </form>
+`;
+  document.getElementById("cancel").onclick=()=>{editing=null;render()};
+  document.getElementById("f").onsubmit=async ev=>{ev.preventDefault();
+    const v=id=>document.getElementById(id).value.trim();
+    const data={title:v("f_title"),status:v("f_status"),video:v("f_video"),recipeUrl:v("f_url"),oven:v("f_oven"),ovenNote:v("f_ovenn"),servings:v("f_serv"),time:v("f_time"),
+      ingredients:v("f_ing").split("\n").map(s=>s.trim()).filter(Boolean).map(lineToIng),
+      ...(()=>{const ls=v("f_steps").split("\n").map(s=>s.trim()).filter(Boolean).map(l=>{const i=l.indexOf(" | ");return i>0?[l.slice(0,i).trim(),l.slice(i+3).trim()]:["",l]});return {steps:ls.map(x=>x[1]),stepTitles:ls.map(x=>x[0])}})(),before:v("f_before"),done:v("f_done"),storage:v("f_storage"),notes:v("f_notes"),easy:document.getElementById("f_easy").checked,standard:document.getElementById("f_std").checked,gentle:document.getElementById("f_gentle").checked,tips:v("f_tips").split("\n").map(s=>s.trim()).filter(Boolean)};
+    try{
+      if(isNew){const ref=await db.collection("recipes").add({...data,photo:"",source:r.source||"",tips:data.tips});openId=ref.id}
+      else{await db.collection("recipes").doc(r.id).update(data);openId=r.id}
+      editing=null;toast("Сохранено");render();
+    }catch(e){toast("Не получилось сохранить: "+(e.message||e.code))}
+  };
+}
+
+function renderNav(){const n=document.getElementById("nav");if(!n)return;const wk=filter==="week"&&!editing&&!importing&&!(openId&&recipes.some(x=>x.id===openId));
+  n.innerHTML=`<div class="seg"><button type="button" data-nav="bank" ${!wk?'aria-current="page"':""}>${IC.book} Рецепты <span class="cnt">${recipes.length}</span></button><button type="button" data-nav="week" ${wk?'aria-current="page"':""}>${IC.cal} Меню и покупки <span class="cnt">${scheduled().length}</span></button></div>`;
+  n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{editing=null;importing=null;openId=null;filter=b.dataset.nav==="week"?"week":(filter==="week"?"all":filter);render();window.scrollTo(0,0)})}
+function renderImport(){const st=importing;
+  view.innerHTML=`<button class="btn back" type="button" id="cancel">${IC.back} Назад</button>
+  <div class="imp"><h2>Импорт рецепта</h2>
+   <p class="muted" style="margin:0">Страница не может сама открыть Instagram или YouTube. Поэтому: вставь ссылку на видео, скопируй текст рецепта из описания или комментария и/или добавь скриншоты. Claude переведёт на русский, распишет простые шаги и типичные ошибки. Перед сохранением всё можно проверить.</p>
+   <label for="im_link">Ссылка на видео<input id="im_link" type="url" placeholder="https://www.instagram.com/reel/…" value="${esc(st.link||"")}"></label>
+   <label for="im_text">Текст рецепта (из описания, на любом языке)<textarea id="im_text" placeholder="Ингредиенты… Шаги…">${esc(st.text||"")}</textarea></label>
+   <div class="fld"><span>Скриншоты рецепта <span class="hint">по желанию, до 4</span></span><div class="drop" id="im_th"></div></div>
+   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn primary" type="button" id="im_go">${IC.spark} Разобрать рецепт</button><span class="muted" id="im_st">${esc(st.status||"")}</span></div>
+  </div>`;
+  document.getElementById("cancel").onclick=()=>{importing=null;render()};
+  const th=document.getElementById("im_th");
+  const showTh=()=>{const fs=st.files||[];
+    th.innerHTML=fs.map((f,ix)=>`<div class="th"><img alt="Скриншот ${ix+1}"><button type="button" data-rmf="${ix}" aria-label="Убрать скриншот ${ix+1}">${IC.x}</button></div>`).join("")+(fs.length<4?`<label class="addtile"><span class="pl">${IC.plus}</span>${fs.length?"Ещё":"Добавить"}<input id="im_img" type="file" accept="image/*" multiple hidden></label>`:"");
+    th.querySelectorAll(".th img").forEach((im,ix)=>{im.src=URL.createObjectURL(fs[ix])});
+    th.querySelectorAll("[data-rmf]").forEach(b=>b.onclick=()=>{st.files=fs.filter((_,j)=>j!==+b.dataset.rmf);showTh()});
+    const inp=document.getElementById("im_img");if(inp)inp.onchange=()=>{st.files=[...fs,...inp.files].slice(0,4);showTh()}};
+  showTh();
+  document.getElementById("im_go").onclick=async()=>{st.link=document.getElementById("im_link").value.trim();st.text=document.getElementById("im_text").value.trim();
+    if(!st.text&&!(st.files||[]).length){toast("Вставь текст рецепта или добавь скриншот");return}
+    if(!sample){toast("Импорт с ИИ недоступен в этом просмотре");return}
+    const stEl=document.getElementById("im_st");stEl.textContent="Разбираю рецепт… это займёт до минуты";document.getElementById("im_go").disabled=true;
+    const prompt=`Ты помогаешь вести личный банк рецептов. Ниже рецепт из видео (текст и/или скриншоты). Сделай из него карточку на русском языке.
+Правила:
+- Переведи на русский. Каждый продукт раздели на ВАЖНОЕ и ДОПОЛНИТЕЛЬНОЕ:
+  name — только короткое русское название, без скобок и пояснений («Сливочный сыр»);
+  de — немецкое название для поиска в EDEKA («Frischkäse»);
+  amount — только число + единица, коротко (г, кг, мл, л, шт., ст. л., ч. л.): «200 г», «3 шт.», «½ ч. л.». Без пояснений и скобок;
+  note — всё дополнительное: «лучше кисловатые», «~500 г», «в оригинале 200 г», «комнатной температуры». Если нечего — "";
+  optional — true, если продукт необязательный;
+  group — "" для основных продуктов; «Для формы» или «Для подачи» для того, что не входит в само блюдо.
+- Никаких расплывчатых количеств вроде «немного»: дай конкретную меру (например, масло для формы — «1 ч. л.»). Для соли/специй можно «щепотка» (≈ ⅛ ч. л.) или «по вкусу». Не придумывай количества основных продуктов: если в источнике их нет, amount «?» и упомяни это в notes.
+- steps: очень простые короткие шаги, как для ребёнка: размер нарезки, огонь (слабый/средний/сильный), минуты, как понять, что можно переходить дальше. Нет миксера и блендера — предложи замену (вилка/венчик).
+- oven: «180 °C · 25 мин» если есть духовка, иначе "". ovenNote: режим (верх/низ нагрев или конвекция), уровень, бумага/фольга.
+- stepTitles: для каждого шага заголовок из 1–2 слов — что берём в руки или что происходит: «Яблоки», «Духовка», «Тесто», «Выпечка». Столько же элементов, сколько в steps.
+- whole: true, если блюдо готовится целиком в форме (пирог, киш, торт, запеканка-пирог), иначе false.
+- serves: число — на сколько порций рассчитаны количества (если в источнике кусочки или штуки, переведи в порции; если неизвестно — 2).
+- health: 1–2 коротких предложения «чем полезно это блюдо» — только общеизвестные факты о продуктах (белок, клетчатка, витамины), без медицинских обещаний; если блюдо жирное или сладкое, честно скажи это мягко.
+- tips: 3–5 типичных ошибок, из-за которых блюдо портится, и как их избежать.
+- gentle: true только если блюдо запечённое/варёное, нежирное, не острое, без большого количества томатов, цитрусовых, сырого лука и чеснока.
+- easy: true если активной работы до 30 минут.
+Ответь ТОЛЬКО JSON-объектом с полями: title, serves (число), whole, servings, time, oven, ovenNote, ingredients (массив {name, de, amount, note, optional, group}), before, health, steps (массив строк), stepTitles (массив строк), done, storage, tips (массив строк), notes, easy, gentle.
+Текст рецепта:
+${st.text||"(только скриншоты)"}`;
+    try{const opts={modelTier:"default",cache:false};if((st.files||[]).length){const lim=await sample.limits().catch(()=>null);if(lim&&lim.images)opts.images=st.files.slice(0,lim.images.maxCount||4)}
+      const d=await sample.json(prompt,opts);
+      editing={...d,ingredients:Array.isArray(d.ingredients)?d.ingredients:[],steps:Array.isArray(d.steps)?d.steps:[],tips:Array.isArray(d.tips)?d.tips:[],video:st.link||"",status:"want",source:"Импорт по видео"};importing=null;render();toast("Проверь и нажми «Сохранить»")}
+    catch(e){st.status=e.code==="not_granted"?"Нужно разрешить странице обращаться к Claude.":"Не получилось: "+(e.message||e.code);importing=st;render()}};
+}
+let recipesLoaded=false;
+function render(){
+  if(openId&&!recipesLoaded){renderNav();view.innerHTML='<div class="empty">Загружаю рецепт…</div>';return}
+  try{const want=openId&&!editing&&!importing?"#"+encodeURIComponent(openId):"";if(location.hash!==want)history.replaceState(null,"",location.pathname+want)}catch(e){}
+  renderNav();
+  if(editing) return renderForm(editing);
+  if(importing) return renderImport();
+  const r=openId&&recipes.find(x=>x.id===openId);
+  if(r) return renderSheet(r);
+  if(openId&&openId===justCopied){view.innerHTML='<div class="empty">Создаю копию…</div>';return}
+  renderList();
+}
+
+document.addEventListener("paste",async e=>{
+  if(importing||editing||!editOn||!assets||!db||!openId)return;
+  if(e.target.isContentEditable||(e.target.closest&&e.target.closest("input,textarea")))return;
+  const f=[...(e.clipboardData?.items||[])].find(it=>it.kind==="file"&&it.type.startsWith("image/"))?.getAsFile();
+  if(!f)return;const r=recipes.find(x=>x.id===openId);if(!r)return;e.preventDefault();
+  if(pasteStep==="main")return setPhoto(r,"main",f);
+  if(pasteStep==="ing")return setPhoto(r,"ing",f);
+  if(!(r.steps||[]).length)return;const sp=r.stepPhotos||[];let n=pasteStep;
+  if(n===null){n=r.steps.findIndex((_,i)=>!sp[i]);if(n<0){toast("Выдели карточку, фото которой заменить");return}}
+  setPhoto(r,n,f)});
+/* lightbox: any recipe photo opens full screen; click the photo to zoom, Esc or ✕ to close */
+const lb=document.getElementById("lb"),lbin=document.getElementById("lbin"),lbimg=document.getElementById("lbimg");
+function openLb(src,alt){lbimg.src=src;lbimg.alt=alt||"";lbin.classList.remove("z");lb.hidden=false;document.body.style.overflow="hidden";document.getElementById("lbx").focus()}
+function closeLb(){lb.hidden=true;lbimg.src="";document.body.style.overflow=""}
+document.getElementById("lbx").onclick=closeLb;
+lb.addEventListener("click",e=>{if(e.target===lbimg){lbin.classList.toggle("z");return}if(e.target===lb||e.target===lbin)closeLb()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!lb.hidden)closeLb()});
+view.addEventListener("click",e=>{if(e.defaultPrevented||editOn)return;const a=e.target.closest('.ingph a,.sfig a');if(!a||e.ctrlKey||e.metaKey)return;e.preventDefault();openLb(a.getAttribute("href"),a.querySelector("img")?.alt)});
+/* save inline edits on blur; Enter finishes a field; snapshots wait while someone is typing on the page */
+const busyTyping=()=>{const a=document.activeElement;return !!(a&&view.contains(a)&&(a.isContentEditable||/^(INPUT|TEXTAREA)$/.test(a.tagName)))};
+view.addEventListener("focusout",e=>{const el=e.target;if(el.dataset&&el.dataset.ed)saveEd(el);setTimeout(()=>{if(pendingRender&&!busyTyping()){pendingRender=false;render()}},0)});
+document.addEventListener("click",e=>{if(moreOpen&&!e.target.closest(".ract")){moreOpen=false;if(openId&&!editing)render()}});
+view.addEventListener("keydown",e=>{const el=e.target;if(el.dataset&&el.dataset.ed){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();el.blur()}else if(e.key==="Escape"){el.blur()}}});
+window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
+  [db,assets,sample,who]=[_db,_assets,_sample,_who];
+  const ib=document.getElementById("impBtn");ib.innerHTML=IC.plus+" Новый рецепт";ib.hidden=false;
+  ib.onclick=()=>{if(sample){importing={};editing=null;render();window.scrollTo(0,0);return}newRecipe()};
+  db.collection("templates").onSnapshot(sn=>{templates=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created||0)-(a.created||0));if(!editing&&!importing&&filter==="week")render()},()=>{});
+  db.doc("plan/week").onSnapshot(d=>{const v=d.exists?d.data():{};plan={ids:v.ids||[],have:v.have||[],need:v.need||[],slots:v.slots||{},opt:v.opt||[],portions:v.portions||{},people:v.people||2};if(!editing&&!busyTyping())render()},()=>{});
+  db.collection("recipes").onSnapshot(snap=>{
+    recipes=snap.docs.map(d=>({id:d.id,...d.data()}));recipesLoaded=true;
+    if(editing)return;if(busyTyping()){pendingRender=true;return}render();
+  },err=>{view.innerHTML=`<div class="empty">Не удалось загрузить рецепты (${esc(err.code||err.message||"ошибка")}). Обнови страницу.</div>`});
+};
+async function newRecipe(){try{toast("Создаю рецепт…");const ref=await db.collection("recipes").add({title:"Новый рецепт",status:"want",serves:2,ingredients:[],steps:[],stepTitles:[],tips:[],source:"",video:"",recipeUrl:"",photo:""});justCopied=ref.id;openId=ref.id;filter="all";render();window.scrollTo(0,0)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
+</script>
+<script src="backend.js"></script>
+
+</body></html>
