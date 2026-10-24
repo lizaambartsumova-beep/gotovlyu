@@ -55,9 +55,37 @@ button,select,input,textarea{font:inherit;color:inherit}
 .profbtn{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--paper);border-radius:999px;padding:5px 14px 5px 5px;cursor:pointer;font-weight:600;color:var(--ink)}
 .profbtn.guest{background:var(--ink);color:var(--paper);padding:10px 18px}
 .profbtn .av{width:32px;height:32px;border-radius:50%}
-.byline{margin:0;display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted)}
-.byline .av{width:24px;height:24px;border-radius:50%}
+.byline{margin:0;display:flex;align-items:center;gap:10px;font-size:.92rem;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;font:inherit;text-align:left;align-self:flex-start}
+.byline .av{width:36px;height:36px;border-radius:50%;object-fit:cover}
 .byline b{color:var(--ink)}
+.byline:hover b{text-decoration:underline}
+.story{margin:0;font-style:italic;line-height:1.5;color:var(--ink);border-left:3px solid var(--line);padding-left:12px}
+.story[data-ed]:empty::before{content:attr(data-ph);color:var(--muted)}
+.cby{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted);font-weight:600}
+.cby .av{width:20px;height:20px;border-radius:50%;object-fit:cover}
+.people{display:flex;gap:16px;align-items:flex-start;overflow-x:auto;padding:2px 2px 6px;margin:0 0 20px}
+.pp{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;cursor:pointer;font:inherit;font-size:.82rem;font-weight:600;color:var(--ink);width:72px;flex:none}
+.pp img{width:64px;height:64px;border-radius:50%;object-fit:cover;padding:3px;background:var(--paper);box-shadow:0 0 0 2.5px var(--accent,#F04D36)}
+.pp span{max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pp.inv img,.pp.inv .plus{box-shadow:0 0 0 2px var(--line)}
+.pp .plus{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:1.8rem;color:var(--muted);background:var(--paper);border:2px dashed var(--line);box-sizing:border-box}
+.phead{display:flex;flex-wrap:wrap;gap:16px 20px;align-items:center;margin:0 0 20px}
+.phead .avbig{width:96px;height:96px}
+.phead h2{margin:0;font-family:var(--display);font-size:1.8rem}
+.phead p{margin:2px 0 0}
+.pstats b{color:var(--ink)}
+.avbig{width:72px;height:72px;border-radius:50%;object-fit:cover;flex:none}
+.avrow{display:flex;gap:16px;align-items:center}
+.avbtns{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.pweek{margin-bottom:24px}
+.pweek h3,.psub{margin:0 0 12px;font-size:1.15rem}
+.wdays{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.wday{background:var(--soft);border-radius:12px;padding:10px 12px}
+.wday b{display:block;margin-bottom:4px}
+.wday ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px;font-size:.9rem}
+.wday .wm{color:var(--muted);font-size:.78rem;margin-right:4px}
+.wday a,.wfav a{color:var(--ink)}
+.wfav{margin:12px 0 0;font-size:.9rem}
 /* header */
 header.top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;margin-bottom:28px}
 header.top h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:.3em}
@@ -526,7 +554,8 @@ let editOn=false, focusAfter=null, pendingRender=false, showUrl=false, moreOpen=
 let sample=null, pasteStep=null, pasteFor=null, who=null, notes=[], notesFor=null, nDraft=null;
 let db=null, assets=null, recipes=[], filter="all", openId=null, editing=null, plan={ids:[],have:[],need:[],slots:{}}, sel=null, quickSlot=null, templates=[], tplConfirm=null;
 const view=document.getElementById("view");
-try{const h=decodeURIComponent(location.hash.slice(1)); if(h) openId=h;}catch(e){}
+let person=null;
+try{const h=decodeURIComponent(location.hash.slice(1)); if(h.startsWith("u/")) person=h.slice(2); else if(h) openId=h;}catch(e){}
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function toast(t){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
@@ -704,29 +733,65 @@ function bindHave(){const inp=document.getElementById("haveIn");if(!inp)return;c
 function ingLine(r){const ing=(r.ingredients||[]).map(normIng).filter(i=>!i.group&&i.name&&!/^(соль|перец|вода)/i.test(i.name)&&!i.optional);
   if(!ing.length)return"";const shown=ing.slice(0,4).map(i=>i.name);return `<p class="ingline">${esc(shown.join(" · "))}${ing.length>4?` <span>+${ing.length-4}</span>`:""}</p>`}
 function featDetails(r){const ing=(r.ingredients||[]).map(normIng).filter(i=>!i.group&&i.name);
-  return `${r.source?`<p class="fdesc">${esc(r.source)}</p>`:""}
+  return `${r.story||r.source?`<p class="fdesc">${esc(r.story||r.source)}</p>`:""}
     ${r.health?`<div class="fblock"><p class="flab">Чем полезно</p><p class="fht">${esc(r.health)}</p></div>`:""}
     ${ing.length?`<div class="fblock"><p class="flab">Продукты</p><div class="fchips">${ing.slice(0,8).map(i=>`<span>${esc(i.name)}</span>`).join("")}${ing.length>8?`<span class="more">+${ing.length-8}</span>`:""}</div></div>`:""}`}
+/* ---- люди: аватары, личные странички, меню друзей ---- */
+const personPlans={};
+const meNow=()=>(typeof ME!=="undefined"&&ME)?ME.id:null;
+function pl(n,f){const a=n%10,b=n%100;return f[a===1&&b!==11?0:a>=2&&a<=4&&(b<10||b>=20)?1:2]}
+function peopleList(){const me=meNow();const ids=[...new Set(recipes.map(r=>r.owner).filter(Boolean))];if(me&&!ids.includes(me))ids.push(me);return ids.sort((a,b)=>(b===me)-(a===me))}
+function byMini(r){if(!r.owner||typeof profileOf!=="function")return"";const p=profileOf(r.owner);return `<span class="cby"><img class="av" src="${esc(p.avatarUrl)}" alt="">${esc(p.name||"друг")}</span>`}
+function peopleRow(){if(typeof profileOf!=="function")return"";const ids=peopleList();if(!ids.length)return"";
+  return `<div class="people" aria-label="Чьи рецепты">${ids.map(id=>{const p=profileOf(id);return `<button type="button" class="pp" data-person="${esc(id)}" title="Страничка: ${esc(p.name||"друг")}"><img src="${esc(p.avatarUrl)}" alt=""><span>${esc(p.name||"друг")}</span></button>`}).join("")}${ids.length<4?`<button type="button" class="pp inv" id="invBtn" title="Скопировать ссылку на сайт"><span class="plus">+</span><span>Позвать</span></button>`:""}</div>`}
+function bindPeople(){view.querySelectorAll("[data-person]").forEach(b=>b.onclick=e=>{e.preventDefault();if(editOn)return;person=b.dataset.person;openId=null;render();window.scrollTo(0,0)});
+  const iv=document.getElementById("invBtn");if(iv)iv.onclick=async()=>{const url=location.origin+location.pathname;try{await navigator.clipboard.writeText(url);toast("Ссылка на сайт скопирована — отправь друзьям")}catch(e){prompt("Скопируй ссылку на сайт:",url)}}}
+const WDAYS=["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"],WMEALS=[["b","Завтрак"],["l","Обед"],["d","Ужин"]];
+function weekView(pd,own){const sl=pd.slots||{},t=id=>{const r=recipes.find(x=>x.id===id);return r?`<a href="#" data-openr="${esc(r.id)}">${esc(r.title)}</a>`:""};
+  const days=WDAYS.map((d,i)=>{const li=WMEALS.flatMap(([m,lab])=>(sl[i+"-"+m]||[]).map(t).filter(Boolean).map(a=>`<li><span class="wm">${lab}</span>${a}</li>`));return li.length?`<div class="wday"><b>${d}</b><ul>${li.join("")}</ul></div>`:""}).filter(Boolean);
+  const favs=(pd.ids||[]).map(t).filter(Boolean);
+  if(!days.length&&!favs.length)return own?`<p class="muted" style="margin:0">Меню пока пустое.</p><button class="btn link" type="button" data-goweek style="padding:4px 0">Составить меню →</button>`:`<p class="muted" style="margin:0">На этой неделе пока ничего не запланировано.</p>`;
+  return `${days.length?`<div class="wdays">${days.join("")}</div>`:""}${favs.length?`<p class="wfav"><span class="muted">Хочется попробовать:</span> ${favs.join(" · ")}</p>`:""}${own?`<button class="btn link" type="button" data-goweek style="padding:8px 0 0">Открыть меню и покупки →</button>`:""}`}
+function renderPerson(uid){const p=profileOf(uid),pr=(typeof PROFILES!=="undefined"&&PROFILES[uid])||{},me=meNow();
+  const mine=recipes.filter(r=>r.owner===uid).sort((a,b)=>({plan:0,done:1,want:2}[a.status]-({plan:0,done:1,want:2}[b.status]))||String(a.title).localeCompare(b.title,"ru"));
+  const done=mine.filter(r=>r.status==="done").length;let wk;
+  if(!me)wk=`<p class="muted" style="margin:0 0 10px">Меню на неделю видят только друзья, которые вошли.</p><button class="btn primary" type="button" id="pLogin">Войти</button>`;
+  else if(uid===me)wk=weekView(plan,true);
+  else{const pd=personPlans[uid];if(pd===undefined){personPlans[uid]=null;planOf(uid).then(d=>{personPlans[uid]=d||{}}).catch(()=>{personPlans[uid]={}}).then(()=>{if(person===uid&&!openId)render()})}
+    wk=pd?weekView(pd,false):'<p class="muted" style="margin:0">Загружаю меню…</p>'}
+  view.innerHTML=`<button class="btn back" type="button" id="back">${IC.back} Все рецепты</button>
+  <section class="phead"><img class="avbig" src="${esc(p.avatarUrl)}" alt=""><div><h2>${esc(p.name||"друг")}</h2>${pr.country?`<p class="muted">${esc(pr.country)}</p>`:""}<p class="muted pstats"><b>${mine.length}</b> ${pl(mine.length,["рецепт","рецепта","рецептов"])}${done?` · получилось: <b>${done}</b>`:""}</p></div>${uid===me?`<button class="btn" type="button" id="pEdit">Изменить профиль</button>`:""}</section>
+  <section class="tile pweek"><h3>🗓 На этой неделе</h3>${wk}</section>
+  <h3 class="psub">Рецепты</h3>
+  ${mine.length?`<div class="grid">${mine.map((r,ix)=>cardHtml(r,ix,false,{},false)).join("")}</div>`:`<div class="empty">${uid===me?"Здесь появятся рецепты, которые ты добавишь.":"Пока нет рецептов."}</div>`}`;
+  document.getElementById("back").onclick=()=>{person=null;render();window.scrollTo(0,0)};
+  const pe=document.getElementById("pEdit");if(pe)pe.onclick=()=>openProfile();
+  const plg=document.getElementById("pLogin");if(plg)plg.onclick=()=>openAuth("in");
+  view.querySelectorAll("[data-goweek]").forEach(b=>b.onclick=()=>{person=null;filter="week";render();window.scrollTo(0,0)});
+  view.querySelectorAll("[data-openr]").forEach(a=>a.onclick=e=>{e.preventDefault();openId=a.dataset.openr;render();window.scrollTo(0,0)});
+  view.querySelectorAll(".card .open").forEach(c=>c.onclick=()=>{openId=c.dataset.id;render();window.scrollTo(0,0)});
+  view.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{if(db)togglePlan(b.dataset.plan)})}
+function cardHtml(r,ix,feat,hm,showBy){return `
+    <div class="card${feat?" feat":""}"><button class="open" type="button" data-id="${esc(r.id)}">
+      <div class="ph${!r.photo&&!r.ingPhoto?" noph":""}">${feat&&!r.photo&&r.ingPhoto?`<img src="${esc(blobUrl(r.ingPhoto))}" alt="${esc(r.title)}">`:photo(r)}</div>
+      <div class="body">
+        ${showBy?byMini(r):""}<h3>${esc(r.title)}</h3>
+        <div class="meta"><span class="pill ${esc(r.status)}">${STATUS[r.status]||""}</span>${r.gentle?'<span class="tag">🌿 бережно</span>':""}${r.standard?'<span class="tag">базовый</span>':""}${r.easy?'<span class="tag">лёгкий</span>':""}${r.video?'<span class="tag">▶ видео</span>':""}</div>
+        ${hm[r.id]?`<p class="ingline hv">✓ ${esc(hm[r.id].got.join(", "))} · ${hm[r.id].missing.length?`докупить ${hm[r.id].missing.length}: ${esc(hm[r.id].missing.slice(0,3).map(i=>i.name).join(", "))}${hm[r.id].missing.length>3?"…":""}`:"всё есть 🎉"}</p>`:""}
+        ${feat?featDetails(r):`${hm[r.id]?"":ingLine(r)}${r.oven?`<div class="ovenline">🔥 ${esc(r.oven)}</div>`:""}`}
+      </div></button>
+      ${feat&&r.video?`<a class="fvid" href="${esc(r.video)}" target="_blank" rel="noopener" aria-label="Смотреть видео: ${esc(r.title)}">${IC.play} Видео</a>`:""}
+      <button class="favbtn ${inPlan(r.id)?"on":""}" type="button" data-plan="${esc(r.id)}" aria-pressed="${inPlan(r.id)}" title="${inPlan(r.id)?"В избранном недели":"В избранное недели"}" aria-label="${inPlan(r.id)?"Убрать из избранного недели":"В избранное недели"}">${inPlan(r.id)?IC.starF:IC.star}</button>
+    </div>`}
 function renderList(){
   if(filter==="week") return renderPlan();
   let list=recipes.filter(r=>(filter==="all"||r.status===filter)&&!(hideStd&&r.standard)&&!(onlyGentle&&!r.gentle))
     .sort((a,b)=>({plan:0,done:1,want:2}[a.status]-({plan:0,done:1,want:2}[b.status]))||String(a.title).localeCompare(b.title,"ru"));
   const hm={};if(have.length){const need=Math.min(2,have.length);list.forEach(r=>hm[r.id]=haveMatch(r));
     list=list.filter(r=>hm[r.id].got.length>=need).sort((a,b)=>(hm[b.id].got.length-hm[a.id].got.length)||(hm[a.id].missing.length-hm[b.id].missing.length))}
-  view.innerHTML=haveBar()+chipsHtml()+(onlyGentle?'<p class="hint2" style="margin:-10px 0 16px">🌿 Запечённое или варёное, мало жира, без острого, мало кислого и сырого лука/чеснока. Это общие правила, а не медицинский совет: ориентируйся на то, как реагирует желудок.</p>':"")+
-   (list.length?`<div class="grid">${list.map((r,ix)=>`
-    <div class="card${ix===0&&list.length>2?" feat":""}"><button class="open" type="button" data-id="${esc(r.id)}">
-      <div class="ph${!r.photo&&!r.ingPhoto?" noph":""}">${ix===0&&list.length>2&&!r.photo&&r.ingPhoto?`<img src="${esc(blobUrl(r.ingPhoto))}" alt="${esc(r.title)}">`:photo(r)}</div>
-      <div class="body">
-        <h3>${esc(r.title)}</h3>
-        <div class="meta"><span class="pill ${esc(r.status)}">${STATUS[r.status]||""}</span>${r.gentle?'<span class="tag">🌿 бережно</span>':""}${r.standard?'<span class="tag">базовый</span>':""}${r.easy?'<span class="tag">лёгкий</span>':""}${r.video?'<span class="tag">▶ видео</span>':""}</div>
-        ${hm[r.id]?`<p class="ingline hv">✓ ${esc(hm[r.id].got.join(", "))} · ${hm[r.id].missing.length?`докупить ${hm[r.id].missing.length}: ${esc(hm[r.id].missing.slice(0,3).map(i=>i.name).join(", "))}${hm[r.id].missing.length>3?"…":""}`:"всё есть 🎉"}</p>`:""}
-        ${ix===0&&list.length>2?featDetails(r):`${hm[r.id]?"":ingLine(r)}${r.oven?`<div class="ovenline">🔥 ${esc(r.oven)}</div>`:""}`}
-      </div></button>
-      ${ix===0&&list.length>2&&r.video?`<a class="fvid" href="${esc(r.video)}" target="_blank" rel="noopener" aria-label="Смотреть видео: ${esc(r.title)}">${IC.play} Видео</a>`:""}
-      <button class="favbtn ${inPlan(r.id)?"on":""}" type="button" data-plan="${esc(r.id)}" aria-pressed="${inPlan(r.id)}" title="${inPlan(r.id)?"В избранном недели":"В избранное недели"}" aria-label="${inPlan(r.id)?"Убрать из избранного недели":"В избранное недели"}">${inPlan(r.id)?IC.starF:IC.star}</button>
-    </div>`).join("")}</div>`:`<div class="empty">${have.length?"С этими продуктами пока ничего не нашлось. Попробуй убрать один из них.":recipes.length?"В этом разделе пока пусто.":"Рецептов пока нет. Нажми «Новый рецепт», чтобы добавить первый."}</div>`);
-  bindChips();bindHave();
+  view.innerHTML=peopleRow()+haveBar()+chipsHtml()+(onlyGentle?'<p class="hint2" style="margin:-10px 0 16px">🌿 Запечённое или варёное, мало жира, без острого, мало кислого и сырого лука/чеснока. Это общие правила, а не медицинский совет: ориентируйся на то, как реагирует желудок.</p>':"")+
+   (list.length?`<div class="grid">${list.map((r,ix)=>cardHtml(r,ix,ix===0&&list.length>2,hm,true)).join("")}</div>`:`<div class="empty">${have.length?"С этими продуктами пока ничего не нашлось. Попробуй убрать один из них.":recipes.length?"В этом разделе пока пусто.":"Рецептов пока нет. Нажми «Новый рецепт», чтобы добавить первый."}</div>`);
+  bindChips();bindHave();bindPeople();
   view.querySelectorAll(".card .open").forEach(c=>c.onclick=()=>{openId=c.dataset.id;render();window.scrollTo(0,0)});
   view.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{if(!db){return}togglePlan(b.dataset.plan)});
 }
@@ -756,7 +821,7 @@ function recipeText(r){const L=[r.title||"Рецепт",""];const ing=(r.ingredi
 async function shareRecipe(r){const url=location.origin+location.pathname+"#"+encodeURIComponent(r.id);
   try{if(navigator.share&&matchMedia("(pointer:coarse)").matches){await navigator.share({title:r.title,text:r.title+" — рецепт на «Готовлю как умею»",url});return}}catch(e){if(e&&e.name==="AbortError")return}
   try{await navigator.clipboard.writeText(url);toast("Ссылка на рецепт скопирована")}catch(e){prompt("Скопируй ссылку:",url)}}
-async function copyRecipe(r){if(!db)return;const keep=["ingredients","steps","stepTitles","stepPhotos","photo","ingPhoto","tips","oven","ovenNote","servings","time","before","done","storage","notes","video","recipeUrl","easy","gentle","gallery","source"];
+async function copyRecipe(r){if(!db)return;const keep=["ingredients","steps","stepTitles","stepPhotos","photo","ingPhoto","tips","oven","ovenNote","servings","time","before","done","storage","notes","video","recipeUrl","easy","gentle","gallery","source","story"];
   const d={};keep.forEach(k=>{if(r[k]!==undefined)d[k]=r[k]});d.title=(r.title||"Рецепт")+" (копия)";d.status="want";d.copiedFrom=r.id;
   const by=who?await who.id().catch(()=>null):null;if(by)d.by=by;
   try{toast("Создаю копию…");const ref=await db.collection("recipes").add(d);justCopied=ref.id;openId=ref.id;render();window.scrollTo(0,0);toast("Копия готова — можно менять")}catch(e){toast("Не получилось: "+(e.message||e.code))}}
@@ -790,7 +855,8 @@ function renderSheet(r){
         ${moreOpen?`<div class="rmenu" role="menu"><button type="button" role="menuitem" data-ma="copy">📋 Сделать копию${canW?"":" — чтобы изменить"}</button><button type="button" role="menuitem" data-ma="fav">${inPlan(r.id)?"★ Убрать из избранного недели":"☆ В избранное недели"}</button>${canW?`<p class="rmsep">Статус</p>${Object.entries(STATUS).map(([k,v])=>`<button type="button" role="menuitemradio" aria-checked="${r.status===k}" data-ma="st:${k}"><span class="ck">${r.status===k?"✓":""}</span>${v}</button>`).join("")}`:""}</div>`:""}</div>
       <div class="meta"><span class="pill ${esc(r.status)}">${STATUS[r.status]||""}</span>${r.easy?'<span class="tag">лёгкий</span>':""}${r.servings||editOn?`<span class="tag"${ed("servings","порции")}>${esc(r.servings||"")}</span>`:""}${r.time||editOn?`<span class="tag">⏱ <span${ed("time","время")}>${esc(r.time||"")}</span></span>`:""}</div>
       <h2${ed("title","Название")}>${esc(r.title)}</h2>
-      ${r.owner&&typeof profileOf==="function"?(()=>{const p=profileOf(r.owner);return `<p class="byline"><img class="av" src="${esc(p.avatarUrl)}" alt="">Добавила: <b>${esc(p.name||"друг")}</b></p>`})():""}
+      ${r.owner&&typeof profileOf==="function"?(()=>{const p=profileOf(r.owner);return `<button type="button" class="byline" data-person="${esc(r.owner)}" title="Открыть страничку"><img class="av" src="${esc(p.avatarUrl)}" alt=""><span>Добавила: <b>${esc(p.name||"друг")}</b></span></button>`})():""}
+      ${editOn?`<p class="story"${ed("story","История: откуда рецепт, кто рассказал, где пробовали")}>${esc(r.story||"")}</p>`:(r.story?`<p class="story">${esc(r.story)}</p>`:"")}
       ${r.copiedFrom&&!editOn?(()=>{const o=recipes.find(x=>x.id===r.copiedFrom);return o?`<p class="hint2 copyof">Копия рецепта <a href="#" data-openr="${esc(o.id)}">«${esc(o.title)}»</a></p>`:""})():""}
       ${editOn?`<p class="muted" style="margin:0"${ed("source","Откуда рецепт, что я поменяла")}>${esc(r.source||"")}</p>`:(r.source||r.recipeUrl?`<p class="muted srcline" style="margin:0">${esc(r.source||"")}${r.recipeUrl?`${r.source?" ":""}<a href="${esc(r.recipeUrl)}" target="_blank" rel="noopener">Рецепт: ${esc(hostOf(r.recipeUrl))} ↗</a>`:""}</p>`:"")}
       ${editOn?`<p class="elink">▶ Видео: <span${ed("video","вставь ссылку")}>${esc(r.video||"")}</span></p>${r.recipeUrl||showUrl?`<p class="elink">🔗 Рецепт: <span${ed("recipeUrl","вставь ссылку на рецепт")}>${esc(r.recipeUrl||"")}</span>${r.recipeUrl?` <button class="idel" type="button" id="urlDel" aria-label="Убрать ссылку">✕</button>`:""}</p>`:`<button class="btn link addln" type="button" id="addUrl" style="margin:0;padding:2px 0">🔗 Добавить ссылку на рецепт</button>`}`:`<div class="links">${linkBtns(r)}</div>${!r.video&&canW?`<p class="hint2">Видео пока нет — добавь ссылку в «Изменить».</p>`:""}`}
@@ -816,7 +882,7 @@ function renderSheet(r){
     <section class="tile nsec win" id="nWin"></section>
     <section class="tile nsec real" id="nReal"></section>
   </article>`;
-  watchNotes(r.id);drawNotes();
+  watchNotes(r.id);drawNotes();bindPeople();
   const atb=document.getElementById("aiTipsBtn");if(atb)atb.onclick=()=>buildTips(r);
   view.querySelectorAll("[data-jump]").forEach(a=>a.onclick=async e=>{e.preventDefault();const id=a.dataset.jump;let t=document.getElementById(id);
     if(!t&&id.startsWith("c-")){const c=cmts.find(x=>"c-"+x.id===id);if(c){openAll.add(c.note);await drawNotes();t=document.getElementById(id)}}
@@ -1026,7 +1092,7 @@ function renderForm(r){
 
 function renderNav(){const n=document.getElementById("nav");if(!n)return;const wk=filter==="week"&&!editing&&!importing&&!(openId&&recipes.some(x=>x.id===openId));
   n.innerHTML=`<div class="seg"><button type="button" data-nav="bank" ${!wk?'aria-current="page"':""}>${IC.book} Рецепты <span class="cnt">${recipes.length}</span></button><button type="button" data-nav="week" ${wk?'aria-current="page"':""}>${IC.cal} Меню и покупки <span class="cnt">${scheduled().length}</span></button></div>`;
-  n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{editing=null;importing=null;openId=null;filter=b.dataset.nav==="week"?"week":(filter==="week"?"all":filter);render();window.scrollTo(0,0)})}
+  n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{editing=null;importing=null;openId=null;person=null;filter=b.dataset.nav==="week"?"week":(filter==="week"?"all":filter);render();window.scrollTo(0,0)})}
 function renderImport(){const st=importing;
   view.innerHTML=`<button class="btn back" type="button" id="cancel">${IC.back} Назад</button>
   <div class="imp"><h2>Импорт рецепта</h2>
@@ -1078,12 +1144,13 @@ ${st.text||"(только скриншоты)"}`;
 let recipesLoaded=false;
 function render(){
   if(openId&&!recipesLoaded){renderNav();view.innerHTML='<div class="empty">Загружаю рецепт…</div>';return}
-  try{const want=openId&&!editing&&!importing?"#"+encodeURIComponent(openId):"";if(location.hash!==want)history.replaceState(null,"",location.pathname+want)}catch(e){}
+  try{const want=openId&&!editing&&!importing?"#"+encodeURIComponent(openId):(person&&!editing&&!importing?"#u/"+person:"");if(location.hash!==want)history.replaceState(null,"",location.pathname+want)}catch(e){}
   renderNav();
   if(editing) return renderForm(editing);
   if(importing) return renderImport();
   const r=openId&&recipes.find(x=>x.id===openId);
   if(r) return renderSheet(r);
+  if(person&&!openId) return renderPerson(person);
   if(openId&&openId===justCopied){view.innerHTML='<div class="empty">Создаю копию…</div>';return}
   renderList();
 }

@@ -46,8 +46,31 @@ function live(table, filter, load, cb, err) {
 /* гость (без входа) может только смотреть: любая запись открывает окно входа */
 function need() { if (ME) return; openAuth("up"); const e = new Error("Войди или зарегистрируйся, чтобы это сделать"); e.code = "auth"; throw e; }
 const guarded = fn => (...a) => { need(); return fn(...a); };
-const recMap = r => ({ id: r.id, ...(r.data || {}), owner: r.owner, copiedFrom: r.copied_from || null });
-const strip = o => { const { id, owner, copiedFrom, ...rest } = o || {}; return rest; };
+const recMap = r => ({ id: r.id, ...(r.data || {}), owner: r.owner, copiedFrom: r.copied_from || null, createdAt: ms(r.created_at) });
+const strip = o => { const { id, owner, copiedFrom, createdAt, ...rest } = o || {}; return rest; };
+/* меню другого человека: видно только тем, кто вошёл */
+async function planOf(uid) { if (!ME) return null; const rows = await chk(sb.from("plans").select("data").eq("owner", uid)); return rows[0] ? rows[0].data || {} : {}; }
+
+/* аватар: квадрат 400×400 из середины фото */
+async function squareAvatar(file) {
+  const bmp = await createImageBitmap(file), s = Math.min(bmp.width, bmp.height), out = 400;
+  const c = document.createElement("canvas"); c.width = c.height = out;
+  c.getContext("2d").drawImage(bmp, (bmp.width - s) / 2, (bmp.height - s) / 2, s, s, 0, 0, out, out);
+  return await new Promise(res => c.toBlob(res, "image/jpeg", 0.88));
+}
+async function setAvatar(file) {
+  let path = "";
+  if (file) {
+    const blob = await squareAvatar(file);
+    path = ME.id + "/avatar-" + Date.now() + ".jpg";
+    await chk(sb.storage.from("photos").upload(path, blob, { contentType: "image/jpeg", upsert: false }));
+  }
+  const old = PROFILE.avatar_url;
+  await chk(sb.from("profiles").update({ avatar_url: path || null }).eq("id", ME.id));
+  PROFILE = { ...PROFILE, avatar_url: path || null }; PROFILES[ME.id] = { ...PROFILES[ME.id], avatar_url: path || null };
+  if (old && old.startsWith(ME.id + "/")) sb.storage.from("photos").remove([old]).catch(() => {});
+  drawProfBtn(); if (typeof render === "function") render();
+}
 
 const sbDb = {
   collection(path) {
@@ -183,7 +206,9 @@ function openAuth(mode) {
 
 function openProfile() {
   const ov = document.createElement("div"); ov.className = "pov"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
-  ov.innerHTML = `<form class="auth ppanel" id="profForm"><h2>Профиль</h2>${profileFields(PROFILE)}
+  ov.innerHTML = `<form class="auth ppanel" id="profForm"><h2>Профиль</h2>
+    <div class="avrow"><img class="avbig" id="pfAv" src="${profileOf(ME.id).avatarUrl}" alt="Аватар"><div class="avbtns"><label class="btn">Выбрать фото<input type="file" accept="image/*" id="pfAvIn" hidden></label>${PROFILE.avatar_url ? '<button class="btn link" type="button" id="pfAvDel">Убрать фото</button>' : ""}</div></div>
+    ${profileFields(PROFILE)}
     <p class="muted" style="margin:0;font-size:.85rem">${hEsc(ME.email || "")}</p>
     <div class="arow"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="button" id="pfClose">Закрыть</button></div>
     <button class="btn link" type="button" id="pfOut" style="align-self:flex-start">Выйти</button><p class="aerr" id="pf_err" role="alert"></p></form>`;
@@ -191,6 +216,11 @@ function openProfile() {
   const close = () => ov.remove();
   ov.addEventListener("click", e => { if (e.target === ov) close(); });
   document.getElementById("pfClose").onclick = close;
+  const avErr = m => (document.getElementById("pf_err").textContent = m);
+  document.getElementById("pfAvIn").onchange = async e => { const f = e.target.files[0]; if (!f) return; avErr("Загружаю фото…");
+    try { await setAvatar(f); document.getElementById("pfAv").src = profileOf(ME.id).avatarUrl; avErr("Фото сохранено ✓"); } catch (err) { avErr("Фото не загрузилось: " + err.message); } };
+  const avDel = document.getElementById("pfAvDel");
+  if (avDel) avDel.onclick = async () => { try { await setAvatar(null); document.getElementById("pfAv").src = profileOf(ME.id).avatarUrl; avDel.remove(); avErr(""); } catch (err) { avErr("Не получилось: " + err.message); } };
   document.getElementById("pfOut").onclick = async () => { close(); await sb.auth.signOut(); location.hash = ""; location.reload(); };
   document.getElementById("profForm").onsubmit = async e => {
     e.preventDefault(); const p = readProfile();
