@@ -538,7 +538,7 @@ ul.shop li.have .src{color:var(--bad)}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Фото"><button class="lbx" type="button" id="lbx" aria-label="Закрыть">✕</button><div class="lbin" id="lbin"><img id="lbimg" alt=""></div><p class="lbhint">Нажми на фото, чтобы приблизить</p></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="i18n.js"></script>
+<script src="i18n.js?v=202610241958"></script>
 <script>
 const IC={
  star:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -754,6 +754,8 @@ function firstName(n){n=String(n||"").trim();return n.split(/\s+/)[0]||(EN?"Frie
 /* родительный падеж имени: Лиза → Лизы, Маша → Маши, Иван → Ивана; не русские имена не склоняем */
 function genName(n){n=String(n||"").trim();if(!n)return "друга";const w=n.split(/\s+/);if(!/^[а-яё-]+$/i.test(w[0]))return n;const f=w[0],l=f.slice(-1).toLowerCase(),p=f.slice(-2,-1).toLowerCase();let g=f;
   if(/ия$/i.test(f))g=f.slice(0,-1)+"и";else if(l==="я")g=f.slice(0,-1)+"и";else if(l==="а")g=f.slice(0,-1)+("гкхжчшщ".includes(p)?"и":"ы");else if(l==="й"||l==="ь")g=f.slice(0,-1)+"я";else if(!"аеёиоуыэюя".includes(l))g=f+"а";return g}
+/* если браузер взял старую копию backend.js — не ломаем страницу */
+if(typeof avTag!=="function")window.avTag=(id,cls)=>{const p=typeof profileOf==="function"?profileOf(id):{avatarUrl:""};return `<span class="ava${cls?" "+cls:""}"><img src="${esc(p.avatarUrl)}" alt=""></span>`};
 function byMini(r){if(!r.owner||typeof profileOf!=="function")return"";const p=profileOf(r.owner);return `<span class="cby">${avTag(r.owner)}${esc(p.name||"друг")}</span>`}
 function peopleRow(){if(typeof profileOf!=="function")return"";const ids=peopleList();if(!ids.length)return"";
   return `<p class="label plabel">Рецепты друзей</p><div class="people" aria-label="Рецепты друзей">${ids.map(id=>{const p=profileOf(id);return `<button type="button" class="pp" data-person="${esc(id)}" title="Страничка: ${esc(p.name||"друг")}">${avTag(id,"ring")}<span>${esc(p.name||"друг")}</span></button>`}).join("")}${ids.length<4?`<button type="button" class="pp inv" id="invBtn" title="Скопировать ссылку на сайт"><span class="plus">+</span><span>Позвать</span></button>`:""}</div>`}
@@ -1206,6 +1208,6 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
 };
 async function newRecipe(){try{toast("Создаю рецепт…");const ref=await db.collection("recipes").add({title:"Новый рецепт",status:"want",serves:2,ingredients:[],steps:[],stepTitles:[],tips:[],source:"",video:"",recipeUrl:"",photo:""});justCopied=ref.id;openId=ref.id;filter="all";render();window.scrollTo(0,0)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
 </script>
-<script src="backend.js"></script>
+<script src="backend.js?v=202610241958"></script>
 
 </body></html>
