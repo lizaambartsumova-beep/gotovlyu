@@ -46,7 +46,7 @@ function live(table, filter, load, cb, err) {
 const recMap = r => ({ id: r.id, ...(r.data || {}), owner: r.owner, copiedFrom: r.copied_from || null });
 const strip = o => { const { id, owner, copiedFrom, ...rest } = o || {}; return rest; };
 
-const db = {
+const sbDb = {
   collection(path) {
     const seg = path.split("/");
     if (path === "recipes") return {
@@ -211,6 +211,6 @@ async function startWith(session) {
   try { await loadProfiles(); } catch (e) {}
   PROFILE = PROFILES[ME.id] || { id: ME.id, name: (ME.user_metadata || {}).name || "", people: 2, country: "", currency: "EUR" };
   drawProfBtn();
-  window.__startApp({ db, assets: assetsApi, sample: null, who: whoApi });
+  window.__startApp({ db: sbDb, assets: assetsApi, sample: null, who: whoApi });
 }
 sb.auth.onAuthStateChange((_ev, session) => { setTimeout(() => startWith(session), 0); });
