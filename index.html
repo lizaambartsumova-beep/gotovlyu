@@ -58,27 +58,29 @@ button,select,input,textarea{font:inherit;color:inherit}
 .untr a{color:var(--ink)}
 .profbtn{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--paper);border-radius:999px;padding:5px 14px 5px 5px;cursor:pointer;font-weight:600;color:var(--ink)}
 .profbtn.guest{background:var(--ink);color:var(--paper);padding:10px 18px}
-.profbtn .av{width:32px;height:32px;border-radius:50%}
+.profbtn .ava{width:32px;height:32px}
 .byline{margin:0;display:flex;align-items:center;gap:10px;font-size:.92rem;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;font:inherit;text-align:left;align-self:flex-start}
-.byline .av{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.byline .ava{width:40px;height:40px}
 .byline b{color:var(--ink)}
 .byline:hover b{text-decoration:underline}
 .story{margin:0;font-style:italic;line-height:1.5;color:var(--ink);border-left:3px solid var(--line);padding-left:12px}
 .story[data-ed]:empty::before{content:attr(data-ph);color:var(--muted)}
 .cby{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted);font-weight:600}
-.cby .av{width:20px;height:20px;border-radius:50%;object-fit:cover}
+.cby .ava{width:22px;height:22px}
 .people{display:flex;gap:16px;align-items:flex-start;overflow-x:auto;padding:2px 2px 6px;margin:0 0 20px}
-.pp{display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;cursor:pointer;font:inherit;font-size:.82rem;font-weight:600;color:var(--ink);width:72px;flex:none}
-.pp img{width:64px;height:64px;border-radius:50%;object-fit:cover;padding:3px;background:var(--paper);box-shadow:0 0 0 2.5px var(--accent,#F04D36)}
-.pp span{max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pp.inv img,.pp.inv .plus{box-shadow:0 0 0 2px var(--line)}
-.pp .plus{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:1.8rem;color:var(--muted);background:var(--paper);border:2px dashed var(--line);box-sizing:border-box}
+.pp{display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:0;cursor:pointer;font:inherit;font-size:.86rem;font-weight:600;color:var(--ink);width:96px;flex:none;padding:4px 0}
+.pp .ava{width:84px;height:84px}
+.pp:hover .ava{transform:translateY(-2px)}
+.pp .ava{transition:transform .15s}
+.plabel{margin:0 0 10px}
+.pp>span:not(.ava):not(.plus){max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pp .plus{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font-size:1.8rem;color:var(--muted);background:var(--paper);border:2px dashed var(--line);box-sizing:border-box}
 .phead{display:flex;flex-wrap:wrap;gap:16px 20px;align-items:center;margin:0 0 20px}
-.phead .avbig{width:96px;height:96px}
+.phead .ava{width:110px;height:110px}
 .phead h2{margin:0;font-family:var(--display);font-size:1.8rem}
 .phead p{margin:2px 0 0}
 .pstats b{color:var(--ink)}
-.avbig{width:72px;height:72px;border-radius:50%;object-fit:cover;flex:none}
+.ava.avbig{width:72px;height:72px}
 .avrow{display:flex;gap:16px;align-items:center}
 .avbtns{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
 .pweek{margin-bottom:24px}
@@ -370,6 +372,7 @@ ol.steps li.pt .sadd{border-color:var(--ink);color:var(--ink)}
 ul.cmts{list-style:none;margin:6px 0 0;padding:0 14px;display:flex;flex-direction:column;gap:8px}
 ul.cmts li{display:flex;gap:8px;align-items:flex-start;border-radius:10px;min-width:0}
 ul.cmts .av{width:24px;height:24px}
+span.ava.av{border-radius:0;background:none}
 ul.cmts li>div{min-width:0}
 ul.cmts p{margin:0;font-size:.93rem;overflow-wrap:anywhere}
 .cmeta{font-size:.76rem;color:var(--muted)}
@@ -747,9 +750,13 @@ const personPlans={};
 const meNow=()=>(typeof ME!=="undefined"&&ME)?ME.id:null;
 function pl(n,f){const a=n%10,b=n%100;return f[a===1&&b!==11?0:a>=2&&a<=4&&(b<10||b>=20)?1:2]}
 function peopleList(){const me=meNow();const cnt={};recipes.forEach(r=>{if(r.owner)cnt[r.owner]=(cnt[r.owner]||0)+1});const ids=[...new Set([...Object.keys(cnt),...(typeof PROFILES!=="undefined"?Object.keys(PROFILES).filter(id=>PROFILES[id]&&PROFILES[id].name):[])])];if(me&&!ids.includes(me))ids.push(me);return ids.sort((a,b)=>((b===me)-(a===me))||((cnt[b]||0)-(cnt[a]||0)))}
-function byMini(r){if(!r.owner||typeof profileOf!=="function")return"";const p=profileOf(r.owner);return `<span class="cby"><img class="av" src="${esc(p.avatarUrl)}" alt="">${esc(p.name||"друг")}</span>`}
+function firstName(n){n=String(n||"").trim();return n.split(/\s+/)[0]||(EN?"Friend":"друга")}
+/* родительный падеж имени: Лиза → Лизы, Маша → Маши, Иван → Ивана; не русские имена не склоняем */
+function genName(n){n=String(n||"").trim();if(!n)return "друга";const w=n.split(/\s+/);if(!/^[а-яё-]+$/i.test(w[0]))return n;const f=w[0],l=f.slice(-1).toLowerCase(),p=f.slice(-2,-1).toLowerCase();let g=f;
+  if(/ия$/i.test(f))g=f.slice(0,-1)+"и";else if(l==="я")g=f.slice(0,-1)+"и";else if(l==="а")g=f.slice(0,-1)+("гкхжчшщ".includes(p)?"и":"ы");else if(l==="й"||l==="ь")g=f.slice(0,-1)+"я";else if(!"аеёиоуыэюя".includes(l))g=f+"а";return g}
+function byMini(r){if(!r.owner||typeof profileOf!=="function")return"";const p=profileOf(r.owner);return `<span class="cby">${avTag(r.owner)}${esc(p.name||"друг")}</span>`}
 function peopleRow(){if(typeof profileOf!=="function")return"";const ids=peopleList();if(!ids.length)return"";
-  return `<div class="people" aria-label="Чьи рецепты">${ids.map(id=>{const p=profileOf(id);return `<button type="button" class="pp" data-person="${esc(id)}" title="Страничка: ${esc(p.name||"друг")}"><img src="${esc(p.avatarUrl)}" alt=""><span>${esc(p.name||"друг")}</span></button>`}).join("")}${ids.length<4?`<button type="button" class="pp inv" id="invBtn" title="Скопировать ссылку на сайт"><span class="plus">+</span><span>Позвать</span></button>`:""}</div>`}
+  return `<p class="label plabel">Рецепты друзей</p><div class="people" aria-label="Рецепты друзей">${ids.map(id=>{const p=profileOf(id);return `<button type="button" class="pp" data-person="${esc(id)}" title="Страничка: ${esc(p.name||"друг")}">${avTag(id,"ring")}<span>${esc(p.name||"друг")}</span></button>`}).join("")}${ids.length<4?`<button type="button" class="pp inv" id="invBtn" title="Скопировать ссылку на сайт"><span class="plus">+</span><span>Позвать</span></button>`:""}</div>`}
 function bindPeople(){view.querySelectorAll("[data-person]").forEach(b=>b.onclick=e=>{e.preventDefault();if(editOn)return;person=b.dataset.person;openId=null;render();window.scrollTo(0,0)});
   const iv=document.getElementById("invBtn");if(iv)iv.onclick=async()=>{const url=location.origin+location.pathname;try{await navigator.clipboard.writeText(url);toast("Ссылка на сайт скопирована — отправь друзьям")}catch(e){prompt("Скопируй ссылку на сайт:",url)}}}
 const WDAYS=["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"],WMEALS=[["b","Завтрак"],["l","Обед"],["d","Ужин"]];
@@ -766,9 +773,9 @@ function renderPerson(uid){const p=profileOf(uid),pr=(typeof PROFILES!=="undefin
   else{const pd=personPlans[uid];if(pd===undefined){personPlans[uid]=null;planOf(uid).then(d=>{personPlans[uid]=d||{}}).catch(()=>{personPlans[uid]={}}).then(()=>{if(person===uid&&!openId)render()})}
     wk=pd?weekView(pd,false):'<p class="muted" style="margin:0">Загружаю меню…</p>'}
   view.innerHTML=`<button class="btn back" type="button" id="back">${IC.back} Все рецепты</button>
-  <section class="phead"><img class="avbig" src="${esc(p.avatarUrl)}" alt=""><div><h2>${esc(p.name||"друг")}</h2>${pr.country?`<p class="muted">${esc(pr.country)}</p>`:""}<p class="muted pstats"><b>${mine.length}</b> ${pl(mine.length,["рецепт","рецепта","рецептов"])}${done?` · получилось: <b>${done}</b>`:""}</p></div>${uid===me?`<button class="btn" type="button" id="pEdit">Изменить профиль</button>`:""}</section>
+  <section class="phead">${avTag(uid,"ring")}<div><h2>${esc(p.name||"друг")}</h2>${pr.country?`<p class="muted">${esc(pr.country)}</p>`:""}<p class="muted pstats"><b>${mine.length}</b> ${pl(mine.length,["рецепт","рецепта","рецептов"])}${done?` · получилось: <b>${done}</b>`:""}</p></div>${uid===me?`<button class="btn" type="button" id="pEdit">Изменить профиль</button>`:""}</section>
   <section class="tile pweek"><h3>🗓 На этой неделе</h3>${wk}</section>
-  <h3 class="psub">Рецепты</h3>
+  <h3 class="psub" data-nt>${esc(EN?firstName(p.name)+"’s recipes":"Рецепты "+genName(p.name))}</h3>
   ${mine.length?`<div class="grid">${mine.map((r,ix)=>cardHtml(r,ix,false,{},false)).join("")}</div>`:`<div class="empty">${uid===me?"Здесь появятся рецепты, которые ты добавишь.":"Пока нет рецептов."}</div>`}`;
   document.getElementById("back").onclick=()=>{person=null;render();window.scrollTo(0,0)};
   const pe=document.getElementById("pEdit");if(pe)pe.onclick=()=>openProfile();
@@ -862,7 +869,7 @@ function renderSheet(r){
       <div class="meta"><span class="pill ${esc(r.status)}">${STATUS[r.status]||""}</span>${r.easy?'<span class="tag">лёгкий</span>':""}${r.servings||editOn?`<span class="tag"${ed("servings","порции")}>${esc(r.servings||"")}</span>`:""}${r.time||editOn?`<span class="tag">⏱ <span${ed("time","время")}>${esc(r.time||"")}</span></span>`:""}</div>
       <h2${ed("title","Название")}>${esc(r.title)}</h2>
       ${EN&&r._untr&&/[а-яё]/i.test(r.title||"")?`<p class="untr" data-nt>This recipe has no English version yet. <a href="https://translate.google.com/?sl=ru&tl=en&op=translate&text=${encodeURIComponent(recipeText(r).slice(0,4500))}" target="_blank" rel="noopener">Open it in Google Translate ↗</a></p>`:""}
-      ${r.owner&&typeof profileOf==="function"?(()=>{const p=profileOf(r.owner);return `<button type="button" class="byline" data-person="${esc(r.owner)}" title="Открыть страничку"><img class="av" src="${esc(p.avatarUrl)}" alt=""><span>Добавила: <b>${esc(p.name||"друг")}</b></span></button>`})():""}
+      ${r.owner&&typeof profileOf==="function"?(()=>{const p=profileOf(r.owner);return `<button type="button" class="byline" data-person="${esc(r.owner)}" title="Открыть страничку">${avTag(r.owner)}<span>Добавила: <b>${esc(p.name||"друг")}</b></span></button>`})():""}
       ${editOn?`<p class="story"${ed("story","История: откуда рецепт, кто рассказал, где пробовали")}>${esc(r.story||"")}</p>`:(r.story?`<p class="story">${esc(r.story)}</p>`:"")}
       ${r.copiedFrom&&!editOn?(()=>{const o=recipes.find(x=>x.id===r.copiedFrom);return o?`<p class="hint2 copyof">Копия рецепта <a href="#" data-openr="${esc(o.id)}">«${esc(o.title)}»</a></p>`:""})():""}
       ${editOn?`<p class="muted" style="margin:0"${ed("source","Откуда рецепт, что я поменяла")}>${esc(r.source||"")}</p>`:(r.source||r.recipeUrl?`<p class="muted srcline" style="margin:0">${esc(r.source||"")}${r.recipeUrl?`${r.source?" ":""}<a href="${esc(r.recipeUrl)}" target="_blank" rel="noopener">Рецепт: ${esc(hostOf(r.recipeUrl))} ↗</a>`:""}</p>`:"")}
@@ -971,7 +978,7 @@ async function drawNotes(){if(!openId||editing||importing)return;
   if(who&&!meId)meId=await who.id().catch(()=>null);
   const canW=!!db&&!(who&&who.can&&who.can("data.write")===false),canAdm=(()=>{const cr=recipes.find(x=>x.id===openId);return !!(cr&&typeof ME!=="undefined"&&ME&&cr.owner===ME.id)})();
   const ids=[...new Set([...notes,...cmts].map(n=>n.by).filter(Boolean))];const ps=ids.length&&who?await who.profiles(ids).catch(()=>({})):{};
-  const av=by=>{const p=by&&ps[by];return p&&p.avatarUrl?`<img class="av" src="${esc(p.avatarUrl)}" alt="">`:`<span class="av av0" aria-hidden="true"></span>`};
+  const av=by=>{const p=by&&ps[by];return p&&p.avatarUrl?`<span class="ava av sh-${esc(p.shape||"circle")}"><img src="${esc(p.avatarUrl)}" alt=""></span>`:`<span class="av av0" aria-hidden="true"></span>`};
   const nm=by=>`<b class="nm2" data-by="${esc(by||"")}"></b>`;
   const mine=by=>canAdm||(meId&&by===meId);
   const focusedC=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.cin:null;

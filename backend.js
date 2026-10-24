@@ -19,17 +19,50 @@ function blobUrl(id) {
   return sb.storage.from("photos").getPublicUrl(id).data.publicUrl;
 }
 
-/* кружок с первой буквой имени, если нет аватара */
+/* ---------- аватары: формы фруктов и овощей ---------- */
+const SHAPES = {
+  circle:     { ru: "Круг",     en: "Circle",     color: null,      ink: "#fff", ty: 62, body: '<circle cx="50" cy="50" r="50"/>', deco: "" },
+  apple:      { ru: "Яблоко",   en: "Apple",      color: "#D9473B", ink: "#fff", ty: 70, body: '<path d="M50 27C39 17 11 18 7 45C3 71 23 97 38 97C44 97 46 94 50 94C54 94 56 97 62 97C77 97 97 71 93 45C89 18 61 17 50 27Z"/>',
+                deco: '<path d="M50 27C50 19 52 12 56 7" stroke="#6B4A2B" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M55 17C61 5 77 4 82 8C76 18 64 21 55 17Z" fill="#5E9E3A"/>' },
+  pear:       { ru: "Груша",    en: "Pear",       color: "#A8C64A", ink: "#2C3A12", ty: 78, body: '<path d="M50 12C61 12 65 22 65 33C65 45 83 54 87 71C91 89 73 99 50 99C27 99 9 89 13 71C17 54 35 45 35 33C35 22 39 12 50 12Z"/>',
+                deco: '<path d="M50 13C50 8 52 4 55 1" stroke="#6B4A2B" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M54 8C59 0 70 0 74 3C69 10 61 11 54 8Z" fill="#5E9E3A"/>' },
+  lemon:      { ru: "Лимон",    en: "Lemon",      color: "#F2D04A", ink: "#4A3A00", ty: 63, body: '<path d="M3 52C9 48 11 42 15 36C25 18 75 18 85 36C89 42 91 48 97 52C91 56 89 62 85 68C75 86 25 86 15 68C11 62 9 56 3 52Z"/>',
+                deco: '<path d="M70 24C74 12 88 9 94 12C90 22 80 27 70 24Z" fill="#5E9E3A"/>' },
+  strawberry: { ru: "Клубника", en: "Strawberry", color: "#E2453F", ink: "#fff", ty: 64, body: '<path d="M50 98C29 88 6 62 8 39C10 24 25 19 50 24C75 19 90 24 92 39C94 62 71 88 50 98Z"/>',
+                deco: '<path d="M27 27L39 20L41 6L50 17L59 6L61 20L73 27L60 30L50 37L40 30Z" fill="#4E9A35"/>' },
+  pumpkin:    { ru: "Тыква",    en: "Pumpkin",    color: "#E98A2E", ink: "#fff", ty: 66, body: '<path d="M50 22C60 16 72 18 78 24C92 24 100 42 98 60C96 82 82 94 66 92C60 96 40 96 34 92C18 94 4 82 2 60C0 42 8 24 22 24C28 18 40 16 50 22Z"/>',
+                deco: '<path d="M46 23L47 9C50 6 55 6 57 8L55 23Z" fill="#5C7A2E"/><path d="M50 26C44 42 44 76 50 94M50 26C56 42 56 76 50 94" stroke="#C46F1E" stroke-width="2" fill="none" opacity=".55"/>' }
+};
+const shapeOf = s => (SHAPES[s] ? s : "circle");
+const svgUrl = inner => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${inner}</svg>`);
+(function shapeCss() {
+  let css = `.ava{position:relative;display:inline-block;flex:none;width:32px;height:32px;vertical-align:middle;line-height:0}
+.ava img{width:100%;height:100%;object-fit:cover;display:block;-webkit-mask:var(--m) center/100% 100% no-repeat;mask:var(--m) center/100% 100% no-repeat}
+.ava::after{content:"";position:absolute;inset:0;background:var(--d) center/100% 100% no-repeat;pointer-events:none}
+.ava.ring{filter:drop-shadow(1.5px 0 0 var(--ink)) drop-shadow(-1.5px 0 0 var(--ink)) drop-shadow(0 1.5px 0 var(--ink)) drop-shadow(0 -1.5px 0 var(--ink))}
+.shapes{display:flex;flex-wrap:wrap;gap:8px;border:0;padding:0;margin:0}
+.shapes legend{font-size:.9rem;font-weight:600;margin-bottom:6px;padding:0}
+.shapes label{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.75rem;cursor:pointer;padding:6px;border-radius:12px;border:1.5px solid transparent;min-width:58px}
+.shapes input{position:absolute;opacity:0;pointer-events:none}
+.shapes label:has(input:checked){border-color:var(--ink);background:var(--soft)}
+.shapes label:has(input:focus-visible){outline:2px solid var(--ink);outline-offset:2px}
+.shapes .ava{width:44px;height:44px}\n`;
+  for (const k in SHAPES) css += `.sh-${k}{--m:url("${svgUrl(SHAPES[k].body.replace("<path", '<path fill="#000"').replace("<circle", '<circle fill="#000"'))}");--d:${SHAPES[k].deco ? `url("${svgUrl(SHAPES[k].deco)}")` : "none"}}\n`;
+  const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
+})();
+
+/* буква на цветном фоне, если нет фото */
 const AV_COLORS = ["#F04D36", "#4A5800", "#765500", "#3A6EA5", "#7A4FA0", "#2F8F6B"];
-function avatarFor(name) {
-  const n = String(name || "?").trim() || "?", ch = n[0].toUpperCase();
+function avatarFor(name, shape) {
+  const n = String(name || "?").trim() || "?", ch = n[0].toUpperCase(), sh = SHAPES[shapeOf(shape)];
   let h = 0; for (const c of n) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  const bg = AV_COLORS[h % AV_COLORS.length];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="${bg}"/><text x="20" y="26" text-anchor="middle" font-family="system-ui,sans-serif" font-size="18" font-weight="700" fill="#fff">${ch.replace(/[<&>"]/g, "")}</text></svg>`;
-  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  const bg = sh.color || AV_COLORS[h % AV_COLORS.length];
+  return svgUrl(`<rect width="100" height="100" fill="${bg}"/><text x="50" y="${sh.ty}" text-anchor="middle" font-family="system-ui,sans-serif" font-size="38" font-weight="700" fill="${sh.ink}">${ch.replace(/[<&>"]/g, "")}</text>`);
 }
-function profileOf(id) { const p = PROFILES[id]; return { id, name: p ? p.name : "", avatarUrl: (p && p.avatar_url) ? blobUrl(p.avatar_url) : avatarFor(p ? p.name : "") }; }
-async function loadProfiles() { (await chk(sb.from("profiles").select("id,name,avatar_url,people,country,currency"))).forEach(p => (PROFILES[p.id] = p)); }
+function profileOf(id) { const p = PROFILES[id]; const shape = shapeOf(p && p.avatar_shape); return { id, name: p ? p.name : "", shape, avatarUrl: (p && p.avatar_url) ? blobUrl(p.avatar_url) : avatarFor(p ? p.name : "", shape) }; }
+/* готовый аватар: <span class="ava sh-яблоко"><img></span> */
+function avTag(id, cls, alt) { const p = profileOf(id); return `<span class="ava sh-${p.shape}${cls ? " " + cls : ""}"><img src="${hEsc(p.avatarUrl)}" alt="${hEsc(alt || "")}"></span>`; }
+async function loadProfiles() { (await chk(sb.from("profiles").select("id,name,avatar_url,people,country,currency,avatar_shape"))).forEach(p => (PROFILES[p.id] = p)); }
 
 /* живой запрос: загрузить, потом перезагружать при изменениях в таблице */
 function snap(rows, map) { return { docs: rows.map(r => { const o = map(r); return { id: o.id, data: () => { const { id, ...rest } = o; return rest; } }; }) }; }
@@ -157,14 +190,16 @@ const AUTH_ERR = { "Invalid login credentials": "Неверная почта и�
 const authMsg = e => AUTH_ERR[e && e.message] || (e && /Password should be/.test(e.message) ? "Пароль — минимум 6 символов." : (e && e.message) || "Что-то пошло не так.");
 
 function profileFields(p) {
-  p = p || { name: "", people: 2, country: "Германия", currency: "EUR" };
+  p = p || { name: "", people: 2, country: "Германия", currency: "EUR", avatar_shape: "circle" };
+  const cur = shapeOf(p.avatar_shape);
   return `<label>Как тебя зовут<input id="pf_name" required maxlength="40" value="${hEsc(p.name)}" placeholder="Имя"></label>
+    <fieldset class="shapes"><legend>Форма аватара</legend>${Object.keys(SHAPES).map(k => `<label><input type="radio" name="pf_shape" value="${k}" ${k === cur ? "checked" : ""}><span class="ava sh-${k}"><img data-shp="${k}" src="${p.avatar_url ? hEsc(blobUrl(p.avatar_url)) : avatarFor(p.name, k)}" alt=""></span>${typeof EN !== "undefined" && EN ? SHAPES[k].en : SHAPES[k].ru}</label>`).join("")}</fieldset>
     <label>Сколько вас обычно за столом<input id="pf_people" type="number" min="1" max="20" value="${hEsc(p.people || 2)}"></label>
     <div class="arow"><label>Страна<select id="pf_country">${COUNTRIES.map(([c]) => `<option ${p.country === c ? "selected" : ""}>${c}</option>`).join("")}</select></label>
     <label>Валюта<select id="pf_cur">${CURRENCIES.map(c => `<option ${p.currency === c ? "selected" : ""}>${c}</option>`).join("")}</select></label></div>`;
 }
-function bindCountry() { const c = document.getElementById("pf_country"), cur = document.getElementById("pf_cur"); if (c) c.onchange = () => { const m = COUNTRIES.find(x => x[0] === c.value); if (m) cur.value = m[1]; }; }
-const readProfile = () => ({ name: document.getElementById("pf_name").value.trim(), people: Math.max(1, Math.min(20, parseInt(document.getElementById("pf_people").value, 10) || 2)), country: document.getElementById("pf_country").value, currency: document.getElementById("pf_cur").value });
+function bindCountry() { const nm = document.getElementById("pf_name"); if (nm) nm.addEventListener("input", () => document.querySelectorAll("img[data-shp]").forEach(i => { if (i.src.startsWith("data:")) i.src = avatarFor(nm.value, i.dataset.shp); })); const c = document.getElementById("pf_country"), cur = document.getElementById("pf_cur"); if (c) c.onchange = () => { const m = COUNTRIES.find(x => x[0] === c.value); if (m) cur.value = m[1]; }; }
+const readProfile = () => ({ name: document.getElementById("pf_name").value.trim(), people: Math.max(1, Math.min(20, parseInt(document.getElementById("pf_people").value, 10) || 2)), country: document.getElementById("pf_country").value, currency: document.getElementById("pf_cur").value, avatar_shape: shapeOf((document.querySelector("input[name=pf_shape]:checked") || {}).value) });
 
 function openAuth(mode) {
   mode = mode || "in";
@@ -207,12 +242,13 @@ function openAuth(mode) {
 function openProfile() {
   const ov = document.createElement("div"); ov.className = "pov"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
   ov.innerHTML = `<form class="auth ppanel" id="profForm"><h2>Профиль</h2>
-    <div class="avrow"><img class="avbig" id="pfAv" src="${profileOf(ME.id).avatarUrl}" alt="Аватар"><div class="avbtns"><label class="btn">Выбрать фото<input type="file" accept="image/*" id="pfAvIn" hidden></label>${PROFILE.avatar_url ? '<button class="btn link" type="button" id="pfAvDel">Убрать фото</button>' : ""}</div></div>
+    <div class="avrow"><span class="ava avbig sh-${profileOf(ME.id).shape}"><img id="pfAv" src="${profileOf(ME.id).avatarUrl}" alt="Аватар"></span><div class="avbtns"><label class="btn">Выбрать фото<input type="file" accept="image/*" id="pfAvIn" hidden></label>${PROFILE.avatar_url ? '<button class="btn link" type="button" id="pfAvDel">Убрать фото</button>' : ""}</div></div>
     ${profileFields(PROFILE)}
     <p class="muted" style="margin:0;font-size:.85rem">${hEsc(ME.email || "")}</p>
     <div class="arow"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="button" id="pfClose">Закрыть</button></div>
     <button class="btn link" type="button" id="pfOut" style="align-self:flex-start">Выйти</button><p class="aerr" id="pf_err" role="alert"></p></form>`;
   document.body.appendChild(ov); bindCountry();
+  ov.querySelectorAll("input[name=pf_shape]").forEach(r => r.onchange = () => { const b = ov.querySelector(".avrow .ava"); b.className = "ava avbig sh-" + r.value; });
   const close = () => ov.remove();
   ov.addEventListener("click", e => { if (e.target === ov) close(); });
   document.getElementById("pfClose").onclick = close;
@@ -237,7 +273,7 @@ function drawProfBtn() {
   const pb = document.getElementById("profBtn"); if (!pb) return;
   if (!ME) { pb.hidden = false; pb.classList.add("guest"); pb.innerHTML = "<span>Войти</span>"; pb.onclick = () => openAuth("in"); return; }
   pb.classList.remove("guest");
-  pb.hidden = false; pb.innerHTML = `<img class="av" src="${profileOf(ME.id).avatarUrl}" alt=""><span>${hEsc(PROFILE.name || "Профиль")}</span>`;
+  pb.hidden = false; pb.innerHTML = `${avTag(ME.id, "pav")}<span>${hEsc(PROFILE.name || "Профиль")}</span>`;
   pb.onclick = openProfile;
 }
 
