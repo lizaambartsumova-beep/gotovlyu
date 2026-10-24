@@ -198,9 +198,9 @@ if (EN) {
 /* кнопка языка */
 function setLang(l) { try { localStorage.setItem("lang", l); } catch (e) {} location.reload(); }
 document.addEventListener("DOMContentLoaded", () => {
-  const box = document.querySelector(".hbtns"); if (!box || document.getElementById("langBtn")) return;
+  const box = document.querySelector("header.top"); if (!box || document.getElementById("langBtn")) return;
   const b = document.createElement("button"); b.type = "button"; b.id = "langBtn"; b.className = "langbtn"; b.setAttribute("data-nt", "");
   b.textContent = EN ? "RU" : "EN"; b.title = EN ? "Читать по-русски" : "Read in English"; b.setAttribute("aria-label", b.title);
   b.onclick = () => setLang(EN ? "ru" : "en");
-  box.insertBefore(b, box.firstChild);
+  box.appendChild(b);
 });

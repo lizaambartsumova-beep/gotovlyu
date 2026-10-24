@@ -52,7 +52,7 @@ button,select,input,textarea{font:inherit;color:inherit}
 .ppanel{width:100%;max-height:90vh;overflow:auto}
 .ppanel h2{font-size:1.4rem}
 .hbtns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.langbtn{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;font-size:.85rem;letter-spacing:.04em;cursor:pointer}
+.langbtn{position:absolute;top:0;right:0;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;font-size:.85rem;letter-spacing:.04em;cursor:pointer}
 .langbtn:hover{background:var(--soft)}
 .untr{margin:0;font-size:.88rem;color:var(--muted);background:var(--soft);border-radius:10px;padding:8px 12px}
 .untr a{color:var(--ink)}
@@ -91,7 +91,7 @@ button,select,input,textarea{font:inherit;color:inherit}
 .wday a,.wfav a{color:var(--ink)}
 .wfav{margin:12px 0 0;font-size:.9rem}
 /* header */
-header.top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;margin-bottom:28px}
+header.top{position:relative;padding-top:44px;display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between;margin-bottom:28px}
 header.top h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:.3em}
 header.top h1 .star{width:.62em;height:.62em;color:var(--coral);flex:none}
 header.top h1 .pan{width:.95em;height:.84em}
