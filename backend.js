@@ -43,6 +43,9 @@ function live(table, filter, load, cb, err) {
   return () => { dead = true; sb.removeChannel(ch); };
 }
 
+/* гость (без входа) может только смотреть: любая запись открывает окно входа */
+function need() { if (ME) return; openAuth("up"); const e = new Error("Войди или зарегистрируйся, чтобы это сделать"); e.code = "auth"; throw e; }
+const guarded = fn => (...a) => { need(); return fn(...a); };
 const recMap = r => ({ id: r.id, ...(r.data || {}), owner: r.owner, copiedFrom: r.copied_from || null });
 const strip = o => { const { id, owner, copiedFrom, ...rest } = o || {}; return rest; };
 
@@ -51,42 +54,42 @@ const sbDb = {
     const seg = path.split("/");
     if (path === "recipes") return {
       onSnapshot(cb, err) { return live("recipes", null, async () => snap(await chk(sb.from("recipes").select("*").order("created_at")), recMap), cb, err); },
-      async add(o) { const row = await chk(sb.from("recipes").insert({ data: strip(o), copied_from: o.copiedFrom || null }).select("id").single()); return { id: row.id }; },
+      add: guarded(async o => { const row = await chk(sb.from("recipes").insert({ data: strip(o), copied_from: o.copiedFrom || null }).select("id").single()); return { id: row.id }; }),
       doc(id) { return {
-        update: p => chk(sb.rpc("patch_recipe", { rid: id, patch: strip(p) })),
-        set: o => chk(sb.from("recipes").update({ data: strip(o) }).eq("id", id)),
-        delete: () => chk(sb.from("recipes").delete().eq("id", id)) }; }
+        update: guarded(p => chk(sb.rpc("patch_recipe", { rid: id, patch: strip(p) }))),
+        set: guarded(o => chk(sb.from("recipes").update({ data: strip(o) }).eq("id", id))),
+        delete: guarded(() => chk(sb.from("recipes").delete().eq("id", id))) }; }
     };
     if (path === "templates") return {
-      onSnapshot(cb, err) { return live("templates", "owner=eq." + ME.id, async () => snap(await chk(sb.from("templates").select("*").eq("owner", ME.id)), r => ({ id: r.id, name: r.name, ...(r.data || {}), created: ms(r.created_at) })), cb, err); },
-      async add(o) { const { name, ...rest } = o; const row = await chk(sb.from("templates").insert({ name: name || "", data: rest }).select("id").single()); return { id: row.id }; },
-      doc(id) { return { delete: () => chk(sb.from("templates").delete().eq("id", id)) }; }
+      onSnapshot(cb, err) { if (!ME) { cb({ docs: [] }); return () => {}; } return live("templates", "owner=eq." + ME.id, async () => snap(await chk(sb.from("templates").select("*").eq("owner", ME.id)), r => ({ id: r.id, name: r.name, ...(r.data || {}), created: ms(r.created_at) })), cb, err); },
+      add: guarded(async o => { const { name, ...rest } = o; const row = await chk(sb.from("templates").insert({ name: name || "", data: rest }).select("id").single()); return { id: row.id }; }),
+      doc(id) { return { delete: guarded(() => chk(sb.from("templates").delete().eq("id", id))) }; }
     };
     if (seg[0] === "recipes" && seg.length === 3) {
       const rid = seg[1], kind = seg[2], f = "recipe_id=eq." + rid;
       if (kind === "notes") return {
         onSnapshot(cb, err) { return live("notes", f, async () => snap(await chk(sb.from("notes").select("*").eq("recipe_id", rid)), r => ({ id: r.id, kind: r.kind, text: r.text, photo: r.photo, by: r.by, at: ms(r.at) })), cb, err); },
-        async add(o) { const row = await chk(sb.from("notes").insert({ recipe_id: rid, kind: o.kind, text: o.text || "", photo: o.photo || "" }).select("id").single()); return { id: row.id }; },
-        doc(id) { return { delete: () => chk(sb.from("notes").delete().eq("id", id)) }; }
+        add: guarded(async o => { const row = await chk(sb.from("notes").insert({ recipe_id: rid, kind: o.kind, text: o.text || "", photo: o.photo || "" }).select("id").single()); return { id: row.id }; }),
+        doc(id) { return { delete: guarded(() => chk(sb.from("notes").delete().eq("id", id))) }; }
       };
       if (kind === "comments") return {
         onSnapshot(cb, err) { return live("comments", f, async () => snap(await chk(sb.from("comments").select("*").eq("recipe_id", rid)), r => ({ id: r.id, note: r.note_id, text: r.text, by: r.by, at: ms(r.at) })), cb, err); },
-        async add(o) { const row = await chk(sb.from("comments").insert({ recipe_id: rid, note_id: o.note, text: o.text }).select("id").single()); return { id: row.id }; },
-        doc(id) { return { delete: () => chk(sb.from("comments").delete().eq("id", id)) }; }
+        add: guarded(async o => { const row = await chk(sb.from("comments").insert({ recipe_id: rid, note_id: o.note, text: o.text }).select("id").single()); return { id: row.id }; }),
+        doc(id) { return { delete: guarded(() => chk(sb.from("comments").delete().eq("id", id))) }; }
       };
       if (kind === "likes") return {
         onSnapshot(cb, err) { return live("likes", f, async () => snap(await chk(sb.from("likes").select("*").eq("recipe_id", rid)), r => ({ id: r.note_id + "__" + r.by, note: r.note_id, by: r.by, at: ms(r.at) })), cb, err); },
         doc(lid) { const [nid, by] = lid.split("__"); return {
-          set: () => chk(sb.from("likes").insert({ note_id: nid, recipe_id: rid })),
-          delete: () => chk(sb.from("likes").delete().eq("note_id", nid).eq("by", by)) }; }
+          set: guarded(() => chk(sb.from("likes").insert({ note_id: nid, recipe_id: rid }))),
+          delete: guarded(() => chk(sb.from("likes").delete().eq("note_id", nid).eq("by", by))) }; }
       };
     }
     throw new Error("Неизвестная коллекция: " + path);
   },
   doc(path) {
     if (path === "plan/week") return {
-      onSnapshot(cb, err) { return live("plans", "owner=eq." + ME.id, async () => { const rows = await chk(sb.from("plans").select("*").eq("owner", ME.id)); const d = rows[0] ? rows[0].data : {}; return { exists: true, data: () => ({ people: PROFILE.people || 2, ...(d || {}) }) }; }, cb, err); },
-      set: o => chk(sb.from("plans").upsert({ owner: ME.id, data: o, updated_at: new Date().toISOString() }))
+      onSnapshot(cb, err) { if (!ME) { cb({ exists: true, data: () => ({ people: 2 }) }); return () => {}; } return live("plans", "owner=eq." + ME.id, async () => { const rows = await chk(sb.from("plans").select("*").eq("owner", ME.id)); const d = rows[0] ? rows[0].data : {}; return { exists: true, data: () => ({ people: PROFILE.people || 2, ...(d || {}) }) }; }, cb, err); },
+      set: guarded(o => chk(sb.from("plans").upsert({ owner: ME.id, data: o, updated_at: new Date().toISOString() })))
     };
     throw new Error("Неизвестный документ: " + path);
   }
@@ -140,22 +143,25 @@ function profileFields(p) {
 function bindCountry() { const c = document.getElementById("pf_country"), cur = document.getElementById("pf_cur"); if (c) c.onchange = () => { const m = COUNTRIES.find(x => x[0] === c.value); if (m) cur.value = m[1]; }; }
 const readProfile = () => ({ name: document.getElementById("pf_name").value.trim(), people: Math.max(1, Math.min(20, parseInt(document.getElementById("pf_people").value, 10) || 2)), country: document.getElementById("pf_country").value, currency: document.getElementById("pf_cur").value });
 
-function renderAuth(mode) {
+function openAuth(mode) {
   mode = mode || "in";
-  document.getElementById("nav").innerHTML = "";
-  const ib = document.getElementById("impBtn"); if (ib) ib.hidden = true;
-  const pb = document.getElementById("profBtn"); if (pb) pb.hidden = true;
-  view.innerHTML = `<form class="auth" id="authForm">
+  const old = document.getElementById("authOv"); if (old) old.remove();
+  const ov = document.createElement("div"); ov.className = "pov"; ov.id = "authOv"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
+  ov.innerHTML = `<form class="auth ppanel" id="authForm">
     <div class="seg" role="tablist"><button type="button" data-am="in" ${mode === "in" ? 'aria-current="page"' : ""}>Вход</button><button type="button" data-am="up" ${mode === "up" ? 'aria-current="page"' : ""}>Регистрация</button></div>
-    ${mode === "up" ? `<p class="muted" style="margin:0">Рецепты, меню на неделю и «упсы» друзей. Регистрация бесплатная.</p>` : ""}
+    <p class="muted" style="margin:0">${mode === "up" ? "Чтобы копировать рецепты, вести своё меню и писать «упсы». Регистрация бесплатная." : "С возвращением!"}</p>
     <label>Почта<input id="au_email" type="email" required autocomplete="email"></label>
     <label>Пароль<input id="au_pass" type="password" required minlength="6" autocomplete="${mode === "up" ? "new-password" : "current-password"}" placeholder="${mode === "up" ? "минимум 6 символов" : ""}"></label>
     ${mode === "up" ? profileFields() : ""}
-    <button class="btn primary" type="submit">${mode === "up" ? "Зарегистрироваться" : "Войти"}</button>
+    <div class="arow"><button class="btn primary" type="submit">${mode === "up" ? "Зарегистрироваться" : "Войти"}</button><button class="btn" type="button" id="auClose">Не сейчас</button></div>
     <p class="aerr" id="au_err" role="alert"></p>
   </form>`;
-  bindCountry();
-  view.querySelectorAll("[data-am]").forEach(b => (b.onclick = () => renderAuth(b.dataset.am)));
+  document.body.appendChild(ov); bindCountry();
+  const close = () => ov.remove();
+  ov.addEventListener("click", e => { if (e.target === ov) close(); });
+  document.getElementById("auClose").onclick = close;
+  ov.querySelectorAll("[data-am]").forEach(b => (b.onclick = () => openAuth(b.dataset.am)));
+  setTimeout(() => { const i = document.getElementById("au_email"); if (i) i.focus(); }, 30);
   document.getElementById("authForm").onsubmit = async e => {
     e.preventDefault();
     const er = document.getElementById("au_err"), btn = e.target.querySelector("button[type=submit]");
@@ -170,6 +176,7 @@ function renderAuth(mode) {
       } else {
         const { error } = await sb.auth.signInWithPassword({ email, password }); if (error) throw error;
       }
+      er.textContent = "Готово, открываю…";
     } catch (err) { er.textContent = authMsg(err); btn.disabled = false; }
   };
 }
@@ -197,20 +204,25 @@ function openProfile() {
   };
 }
 function drawProfBtn() {
-  const pb = document.getElementById("profBtn"); if (!pb || !PROFILE) return;
+  const pb = document.getElementById("profBtn"); if (!pb) return;
+  if (!ME) { pb.hidden = false; pb.classList.add("guest"); pb.innerHTML = "<span>Войти</span>"; pb.onclick = () => openAuth("in"); return; }
+  pb.classList.remove("guest");
   pb.hidden = false; pb.innerHTML = `<img class="av" src="${profileOf(ME.id).avatarUrl}" alt=""><span>${hEsc(PROFILE.name || "Профиль")}</span>`;
   pb.onclick = openProfile;
 }
 
-/* старт: ждём вход, потом запускаем страницу */
-let started = false;
+/* старт: гостем или под своим именем; смена входа перезагружает страницу */
+const guestWho = { async id() { return null; }, async me() { return { id: null, name: "" }; }, can() { return false; }, canEdit() { return false; }, isOwner() { return false }, profiles: (ids) => whoApi.profiles(ids) };
+let startedAs;
 async function startWith(session) {
-  if (!session) { started = false; renderAuth("in"); return; }
-  if (started) return; started = true;
-  ME = session.user;
+  const key = session ? session.user.id : "guest";
+  if (startedAs !== undefined) { if (startedAs !== key) location.reload(); return; }
+  startedAs = key;
+  ME = session ? session.user : null;
   try { await loadProfiles(); } catch (e) {}
-  PROFILE = PROFILES[ME.id] || { id: ME.id, name: (ME.user_metadata || {}).name || "", people: 2, country: "", currency: "EUR" };
+  PROFILE = ME ? (PROFILES[ME.id] || { id: ME.id, name: (ME.user_metadata || {}).name || "", people: 2, country: "", currency: "EUR" }) : null;
   drawProfBtn();
-  window.__startApp({ db: sbDb, assets: assetsApi, sample: null, who: whoApi });
+  window.__startApp({ db: sbDb, assets: ME ? assetsApi : null, sample: null, who: ME ? whoApi : guestWho });
+  if (!ME) { const ib = document.getElementById("impBtn"); if (ib) ib.hidden = true; }
 }
 sb.auth.onAuthStateChange((_ev, session) => { setTimeout(() => startWith(session), 0); });

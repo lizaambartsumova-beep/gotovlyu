@@ -53,6 +53,7 @@ button,select,input,textarea{font:inherit;color:inherit}
 .ppanel h2{font-size:1.4rem}
 .hbtns{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .profbtn{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--paper);border-radius:999px;padding:5px 14px 5px 5px;cursor:pointer;font-weight:600;color:var(--ink)}
+.profbtn.guest{background:var(--ink);color:var(--paper);padding:10px 18px}
 .profbtn .av{width:32px;height:32px;border-radius:50%}
 .byline{margin:0;display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted)}
 .byline .av{width:24px;height:24px;border-radius:50%}
@@ -727,7 +728,7 @@ function renderList(){
     </div>`).join("")}</div>`:`<div class="empty">${have.length?"С этими продуктами пока ничего не нашлось. Попробуй убрать один из них.":recipes.length?"В этом разделе пока пусто.":"Рецептов пока нет. Нажми «Новый рецепт», чтобы добавить первый."}</div>`);
   bindChips();bindHave();
   view.querySelectorAll(".card .open").forEach(c=>c.onclick=()=>{openId=c.dataset.id;render();window.scrollTo(0,0)});
-  view.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{if(!db){toast("Войди в claude.ai, чтобы планировать");return}togglePlan(b.dataset.plan)});
+  view.querySelectorAll("[data-plan]").forEach(b=>b.onclick=()=>{if(!db){return}togglePlan(b.dataset.plan)});
 }
 
 function stepTitle(r,n){return String((r.stepTitles||[])[n]||"").trim()}
@@ -931,7 +932,7 @@ async function drawNotes(){if(!openId||editing||importing)return;
     el.querySelectorAll("[data-ndel]").forEach(b=>b.onclick=async()=>{const nid=b.dataset.ndel;openMenu=null;try{await db.collection("recipes/"+notesFor+"/notes").doc(nid).delete();
       for(const c of cmts.filter(c=>c.note===nid))await db.collection("recipes/"+notesFor+"/comments").doc(c.id).delete().catch(()=>{});
       for(const l of likes.filter(l=>l.note===nid))await db.collection("recipes/"+notesFor+"/likes").doc(l.id).delete().catch(()=>{});toast("Публикация удалена")}catch(e){toast("Не получилось удалить")}});
-    el.querySelectorAll("[data-like]").forEach(b=>b.onclick=async()=>{if(!meId){toast("Войди в claude.ai, чтобы ставить лайки");return}const nid=b.dataset.like,lid=nid+"__"+meId,ref=db.collection("recipes/"+notesFor+"/likes").doc(lid);
+    el.querySelectorAll("[data-like]").forEach(b=>b.onclick=async()=>{if(!meId){toast("Войди, чтобы ставить лайки");return}const nid=b.dataset.like,lid=nid+"__"+meId,ref=db.collection("recipes/"+notesFor+"/likes").doc(lid);
       try{if(likes.some(l=>l.id===lid))await ref.delete();else await ref.set({note:nid,by:meId,at:Date.now()})}catch(e){toast("Не получилось")}});
     el.querySelectorAll("[data-cfocus]").forEach(b=>b.onclick=()=>{const i=el.querySelector(`input[data-cin="${b.dataset.cfocus}"]`);if(i)i.focus()});
     el.querySelectorAll("[data-allc]").forEach(b=>b.onclick=()=>{openAll.add(b.dataset.allc);drawNotes()});
