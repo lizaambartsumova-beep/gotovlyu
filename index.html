@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Готовлю как умею</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;600&family=Unbounded:wght@600;700&display=swap">
+<style>
+:root{--bg:#FAF7F1;--paper:#fff;--ink:#252525;--muted:#6F6A60;--coral:#F04D36}
+@media (prefers-color-scheme:dark){:root{--bg:#171614;--paper:#211F1C;--ink:#F2EEE6;--muted:#ABA497;--coral:#FF6A52}}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font-family:"Onest",system-ui,sans-serif;padding:24px}
+main{max-width:560px;text-align:center}
+h1{font-family:"Unbounded",system-ui,sans-serif;font-size:clamp(2rem,7vw,3rem);margin:0 0 12px;display:inline-flex;gap:.3em;align-items:center}
+h1 svg{width:.95em;height:.84em;color:var(--coral)}
+.smoke{opacity:.55;animation:puff 2.4s ease-in-out infinite}
+@keyframes puff{50%{transform:translateY(-1.5px);opacity:.25}}
+@media (prefers-reduced-motion:reduce){.smoke{animation:none}}
+p{color:var(--muted);font-size:1.05rem;line-height:1.55;margin:0 0 8px}
+.soon{display:inline-block;margin-top:18px;background:var(--paper);border-radius:999px;padding:10px 20px;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+  <h1>Готовлю как умею<svg viewBox="0 0 34 30" aria-hidden="true"><path class="smoke" d="M10.5 12.5c-2-2 2-3.2 0-5.6s1.6-3.6 0-5.4M16.5 12.5c-2-2 2-3.2 0-5.6s1.6-3.6 0-5.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M2.5 16h22v1.2a8.3 8.3 0 01-8.3 8.3h-5.4a8.3 8.3 0 01-8.3-8.3z" fill="currentColor"/><path d="M24.5 17.5h7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></h1>
+  <p>Рецепты, которые получились и не очень, меню на неделю и список покупок. Готовим, делимся с друзьями и учимся на своих «упсах».</p>
+  <span class="soon">Скоро открытие 🍳</span>
+</main>
+</body>
+</html>
