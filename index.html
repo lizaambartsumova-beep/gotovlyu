@@ -63,8 +63,8 @@ button,select,input,textarea{font:inherit;color:inherit}
 .byline .ava{width:40px;height:40px}
 .byline b{color:var(--ink)}
 .byline:hover b{text-decoration:underline}
-.story{margin:0;font-style:italic;line-height:1.5;color:var(--ink);border-left:3px solid var(--line);padding-left:12px}
-.story[data-ed]:empty::before{content:attr(data-ph);color:var(--muted)}
+p.story{margin:0;font-style:italic;line-height:1.5;color:var(--ink);border-left:3px solid var(--line);padding-left:12px}
+.story [data-ed]:empty::before,p.story[data-ed]:empty::before{content:attr(data-ph);color:var(--muted)}
 .cby{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted);font-weight:600}
 .cby .ava{width:22px;height:22px}
 .people{display:flex;gap:16px;align-items:flex-start;overflow-x:auto;padding:2px 2px 6px;margin:0 0 20px}
