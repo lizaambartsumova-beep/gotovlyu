@@ -152,7 +152,7 @@ function trS(s) {
 }
 
 /* рецепт → английская версия (если перевод есть) */
-const TXT = ["title", "story", "source", "health", "before", "done", "storage", "notes", "oven", "ovenNote", "servings", "time", "servesUnit"];
+const TXT = ["title", "story", "about", "source", "health", "before", "done", "storage", "notes", "oven", "ovenNote", "servings", "time", "servesUnit"];
 function locR(r) {
   if (!EN) return r;
   const e = r.en;
