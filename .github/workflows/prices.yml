@@ -1,0 +1,27 @@
+name: Weekly prices
+on:
+  schedule:
+    - cron: "41 5 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: weekly-prices
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pdfplumber==0.11.4
+      - name: Petersburg average prices (Petrostat)
+        run: python tools/update_spb.py
+      - name: Commit changes
+        run: |
+          git add data
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Обновлены средние цены Петербурга (Петростат)"
+          git push
