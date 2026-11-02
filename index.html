@@ -780,6 +780,18 @@ ul.shop li.have .nm,ul.shop li.have .q,ul.shop li.have .src{text-decoration:none
 .stsel select{appearance:none;-webkit-appearance:none;border:0;background:var(--soft);border-radius:999px;padding:7px 32px 7px 14px;font:inherit;font-weight:700;color:var(--ink);cursor:pointer}
 .stsel select:hover{background:var(--line)}
 .stsel select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.planv.simple .planwrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:start}
+.planv.simple .planwrap>.panel:not(.sched){grid-column:1/span 3}
+.bside{display:flex;flex-direction:column;gap:10px;position:sticky;top:16px}
+.bside .budget{margin:0!important;padding:16px}
+.bside .budget .bline{flex-wrap:wrap}
+.tile2{background:var(--paper);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:10px}
+.owntile .xadd{flex-wrap:wrap}
+.owntile .xadd #x_n{flex:1 1 100%}
+.owntile .xadd #x_p{flex:1}
+.bside .wkact{margin:0;justify-content:flex-start;flex-direction:column;align-items:stretch;background:var(--paper);border-radius:var(--r-lg);padding:12px}
+.bside .wkact .btn{justify-content:center}
+@media (max-width:900px){.planv.simple .planwrap{grid-template-columns:minmax(0,1fr)}.planv.simple .planwrap>.panel:not(.sched){grid-column:auto}.bside{position:static}.bside .wkact{flex-direction:row;flex-wrap:wrap;justify-content:center;background:none;padding:0}}
 .xsug{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .xsug .chip{font-size:.85rem;padding:5px 10px}
 .xadd{display:flex;gap:6px;align-items:center}
@@ -822,7 +834,7 @@ ul.shop li.have .src{color:var(--bad)}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Фото"><button class="lbx" type="button" id="lbx" aria-label="Закрыть">✕</button><div class="lbin" id="lbin"><img id="lbimg" alt=""></div><p class="lbhint">Нажми на фото, чтобы приблизить</p></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="i18n.js?v=202611022100000"></script>
+<script src="i18n.js?v=2026110222000000"></script>
 <script>
 const IC={
  star:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -1217,11 +1229,9 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
       const actG=list.filter(g=>!have.has(g.key)),hG=list.filter(g=>have.has(g.key)),actX=(plan.extra||[]).filter(x=>!x.done),hX=(plan.extra||[]).filter(x=>x.done),nH=hG.length+hX.length;
       if(!list.length&&!(plan.extra||[]).length)return'<p class="muted">Список появится, когда поставишь блюда в расписание.</p>';
       return `<ul class="shop">${actG.map(rowG).join("")}${actX.map(rowX).join("")}</ul>${nH?`<details class="havegrp" id="haveGrp"${hideHave?"":" open"}><summary>Уже есть дома · ${nH}</summary><ul class="shop">${hG.map(rowG).join("")}${hX.map(rowX).join("")}</ul></details>`:""}`})()}
-   <form class="xadd" id="xAdd"><input id="x_n" placeholder="+ Своё: Oatly, кофе, бананы…" maxlength="60" aria-label="Добавить продукт в список"><input id="x_p" inputmode="decimal" placeholder="€" aria-label="Цена" maxlength="7"><button class="btn" type="submit">Добавить</button></form>${(()=>{const cur=new Set((plan.extra||[]).map(x=>x.name.toLowerCase()));const sg=(plan.xhist||[]).filter(h=>!cur.has(h.name.toLowerCase())).slice(0,8);return sg.length?`<div class="xsug"><span class="hint2">Часто беру:</span>${sg.map((h,ix)=>`<button type="button" class="chip" data-xs="${ix}">＋ ${esc(h.name)}${h.p!=null?` <span class="n">${euro(h.p)}</span>`:""}</button>`).join("")}</div>`:""})()}
+   
       ${optList.length?`<div class="optbox"><h3>По желанию</h3><p class="muted" style="margin:4px 0 8px">Отметь, что включить в список покупок — отмеченное добавится выше.</p><ul class="shop">${optList.map(g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");return `<li><label><input type="checkbox" data-opt="${esc(g.key)}" ${incOpt.has(g.key)?"checked":""}><span class="nm">${esc(gN(g))}<span class="src">${esc(g.from.join(", "))}</span></span><span class="q">${esc(amtT(q))}</span></label></li>`}).join("")}</ul></div>`:""}
-  </section></div>
-  <div class="budget${tot.shop>bud?" over":tot.shop>bud*0.85?" near":""}" id="budgetBar" role="status" aria-live="polite"><div class="bline"><span><span class="muted">Всего</span> <b>${euro(tot.shop)}</b> <span class="muted">из</span> <button type="button" class="budb" id="budEdit" title="Изменить бюджет">${euro(bud)}</button></span><span class="bnote">${tot.shop>bud?`больше на ${euro(tot.shop-bud)}`:`ещё ${euro(bud-tot.shop)}`}</span></div><div class="btrack"><span style="width:${Math.min(100,tot.shop/bud*100).toFixed(1)}%"></span></div>${tot.shop?`<div class="bsub">съедим на неделе ≈ ${euro(tot.used)} · останется на потом ≈ ${euro(tot.left)}${tot.unknown?` · без цены: ${tot.unknown}`:""}${(()=>{if(!tot.shop)return"";const best=STORES.map(([n])=>[n,totalFor(n)]).sort((a,b)=>a[1]-b[1])[0];return best[0]!==curStore()&&tot.shop-best[1]>=1?` · в ${best[0]} ≈ ${euro(best[1])}`:""})()}</div>`:""}</div>
-  ${scheduled().length||templates.length?`<div class="wkact">${scheduled().length?`${typeof shareWeek==="function"?`<button type="button" class="btn" id="shareWk">↗ Поделиться</button>`:""}<button type="button" class="btn" id="saveWk">💾 Сохранить неделю</button>`:""}<button type="button" class="btn link" id="myWks">Мои недели${templates.length?` · ${templates.length}`:""}${typeof inbox!=="undefined"&&inbox.length?` <span class="dot">${inbox.length}</span>`:""}</button></div>`:""}
+  </section><aside class="bside"><div class="budget${tot.shop>bud?" over":tot.shop>bud*0.85?" near":""}" id="budgetBar" role="status" aria-live="polite"><div class="bline"><span><span class="muted">Всего</span> <b>${euro(tot.shop)}</b> <span class="muted">из</span> <button type="button" class="budb" id="budEdit" title="Изменить бюджет">${euro(bud)}</button></span><span class="bnote">${tot.shop>bud?`больше на ${euro(tot.shop-bud)}`:`ещё ${euro(bud-tot.shop)}`}</span></div><div class="btrack"><span style="width:${Math.min(100,tot.shop/bud*100).toFixed(1)}%"></span></div>${tot.shop?`<div class="bsub">съедим на неделе ≈ ${euro(tot.used)} · останется на потом ≈ ${euro(tot.left)}${tot.unknown?` · без цены: ${tot.unknown}`:""}${(()=>{if(!tot.shop)return"";const best=STORES.map(([n])=>[n,totalFor(n)]).sort((a,b)=>a[1]-b[1])[0];return best[0]!==curStore()&&tot.shop-best[1]>=1?` · в ${best[0]} ≈ ${euro(best[1])}`:""})()}</div>`:""}</div><div class="tile2 owntile"><p class="label">Своё в покупки</p><form class="xadd" id="xAdd"><input id="x_n" placeholder="+ Своё: Oatly, кофе, бананы…" maxlength="60" aria-label="Добавить продукт в список"><input id="x_p" inputmode="decimal" placeholder="€" aria-label="Цена" maxlength="7"><button class="btn" type="submit">Добавить</button></form>${(()=>{const cur=new Set((plan.extra||[]).map(x=>x.name.toLowerCase()));const sg=(plan.xhist||[]).filter(h=>!cur.has(h.name.toLowerCase())).slice(0,8);return sg.length?`<div class="xsug"><span class="hint2">Часто беру:</span>${sg.map((h,ix)=>`<button type="button" class="chip" data-xs="${ix}">＋ ${esc(h.name)}${h.p!=null?` <span class="n">${euro(h.p)}</span>`:""}</button>`).join("")}</div>`:""})()}</div>${scheduled().length||templates.length?`<div class="wkact">${scheduled().length?`${typeof shareWeek==="function"?`<button type="button" class="btn" id="shareWk">↗ Поделиться</button>`:""}<button type="button" class="btn" id="saveWk">💾 Сохранить неделю</button>`:""}<button type="button" class="btn link" id="myWks">Мои недели${templates.length?` · ${templates.length}`:""}${typeof inbox!=="undefined"&&inbox.length?` <span class="dot">${inbox.length}</span>`:""}</button></div>`:""}</aside></div>
   <section class="panel tpl"><h2>Сохранённые недели</h2>
    <p class="muted" style="margin:0">Сохрани удачное расписание, чтобы в другой раз загрузить его одним нажатием.</p>
    <div class="tplsave"><input id="tplName" placeholder="Название, напр. «Обычная неделя»" maxlength="60"><button class="btn primary" type="button" id="tplSave" ${scheduled().length?"":"disabled"}>Сохранить эту неделю</button></div>
@@ -1867,6 +1877,6 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
 };
 async function newRecipe(){try{toast("Создаю рецепт…");const ref=await db.collection("recipes").add({title:"Новый рецепт",status:"want",serves:2,ingredients:[],steps:[],stepTitles:[],tips:[],source:"",video:"",recipeUrl:"",photo:""});justCopied=ref.id;openId=ref.id;filter="all";render();window.scrollTo(0,0)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
 </script>
-<script src="backend.js?v=202611022100000"></script>
+<script src="backend.js?v=2026110222000000"></script>
 
 </body></html>
