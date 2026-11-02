@@ -244,10 +244,11 @@ function openProfile() {
   ov.innerHTML = `<form class="auth ppanel" id="profForm"><h2>Профиль</h2>
     <div class="avrow"><span class="ava avbig sh-${profileOf(ME.id).shape}"><img id="pfAv" src="${profileOf(ME.id).avatarUrl}" alt="Аватар"></span><div class="avbtns"><label class="btn">Выбрать фото<input type="file" accept="image/*" id="pfAvIn" hidden></label>${PROFILE.avatar_url ? '<button class="btn link" type="button" id="pfAvDel">Убрать фото</button>' : ""}</div></div>
     ${profileFields(PROFILE)}
+    ${typeof shopPrefsHtml === "function" ? shopPrefsHtml() : ""}
     <p class="muted" style="margin:0;font-size:.85rem">${hEsc(ME.email || "")}</p>
     <div class="arow"><button class="btn primary" type="submit">Сохранить</button><button class="btn" type="button" id="pfClose">Закрыть</button></div>
     <button class="btn link" type="button" id="pfOut" style="align-self:flex-start">Выйти</button><p class="aerr" id="pf_err" role="alert"></p></form>`;
-  document.body.appendChild(ov); bindCountry();
+  document.body.appendChild(ov); bindCountry(); if (typeof bindShopPrefs === "function") bindShopPrefs(ov);
   ov.querySelectorAll("input[name=pf_shape]").forEach(r => r.onchange = () => { const b = ov.querySelector(".avrow .ava"); b.className = "ava avbig sh-" + r.value; });
   const close = () => ov.remove();
   ov.addEventListener("click", e => { if (e.target === ov) close(); });
@@ -264,7 +265,7 @@ function openProfile() {
     try {
       await chk(sb.from("profiles").update(p).eq("id", ME.id));
       PROFILE = { ...PROFILE, ...p }; PROFILES[ME.id] = { ...PROFILES[ME.id], ...p };
-      if (typeof plan !== "undefined" && typeof savePlan === "function") { plan = { ...plan, people: p.people }; savePlan(plan); }
+      if (typeof plan !== "undefined" && typeof savePlan === "function") { if (typeof readShopPrefs === "function") readShopPrefs(); plan = { ...plan, people: p.people }; savePlan(plan); }
       drawProfBtn(); close(); if (typeof render === "function") render();
     } catch (err) { document.getElementById("pf_err").textContent = "Не получилось сохранить: " + err.message; }
   };

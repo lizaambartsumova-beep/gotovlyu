@@ -665,6 +665,26 @@ ul.shop .pform .btn{padding:6px 12px}
 .prodc .btn{flex:none;padding:7px 12px;font-size:.85rem}
 .sres.prods{display:flex;flex-direction:column;gap:6px}
 @media (max-width:640px){.spov{align-items:flex-end;padding:0}.spanel{border-radius:20px 20px 0 0;max-height:88vh;padding-bottom:max(16px,env(safe-area-inset-bottom,0px))}}
+.shw{display:flex;flex-direction:column;gap:14px;max-width:820px}
+.shw h2{font-size:clamp(1.4rem,4vw,2rem)}
+.shstats{display:flex;flex-wrap:wrap;gap:6px}
+.shstats span{background:var(--paper);border-radius:999px;padding:6px 12px;font-size:.88rem;font-weight:600}
+.shdays{display:flex;flex-direction:column;gap:8px}
+.shd{background:var(--paper);border-radius:var(--r-md);padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.shd>b{width:2.2em;font-family:var(--display)}
+.shm{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.shm .sl{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.shd .chipr{cursor:pointer;border:0;font:inherit}
+.shact{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+fieldset.shp{border:1.5px solid var(--line);border-radius:var(--r-md);padding:12px 14px;display:flex;flex-direction:column;gap:8px;margin:0}
+fieldset.shp legend{font-weight:700;padding:0 6px}
+.mylist{display:flex;flex-direction:column;gap:4px}
+.myp{display:grid;grid-template-columns:minmax(0,1fr) 70px auto 28px;gap:6px;align-items:center;font-size:.92rem}
+.myp input{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:5px 8px;font:inherit;background:var(--bg)}
+.myp.add{grid-template-columns:minmax(0,1fr) 70px auto}
+.onb h2{font-size:1.3rem}
+.onbopts{display:flex;flex-wrap:wrap;gap:8px}
+.onbopts .chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .xsug{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .xsug .chip{font-size:.85rem;padding:5px 10px}
 .xadd{display:flex;gap:6px;align-items:center}
@@ -707,7 +727,7 @@ ul.shop li.have .src{color:var(--bad)}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Фото"><button class="lbx" type="button" id="lbx" aria-label="Закрыть">✕</button><div class="lbin" id="lbin"><img id="lbimg" alt=""></div><p class="lbhint">Нажми на фото, чтобы приблизить</p></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="i18n.js?v=202611021500"></script>
+<script src="i18n.js?v=202611021600"></script>
 <script>
 const IC={
  star:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -733,7 +753,7 @@ let sample=null, pasteStep=null, pasteFor=null, who=null, notes=[], notesFor=nul
 let db=null, assets=null, recipes=[], filter="all", openId=null, editing=null, plan={ids:[],have:[],need:[],slots:{}}, sel=null, quickSlot=null, templates=[], tplConfirm=null;
 const view=document.getElementById("view");
 let person=null;
-try{const h=decodeURIComponent(location.hash.slice(1)); if(h.startsWith("u/")) person=h.slice(2); else if(h) openId=h;}catch(e){}
+try{const h=decodeURIComponent(location.hash.slice(1)); if(h.startsWith("u/")) person=h.slice(2); else if(h.startsWith("w/")) sharedWeek=decodeWeek(h.slice(2)); else if(h) openId=h;}catch(e){}
 
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function toast(t){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
@@ -797,7 +817,7 @@ function linkBtns(r){
 
 function inPlan(id){return (plan.ids||[]).includes(id)}
 function scheduled(){const out=[];Object.values(plan.slots||{}).forEach(a=>(a||[]).forEach(id=>{if(!out.includes(id)&&recipes.some(r=>r.id===id))out.push(id)}));return out}
-async function savePlan(next){if(!db)return;try{await db.doc("plan/week").set({ids:next.ids||[],have:next.have||[],need:next.need||[],slots:next.slots||{},opt:next.opt||[],portions:next.portions||{},people:next.people||2,prices:next.prices||{},extra:next.extra||[],budget:next.budget||80,xhist:next.xhist||[]})}catch(e){toast("Не получилось сохранить план: "+(e.message||e.code))}}
+async function savePlan(next){if(!db)return;try{await db.doc("plan/week").set({ids:next.ids||[],have:next.have||[],need:next.need||[],slots:next.slots||{},opt:next.opt||[],portions:next.portions||{},people:next.people||2,prices:next.prices||{},extra:next.extra||[],budget:next.budget||80,xhist:next.xhist||[],onb:!!next.onb,shops:next.shops||[]})}catch(e){toast("Не получилось сохранить план: "+(e.message||e.code))}}
 async function togglePlan(id){const was=inPlan(id);const ids=was?plan.ids.filter(x=>x!==id):[...(plan.ids||[]),id];plan={...plan,ids};render();await savePlan(plan);toast(inPlan(id)?"Добавлено в избранное недели":"Убрано из избранного")}
 function parseAmt(a){const m=String(a||"").replace(/(\d),(\d)/g,"$1.$2").match(/(\d+(?:\.\d+)?)\s*(кг|г|мл|л|шт\.?|ст\.\s?л\.|ч\.\s?л\.)/i);if(!m)return null;let q=+m[1],u=m[2].toLowerCase().replace(/\s/g,"");if(u==="кг"){q*=1000;u="г"}if(u==="л"){q*=1000;u="мл"}if(u.startsWith("шт"))u="шт.";if(u==="ст.л.")u="ст. л.";if(u==="ч.л.")u="ч. л.";return{q,u,approx:/[~–-]/.test(String(a))}}
 function ingKey(n){return String(n||"").toLowerCase().replace(/\(.*?\)/g,"").replace(/ё/g,"е").trim()}
@@ -857,6 +877,9 @@ const PCAT=[
 ["salmon","Копчёный лосось","Räucherlachs",/лосос|lachs/,"г",200,3.99],
 ["schlemmer","Schlemmerfilet à la Bordelaise","Gut & Günstig Schlemmerfilet à la Bordelaise (TK)",/schlemmer|шлеммер|bordelaise/,"шт",1,3.99,{pcw:400}],
 ["pangasius","Пангасиус (замороженный, 3 филе)","Gut & Günstig Pangasiusfilets (TK, 3 Stück)",/пангасиус|pangasius/,"шт",3,3.49,{pcw:150}],
+["bread","Хлеб","Brot",/(^|[^а-я])хлеб(?! белый)|^brot/,"г",500,1.99,{not:/тост|белый хлеб/}],
+["cookies","Печенье","Kekse",/печень|kekse/,"г",200,1.29],
+["nuts","Орехи","Nüsse / Studentenfutter",/орех|nüsse|studentenfutter/,"г",200,2.49],
 ["zwieback","Brandt Zwieback","Brandt Markenzwieback",/zwieback|цвибак/,"г",225,1.49],
 ["tuna","Тунец","Thunfisch (Dose)",/тунец|thunfisch/,"г",185,1.79,{can:185}],
 ["flour","Мука 405","Weizenmehl Type 405",/мука|mehl(?!\s*pan)/,"г",1000,0.79,{sp:[10,3],not:/панировоч|paniermehl/}],
@@ -955,6 +978,82 @@ function spResults(q){const nq=nrm(q).trim();const row=r=>`<button type="button"
   return (prods.length?`<p class="label">Продукт</p>${prods.map(prodCard).join("")}`:"")+`<p class="label">Рецепты: ${res.length}</p>${res.map(row).join("")||'<p class="hint2">Ничего не нашлось.</p>'}`+`<button type="button" class="sprow own" data-spown>＋ Своё блюдо${q.trim()?` «${esc(q.trim())}»`:""}</button>`}
 function pickerHtml(){const [d,m]=slotPick.split("-");return `<div class="spov" id="spOv" role="dialog" aria-modal="true" aria-label="Выбрать блюдо"><div class="spanel"><div class="sphead"><b>${SLOTN[m]||""} · ${DAYN[+d]||""}</b><button type="button" class="xbtn" id="spX" aria-label="Закрыть">✕</button></div><input id="spQ" type="search" autocomplete="off" placeholder="Блюдо или продукт: гратен, рис, Bergkäse…"><div class="spres" id="spRes">${spResults("")}</div></div></div>`}
 async function addProduct(k){const c=PCAT.find(x=>x.k===k);if(!c)return;const pr=priceOf("c:"+k,c);const x={id:Math.random().toString(36).slice(2,9),name:c.n,keep:false,done:false,p:pr.p};plan={...plan,extra:[...(plan.extra||[]),x],xhist:remember(x)};slotPick=null;render();await savePlan(plan);toast("+"+euro(pr.p).replace("€","€ ")+" · "+c.n+" в покупках")}
+
+/* ===== Share a week: the whole snapshot lives in the link (#w/...), no account needed to view ===== */
+var sharedWeek;
+function b64u(str){const bytes=new TextEncoder().encode(str);let bin="";bytes.forEach(x=>bin+=String.fromCharCode(x));return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+function unb64u(t){t=t.replace(/-/g,"+").replace(/_/g,"/");while(t.length%4)t+="=";const bin=atob(t);return new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)))}
+function decodeWeek(t){try{const d=JSON.parse(unb64u(t));return d&&d.s?d:null}catch(e){return null}}
+const FISH=new Set(["salmon","pangasius","tuna","schlemmer"]),MEAT=new Set(["mince","chicken","bacon"]);
+function weekStats(slots){const ids=[...new Set(Object.values(slots||{}).flat())].filter(id=>recipesRU.some(r=>r.id===id));const rs=ids.map(id=>recipesRU.find(r=>r.id===id));
+  const kinds=r=>{const ks=(r.ingredients||[]).map(normIng).map(i=>catOf(i.name)).filter(Boolean).map(c=>c.k);return {fish:ks.some(k=>FISH.has(k)),meat:ks.some(k=>MEAT.has(k))}};
+  let fish=0,meat=0,veg=0;rs.forEach(r=>{const k=kinds(r);if(k.fish)fish++;else if(k.meat)meat++;else veg++});
+  const meals=Object.values(slots||{}).flat().length;return {dishes:ids.length,meals,fresh:rs.filter(r=>r.status==="want").length,fish,meat,veg}}
+function shareWeekUrl(){const l=shoppingList(false),t=planTotals(l,haveSet(l));const nm=(typeof PROFILE!=="undefined"&&PROFILE&&PROFILE.name)||"";
+  const d={n:nm,p:plan.people||2,t:Math.round(t.shop*100)/100,u:Math.round(t.used*100)/100,b:plan.budget||80,s:plan.slots||{},x:(plan.extra||[]).filter(x=>!x.done).map(x=>x.name).slice(0,10),d:new Date().toISOString().slice(0,10)};
+  return location.origin+location.pathname+"#w/"+b64u(JSON.stringify(d))}
+async function shareWeek(){const url=shareWeekUrl();const nm=(typeof PROFILE!=="undefined"&&PROFILE&&PROFILE.name)||"моя";
+  try{if(navigator.share&&matchMedia("(pointer:coarse)").matches){await navigator.share({title:"Неделя "+nm,text:"Моё меню на неделю — «Готовлю как умею»",url});return}}catch(e){if(e&&e.name==="AbortError")return}
+  try{await navigator.clipboard.writeText(url);toast("Ссылка на неделю скопирована")}catch(e){prompt("Скопируй ссылку:",url)}}
+function pplWord(n){const m=n%10,h=n%100;return (m>=1&&m<=4)&&!(h>=11&&h<=14)?"человека":"человек"}
+const adjN=(n,one,many)=>n%10===1&&n%100!==11?one:many;
+function renderSharedWeek(){const w=sharedWeek,st=weekStats(w.s),DAYS=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],MEALS=[["b","Завтрак"],["l","Обед"],["d","Ужин"]];
+  const perDay=w.t&&w.p?w.t/w.p/7:0;const who=w.n?`Неделя ${esc(w.n)}`:"Меню на неделю";
+  const chip=id=>{const r=recipes.find(x=>x.id===id);if(!r)return"";return `<button type="button" class="chipr" data-open="${esc(id)}">${r.photo?`<img src="${esc(blobUrl(r.photo))}" alt="">`:`<span class="mini">${esc(String(r.title).slice(0,1))}</span>`}<span class="n2">${esc(r.title)}</span></button>`};
+  const loggedIn=typeof ME!=="undefined"&&!!ME;
+  view.innerHTML=`<div class="shw"><p class="label">Меню на неделю${w.d?` · ${esc(new Date(w.d).toLocaleDateString("ru-RU"))}`:""}</p>
+   <h2>${who}: ${w.t?euro(w.t):"—"} на ${w.p} ${pplWord(w.p)}</h2>
+   <div class="shstats"><span>🍽 ${st.dishes} ${st.dishes===1?"блюдо":st.dishes<5?"блюда":"блюд"} на ${st.meals} ${st.meals===1?"приём":st.meals<5?"приёма":"приёмов"} пищи</span>${st.fresh?`<span>✨ ${st.fresh} ${adjN(st.fresh,"новое","новых")}</span>`:""}${st.fish?`<span>🐟 ${st.fish} ${adjN(st.fish,"рыбное","рыбных")}</span>`:""}${st.meat?`<span>🥩 ${st.meat} ${adjN(st.meat,"мясное","мясных")}</span>`:""}${st.veg?`<span>🥗 ${st.veg} без мяса и рыбы</span>`:""}${perDay?`<span>💶 ≈ ${euro(perDay)} в день на человека</span>`:""}${w.b&&w.t?`<span>${w.t<=w.b?"✅ в бюджете "+euro(w.b):"бюджет "+euro(w.b)}</span>`:""}</div>
+   <div class="shdays">${DAYS.map((d,i)=>{const cells=MEALS.map(([m,ml])=>{const ids=(w.s[i+"-"+m]||[]).filter(id=>recipes.some(r=>r.id===id));return ids.length?`<div class="shm"><span class="sl">${ml}</span>${ids.map(chip).join("")}</div>`:""}).join("");return cells?`<div class="shd"><b>${d}</b>${cells}</div>`:""}).join("")}</div>
+   ${(w.x||[]).length?`<p class="hint2">Ещё в корзине: ${esc(w.x.join(", "))}</p>`:""}
+   <p class="hint2">Цены примерные (EDEKA). Нажми на блюдо, чтобы открыть рецепт.</p>
+   <div class="shact">${loggedIn?`<button class="btn primary" type="button" id="takeWeek">Взять эту неделю себе</button>`:`<button class="btn primary" type="button" id="joinWeek">Хочу так же — завести свою неделю</button>`}<button class="btn link" type="button" id="closeWeek">К рецептам</button></div></div>`;
+  view.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{openId=b.dataset.open;render();window.scrollTo(0,0)});
+  const tw=document.getElementById("takeWeek");if(tw)tw.onclick=async()=>{const sl={};for(const k in w.s)sl[k]=(w.s[k]||[]).filter(id=>recipesRU.some(r=>r.id===id));plan={...plan,slots:sl};sharedWeek=null;filter="week";try{history.replaceState(null,"",location.pathname)}catch(e){};render();await savePlan(plan);toast("Неделя добавлена в твоё меню")};
+  const jw=document.getElementById("joinWeek");if(jw)jw.onclick=()=>{if(typeof openAuth==="function")openAuth("up")};
+  document.getElementById("closeWeek").onclick=()=>{sharedWeek=null;try{history.replaceState(null,"",location.pathname)}catch(e){};render()}}
+
+/* ===== Profile: shopping settings (budget, my products and prices) ===== */
+function shopPrefsHtml(){const xs=plan.xhist||[],cp=Object.entries(plan.prices||{}).filter(([k])=>k.startsWith("c:")).map(([k,o])=>({k,o,c:PCAT.find(x=>"c:"+x.k===k)})).filter(x=>x.c);
+  return `<fieldset class="shp"><legend>Покупки</legend>
+   <label>Бюджет на неделю, €<input id="pf_budget" inputmode="decimal" value="${String(plan.budget||80).replace(".",",")}"></label>
+   <p class="label" style="margin:6px 0 0">Мои продукты</p>
+   <div class="mylist">${xs.map((h,i)=>`<div class="myp"><span>${esc(h.name)}</span><input data-mpp="${i}" inputmode="decimal" value="${h.p!=null?String(h.p).replace(".",","):""}" placeholder="€" aria-label="Цена ${esc(h.name)}"><span class="muted">€</span><button type="button" class="idel" data-mpx="${i}" aria-label="Убрать ${esc(h.name)}">✕</button></div>`).join("")||'<p class="hint2" style="margin:0">Пока пусто. Добавляй «своё» в списке покупок — оно появится здесь.</p>'}</div>
+   <div class="myp add"><input id="mp_n" placeholder="Новый продукт" maxlength="60"><input id="mp_p" inputmode="decimal" placeholder="€"><button type="button" class="btn" id="mp_add">＋</button></div>
+   ${cp.length?`<p class="label" style="margin:6px 0 0">Мои цены</p><div class="mylist">${cp.map(({k,o,c})=>`<div class="myp"><span>${esc(c.n)} <small class="muted">${fmtU(o.pack||c.pack,c.u)}</small></span><input data-mcp="${esc(k)}" inputmode="decimal" value="${String(o.p).replace(".",",")}" aria-label="Цена ${esc(c.n)}"><span class="muted">€</span><button type="button" class="idel" data-mcr="${esc(k)}" title="Вернуть примерную цену" aria-label="Сбросить цену ${esc(c.n)}">↺</button></div>`).join("")}</div>`:""}
+   <button type="button" class="btn link" id="pf_onb" style="align-self:flex-start;padding:2px 0">Пройти знакомство заново</button></fieldset>`}
+function bindShopPrefs(root){const num=v=>{const n=parseFloat(String(v||"").replace(",","."));return n>0?Math.round(n*100)/100:null};const sv=()=>{savePlan(plan);if(filter==="week")render()};
+  const redraw=()=>{const f=root.querySelector("fieldset.shp");if(f){f.outerHTML=shopPrefsHtml();bindShopPrefs(root)}};
+  root.querySelectorAll("[data-mpp]").forEach(i=>i.onchange=()=>{const xs=[...(plan.xhist||[])],k=+i.dataset.mpp,p=num(i.value);if(!xs[k])return;xs[k]={...xs[k]};if(p==null)delete xs[k].p;else xs[k].p=p;plan={...plan,xhist:xs};sv()});
+  root.querySelectorAll("[data-mpx]").forEach(b=>b.onclick=()=>{const xs=[...(plan.xhist||[])];xs.splice(+b.dataset.mpx,1);plan={...plan,xhist:xs};sv();redraw()});
+  root.querySelectorAll("[data-mcp]").forEach(i=>i.onchange=()=>{const k=i.dataset.mcp,p=num(i.value);if(p==null)return;plan={...plan,prices:{...(plan.prices||{}),[k]:{...(plan.prices||{})[k],p,at:Date.now()}}};sv()});
+  root.querySelectorAll("[data-mcr]").forEach(b=>b.onclick=()=>{const o={...(plan.prices||{})};delete o[b.dataset.mcr];plan={...plan,prices:o};sv();redraw()});
+  const ad=root.querySelector("#mp_add");if(ad)ad.onclick=()=>{const n=root.querySelector("#mp_n").value.trim();if(!n)return;const p=num(root.querySelector("#mp_p").value);const x={name:n.charAt(0).toUpperCase()+n.slice(1),...(p!=null?{p}:{})};plan={...plan,xhist:[x,...(plan.xhist||[]).filter(y=>y.name.toLowerCase()!==x.name.toLowerCase())]};sv();redraw()};
+  const ob=root.querySelector("#pf_onb");if(ob)ob.onclick=()=>{const ov=root.closest(".pov");if(ov)ov.remove();openOnboarding()}}
+function readShopPrefs(){const i=document.getElementById("pf_budget");if(!i)return;const n=parseFloat(String(i.value).replace(",","."));if(n>0&&n!==plan.budget){plan={...plan,budget:Math.round(n*100)/100}}}
+
+/* ===== Onboarding: a few light questions, every one can be skipped ===== */
+const ONB=[
+ {k:"budget",q:"Сколько примерно уходит на продукты в неделю?",sub:"Это будет цифра на шкале бюджета. Поменять можно в любой момент.",opts:["€40","€60","€80","€100","€120"],one:true},
+ {k:"fridge",q:"Без чего ваш холодильник — не холодильник?",sub:"Отметь, что покупаешь почти всегда.",opts:["Кофе ☕","Oatly","Молоко","Яйца","Сыр","Йогурт","Хлеб","Сливочное масло"]},
+ {k:"sweet",q:"Сладкоежка или фруктоед? А может, и то и другое 😄",sub:"Это попадёт в «Часто беру».",opts:["Горький шоколад 🍫","Печенье","Бананы 🍌","Яблоки 🍎","Ягоды","Орехи"]},
+ {k:"shops",q:"Где обычно закупаетесь?",sub:"Пока цены примерные по EDEKA — остальные магазины добавим.",opts:["EDEKA","REWE","Lidl","Aldi","Kaufland","Netto"]}];
+function openOnboarding(){if(document.getElementById("onbOv"))return;let step=0;const pick={budget:[],fridge:[],sweet:[],shops:[]};
+  const ov=document.createElement("div");ov.className="pov";ov.id="onbOv";ov.setAttribute("role","dialog");ov.setAttribute("aria-modal","true");document.body.appendChild(ov);
+  const finish=async()=>{const xs=[...(plan.xhist||[])];[...pick.fridge,...pick.sweet].forEach(o=>{const name=o.replace(/\s*[^\p{L}\p{N}\s%]+$/u,"").trim();const c=catOf(name);const x={name:c?c.n:name,...(c?{p:c.p}:{})};if(!xs.some(y=>y.name.toLowerCase()===x.name.toLowerCase()))xs.push(x)});
+    const b=pick.budget[0]?parseFloat(pick.budget[0].replace("€","")):null;plan={...plan,xhist:xs,onb:true,shops:pick.shops.length?pick.shops:(plan.shops||[]),...(b?{budget:b}:{})};ov.remove();render();await savePlan(plan);toast("Готово! Это можно поменять в профиле")};
+  const draw=()=>{const st=ONB[step];ov.innerHTML=`<div class="auth ppanel onb"><p class="label" style="margin:0">Шаг ${step+1} из ${ONB.length}</p><h2>${st.q}</h2><p class="muted" style="margin:0">${st.sub}</p>
+    <div class="onbopts">${st.opts.map(o=>`<button type="button" class="chip" data-o="${esc(o)}" aria-pressed="${pick[st.k].includes(o)}">${esc(o)}</button>`).join("")}</div>
+    ${st.k==="budget"?`<label class="muted" style="font-size:.9rem">или своя сумма, €<input id="onbB" inputmode="decimal" style="margin-top:4px" value="${pick.budget[0]&&!st.opts.includes(pick.budget[0])?esc(pick.budget[0].replace("€","")):""}"></label>`:""}
+    <div class="arow"><button class="btn primary" type="button" id="onbNext">${step<ONB.length-1?"Дальше":"Готово"}</button><button class="btn link" type="button" id="onbSkip">${step<ONB.length-1?"Пропустить":"Пропустить и закончить"}</button></div>
+    <button class="btn link" type="button" id="onbAll" style="align-self:flex-start;padding:2px 0;font-size:.85rem">Не сейчас — всё потом в профиле</button></div>`;
+    ov.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{const o=b.dataset.o,a=pick[st.k];if(st.one){pick[st.k]=a[0]===o?[]:[o]}else{const i=a.indexOf(o);i<0?a.push(o):a.splice(i,1)}draw()});
+    const bi=document.getElementById("onbB");if(bi)bi.oninput=()=>{const v=parseFloat(bi.value.replace(",","."));pick.budget=v>0?["€"+v]:[]};
+    const next=()=>{step++;if(step>=ONB.length)finish();else draw()};
+    document.getElementById("onbNext").onclick=next;
+    document.getElementById("onbSkip").onclick=()=>{pick[st.k]=[];next()};
+    document.getElementById("onbAll").onclick=async()=>{ov.remove();plan={...plan,onb:true};await savePlan(plan)}};
+  draw()}
 function curTotal(){const l=shoppingList(false);return planTotals(l,haveSet(l)).shop}
 function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan.opt||[]);const chosen=scheduled().map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const favs=(plan.ids||[]).map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const allR=[...recipes].sort((a,b)=>String(a.title).localeCompare(b.title,'ru'));const list=shoppingList(false);const have=haveSet(list);const tot=planTotals(list,have),bud=plan.budget||80;
   const DAYS=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],MEALS=[["b","Завтрак"],["l","Обед"],["d","Ужин"]];
@@ -973,7 +1072,7 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
      return `${prods.length?`<div class="sres prods">${prods.map(prodCard).join("")}</div>`:""}<p class="label sres" style="margin:2px 0 0">Найдено: ${res.length}</p><div class="pool all sres">${res.length?res.map(r=>chip(r.id,"pool")).join(""):'<span class="hint2">Ничего не нашлось.</span>'}</div>`})()}
    <div class="week">${DAYS.map((d,i)=>{const dt=new Date(mon);dt.setDate(mon.getDate()+i);const isT=dt.toDateString()===now.toDateString();
      return `<div class="day ${isT?"today":""}"><h3>${d}<small>${dt.getDate()}.${String(dt.getMonth()+1).padStart(2,"0")}</small></h3><div class="slots">${MEALS.map(([m,ml])=>{const key=i+"-"+m;return `<div class="slot ${sel?"target":""}" data-slot="${key}"><span class="sl">${ml}</span>${key==="0-b"?ghost:""}${(slots[key]||[]).map(id=>chip(id,key)).join("")}${quickSlot===key?`<div class="qform" data-qf="${key}"><input id="q_t" placeholder="Название, напр. Омлет" value="${esc(quickTitle)}"><textarea id="q_i" placeholder="Продукты (по желанию), по одному в строке: Яйца — 2 шт."></textarea><div class="row2"><button class="btn primary" type="button" id="q_ok">Добавить</button><button class="btn" type="button" id="q_no">Отмена</button></div></div>`:(sel?"":`<button class="qadd" type="button" data-qadd="${key}">＋ своё блюдо</button>`)}</div>`}).join("")}</div></div>`}).join("")}</div>`;
-  view.innerHTML=`<div class="planv${planView==="simple"?" simple":""}${moreR?" more":""}"><div class="vrow"><div class="vseg" role="group" aria-label="Вид страницы"><button type="button" data-pv="simple" aria-pressed="${planView==="simple"}">Просто</button><button type="button" data-pv="full" aria-pressed="${planView!=="simple"}">Подробно</button></div>${planView==="simple"?`<button type="button" class="btn link moreR" id="moreR" aria-expanded="${moreR}">${moreR?"Скрыть другие рецепты":"＋ Другие рецепты и поиск"}</button>`:""}</div>`+weekHtml+`<div class="budget${tot.shop>bud?" over":tot.shop>bud*0.85?" near":""}" id="budgetBar" role="status" aria-live="polite"><div class="bline"><span><b>${euro(tot.shop)}</b> <span class="muted">из</span> <button type="button" class="budb" id="budEdit" title="Изменить бюджет">${euro(bud)}</button></span><span class="bnote">${tot.shop>bud?`больше на ${euro(tot.shop-bud)}`:`ещё ${euro(bud-tot.shop)}`}</span></div><div class="btrack"><span style="width:${Math.min(100,tot.shop/bud*100).toFixed(1)}%"></span></div>${tot.shop?`<div class="bsub">съедим на неделе ≈ ${euro(tot.used)} · останется на потом ≈ ${euro(tot.left)}${tot.unknown?` · без цены: ${tot.unknown}`:""}</div>`:""}</div><div class="planwrap">
+  view.innerHTML=`<div class="planv${planView==="simple"?" simple":""}${moreR?" more":""}"><div class="vrow"><div class="vseg" role="group" aria-label="Вид страницы"><button type="button" data-pv="simple" aria-pressed="${planView==="simple"}">Просто</button><button type="button" data-pv="full" aria-pressed="${planView!=="simple"}">Подробно</button></div>${scheduled().length?`<button type="button" class="btn link" id="shareWk">↗ Поделиться неделей</button>`:""}${planView==="simple"?`<button type="button" class="btn link moreR" id="moreR" aria-expanded="${moreR}">${moreR?"Скрыть другие рецепты":"＋ Другие рецепты и поиск"}</button>`:""}</div>`+weekHtml+`<div class="budget${tot.shop>bud?" over":tot.shop>bud*0.85?" near":""}" id="budgetBar" role="status" aria-live="polite"><div class="bline"><span><b>${euro(tot.shop)}</b> <span class="muted">из</span> <button type="button" class="budb" id="budEdit" title="Изменить бюджет">${euro(bud)}</button></span><span class="bnote">${tot.shop>bud?`больше на ${euro(tot.shop-bud)}`:`ещё ${euro(bud-tot.shop)}`}</span></div><div class="btrack"><span style="width:${Math.min(100,tot.shop/bud*100).toFixed(1)}%"></span></div>${tot.shop?`<div class="bsub">съедим на неделе ≈ ${euro(tot.used)} · останется на потом ≈ ${euro(tot.left)}${tot.unknown?` · без цены: ${tot.unknown}`:""}</div>`:""}</div><div class="planwrap">
   <section class="panel sched"><h2>В расписании</h2><div class="people"><span>Нас</span><span class="stp" role="group" aria-label="Сколько человек"><button type="button" data-ppl="-1" aria-label="Меньше" ${(plan.people||2)<=1?"disabled":""}>−</button><span><b>${plan.people||2}</b> ${(()=>{const n=plan.people||2,m=n%10,h=n%100;return m===1&&h!==11?"человек":(m>=2&&m<=4&&(h<12||h>14))?"человека":"человек"})()}</span><button type="button" data-ppl="1" aria-label="Больше">+</button></span></div>
    ${chosen.length?'<p class="hint2" style="margin:0">Число у блюда — порции для закупки: люди × сколько раз блюдо стоит в меню. Пироги и киши — целыми формами: вторая добавится, только когда одной не хватит на всех.</p>':""}
    ${chosen.length?chosen.map(r=>`<div class="prow">${r.photo?`<img src="${esc(blobUrl(r.photo))}" alt="">`:`<span class="mini">${esc(r.title.slice(0,1))}</span>`}<span class="t" data-open="${esc(r.id)}">${esc(r.title)}</span>${baseServes(r)?`<span class="stp sm" role="group" aria-label="Порции: ${esc(r.title)}"><button type="button" data-pp="${esc(r.id)}|-1" aria-label="Меньше">−</button><span>${planPortions(r)}${r.whole&&planPortions(r)>baseServes(r)&&planPortions(r)%baseServes(r)===0?` <small class="muted">· ${planPortions(r)/baseServes(r)} формы</small>`:""}</span><button type="button" data-pp="${esc(r.id)}|1" aria-label="Больше">+</button></span>`:""}<button class="xbtn" type="button" data-rm="${esc(r.id)}" aria-label="Убрать ${esc(r.title)} из расписания">✕</button></div>`).join(""):'<p class="muted">Пока пусто. Перетащи блюдо в любой день.</p>'}
@@ -995,6 +1094,7 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
   bindChips();
   view.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{planView=b.dataset.pv;try{localStorage.setItem("planView",planView)}catch(e){}render()});
   const mr=document.getElementById("moreR");if(mr)mr.onclick=()=>{moreR=!moreR;render()};
+  const sw=document.getElementById("shareWk");if(sw)sw.onclick=()=>shareWeek();
   view.querySelectorAll("[data-ppl]").forEach(b=>b.onclick=async()=>{plan={...plan,people:Math.max(1,(plan.people||2)+(+b.dataset.ppl))};render();await savePlan(plan)});
   view.querySelectorAll("[data-pp]").forEach(b=>b.onclick=async()=>{const [id,d]=b.dataset.pp.split("|");const r=recipes.find(x=>x.id===id);if(!r)return;const n=Math.max(1,planPortions(r)+(+d));const po={...(plan.portions||{})};if(n===planDefault(r))delete po[id];else po[id]=n;plan={...plan,portions:po};render();await savePlan(plan)});
   const ph=document.getElementById("planHelp");if(ph)ph.onclick=()=>{planHelp=!planHelp;render()};
@@ -1509,7 +1609,7 @@ function renderForm(r){
 
 function renderNav(){const n=document.getElementById("nav");if(!n)return;const wk=filter==="week"&&!editing&&!importing&&!(openId&&recipes.some(x=>x.id===openId));
   n.innerHTML=`<div class="seg"><button type="button" data-nav="bank" ${!wk?'aria-current="page"':""}>${IC.book} Рецепты <span class="cnt">${recipes.length}</span></button><button type="button" data-nav="week" ${wk?'aria-current="page"':""}>${IC.cal} Меню и покупки <span class="cnt">${scheduled().length}</span></button></div>`;
-  n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{editing=null;importing=null;openId=null;person=null;filter=b.dataset.nav==="week"?"week":(filter==="week"?"all":filter);render();window.scrollTo(0,0)})}
+  n.querySelectorAll("[data-nav]").forEach(b=>b.onclick=()=>{editing=null;importing=null;openId=null;person=null;sharedWeek=null;try{history.replaceState(null,"",location.pathname)}catch(e){};filter=b.dataset.nav==="week"?"week":(filter==="week"?"all":filter);render();window.scrollTo(0,0)})}
 function renderImport(){const st=importing;
   view.innerHTML=`<button class="btn back" type="button" id="cancel">${IC.back} Назад</button>
   <div class="imp"><h2>Импорт рецепта</h2>
@@ -1561,6 +1661,7 @@ ${st.text||"(только скриншоты)"}`;
 let recipesLoaded=false,recipesRU=[];
 function render(){
   document.body.classList.remove("onrecipe");
+  if(sharedWeek&&!openId&&!editing&&!importing&&!person){renderNav();return renderSharedWeek()}
   recipes=(EN&&!editOn&&!editing)?recipesRU.map(locR):recipesRU;
   if(openId&&!recipesLoaded){renderNav();view.innerHTML='<div class="empty">Загружаю рецепт…</div>';return}
   try{const want=openId&&!editing&&!importing?"#"+encodeURIComponent(openId):(person&&!editing&&!importing?"#u/"+person:"");if(location.hash!==want)history.replaceState(null,"",location.pathname+want)}catch(e){}
@@ -1609,7 +1710,7 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
   const ib=document.getElementById("impBtn");ib.innerHTML=IC.plus+" Новый рецепт";ib.hidden=false;
   ib.onclick=()=>{if(sample){importing={};editing=null;render();window.scrollTo(0,0);return}newRecipe()};
   db.collection("templates").onSnapshot(sn=>{templates=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created||0)-(a.created||0));if(!editing&&!importing&&filter==="week")render()},()=>{});
-  db.doc("plan/week").onSnapshot(d=>{const v=d.exists?d.data():{};plan={ids:v.ids||[],have:v.have||[],need:v.need||[],slots:v.slots||{},opt:v.opt||[],portions:v.portions||{},people:v.people||2,prices:v.prices||{},extra:v.extra||[],budget:v.budget||80,xhist:v.xhist||[]};if(!editing&&!busyTyping())render()},()=>{});
+  db.doc("plan/week").onSnapshot(d=>{const v=d.exists?d.data():{};plan={ids:v.ids||[],have:v.have||[],need:v.need||[],slots:v.slots||{},opt:v.opt||[],portions:v.portions||{},people:v.people||2,prices:v.prices||{},extra:v.extra||[],budget:v.budget||80,xhist:v.xhist||[],onb:!!v.onb,shops:v.shops||[]};if(typeof ME!=="undefined"&&ME&&!plan.onb&&!(plan.xhist||[]).length&&!Object.values(plan.slots||{}).flat().length&&!document.getElementById("onbOv"))setTimeout(openOnboarding,400);if(!editing&&!busyTyping())render()},()=>{});
   db.collection("recipes").onSnapshot(snap=>{
     recipesRU=snap.docs.map(d=>({id:d.id,...d.data()}));recipes=recipesRU;recipesLoaded=true;
     if(editing)return;if(busyTyping()){pendingRender=true;return}render();
@@ -1617,6 +1718,6 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
 };
 async function newRecipe(){try{toast("Создаю рецепт…");const ref=await db.collection("recipes").add({title:"Новый рецепт",status:"want",serves:2,ingredients:[],steps:[],stepTitles:[],tips:[],source:"",video:"",recipeUrl:"",photo:""});justCopied=ref.id;openId=ref.id;filter="all";render();window.scrollTo(0,0)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
 </script>
-<script src="backend.js?v=202611021500"></script>
+<script src="backend.js?v=202611021600"></script>
 
 </body></html>
