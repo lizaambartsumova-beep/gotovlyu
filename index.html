@@ -814,6 +814,17 @@ ul.shop .pr.own{background:var(--lime-soft);border-color:transparent;color:var(-
 #copyList:hover{border-color:var(--ink)}
 .ofb{white-space:nowrap}
 .bside .budget .bline{flex-direction:column;align-items:flex-start;gap:2px}
+.stwrap{position:relative;display:inline-flex}
+.stbtn{border:0;background:var(--soft);border-radius:999px;padding:7px 32px 7px 14px;font:inherit;font-weight:700;color:var(--ink);cursor:pointer;position:relative}
+.stbtn::after{content:"";position:absolute;right:13px;top:50%;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-70%) rotate(45deg);transition:transform .15s}
+.stbtn[aria-expanded="true"]::after{transform:translateY(-25%) rotate(-135deg)}
+.stbtn:hover{background:var(--line)}
+.stmenu{position:absolute;top:calc(100% + 6px);left:0;z-index:25;background:var(--paper);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.16);padding:6px;display:flex;flex-direction:column;min-width:200px}
+.stmenu button{border:0;background:none;font:inherit;text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;gap:14px;align-items:baseline;color:var(--ink)}
+.stmenu button:hover{background:var(--soft)}
+.stmenu button[aria-checked="true"]{font-weight:700}
+.stmenu button[aria-checked="true"] span:first-child::before{content:"✓ "}
+.stmenu .sttot{color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums;font-weight:500}
 .xsug{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .xsug .chip{font-size:.85rem;padding:5px 10px}
 .xadd{display:flex;gap:6px;align-items:center}
@@ -856,7 +867,7 @@ ul.shop li.have .src{color:var(--bad)}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Фото"><button class="lbx" type="button" id="lbx" aria-label="Закрыть">✕</button><div class="lbin" id="lbin"><img id="lbimg" alt=""></div><p class="lbhint">Нажми на фото, чтобы приблизить</p></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="i18n.js?v=20261102230000000"></script>
+<script src="i18n.js?v=202611022330000000"></script>
 <script>
 const IC={
  star:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -876,7 +887,7 @@ const STATUS={done:"Рекомендую 👍",tried:"Пробовали 👌",w
 const SORD={done:0,tried:1,want:2};const sOrd=r=>SORD[r.status]??3;
 const FILTERS=[["all","Все"],["done","Рекомендую"],["tried","Пробовали"],["want","Хочу попробовать"]];
 let hideStd=false,onlyGentle=false,importing=null;try{hideStd=localStorage.getItem("hideStd")==="1";onlyGentle=localStorage.getItem("onlyGentle")==="1"}catch(e){}
-let planQ="",planHelp=false,budDet=false,poolKind="fav",poolMenu=false,budMini=false,priceInfo=false,planView="simple",moreR=false,slotPick=null,quickTitle="",priceEdit=null,hideHave=false;try{hideHave=localStorage.getItem("hideHave")!=="0";planView="simple";poolKind=localStorage.getItem("poolKind")||"fav";budMini=localStorage.getItem("budMini")==="1"}catch(e){}
+let planQ="",planHelp=false,storeMenu=false,budDet=false,poolKind="fav",poolMenu=false,budMini=false,priceInfo=false,planView="simple",moreR=false,slotPick=null,quickTitle="",priceEdit=null,hideHave=false;try{hideHave=localStorage.getItem("hideHave")!=="0";planView="simple";poolKind=localStorage.getItem("poolKind")||"fav";budMini=localStorage.getItem("budMini")==="1"}catch(e){}
 let editOn=false, focusAfter=null, pendingRender=false, showUrl=false, moreOpen=false, justCopied=null;
 let sample=null, pasteStep=null, pasteFor=null, who=null, notes=[], notesFor=null, nDraft=null;
 let db=null, assets=null, recipes=[], filter="all", openId=null, editing=null, plan={ids:[],have:[],need:[],slots:{}}, sel=null, quickSlot=null, templates=[], tplConfirm=null;
@@ -1243,7 +1254,7 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
    ${chosen.length?chosen.map(r=>`<div class="prow">${r.photo?`<img src="${esc(blobUrl(r.photo))}" alt="">`:`<span class="mini">${esc(r.title.slice(0,1))}</span>`}<span class="t" data-open="${esc(r.id)}">${esc(r.title)}</span>${baseServes(r)?`<span class="stp sm" role="group" aria-label="Порции: ${esc(r.title)}"><button type="button" data-pp="${esc(r.id)}|-1" aria-label="Меньше">−</button><span>${planPortions(r)}${r.whole&&planPortions(r)>baseServes(r)&&planPortions(r)%baseServes(r)===0?` <small class="muted">· ${planPortions(r)/baseServes(r)} формы</small>`:""}</span><button type="button" data-pp="${esc(r.id)}|1" aria-label="Больше">+</button></span>`:""}<button class="xbtn" type="button" data-rm="${esc(r.id)}" aria-label="Убрать ${esc(r.title)} из расписания">✕</button></div>`).join(""):'<p class="muted">Пока пусто. Перетащи блюдо в любой день.</p>'}
    ${chosen.length?'<button class="btn link" type="button" id="clearPlan">Очистить неделю</button>':""}
   </section>
-  <section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Что купить</h2><span class="stgrp"><label class="stsel"><span class="muted">в</span><span class="selw"><select id="storeSel" aria-label="Магазин">${STORES.map(([n])=>`<option ${curStore()===n?"selected":""}>${n}</option>`).join("")}</select></span></label><button type="button" class="infob" id="priceInfo" aria-expanded="${priceInfo}" aria-label="Откуда цены" title="Откуда цены">i</button></span><span class="shbtns">${list.length||(plan.extra||[]).length?`<button class="btn" type="button" id="copyList">${IC.copy} Скопировать</button>`:""}</span></div>${priceInfo?`<div class="pinfo"><b>Цены примерные.</b> EDEKA — по реальным ценам из открытых источников и моим оценкам, Lidl и Aldi — примерно на 15 % дешевле EDEKA, Kaufland — на 10 %. Сами цены не обновляются. Нажми на любую цену и впиши свою — она запомнится для выбранного магазина. Свои цены видны в профиле.</div>`:""}<p class="hint2 shhint">Отметь ✓ то, что <a href="#haveGrp" id="haveLink">уже есть дома</a></p><textarea id="copyArea" hidden readonly style="width:100%;min-height:160px;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:10px;background:var(--bg)"></textarea>
+  <section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Что купить</h2><span class="stgrp"><span class="stsel"><span class="muted">в</span><span class="stwrap"><button type="button" class="stbtn" id="storeBtn" aria-haspopup="menu" aria-expanded="${storeMenu}">${curStore()}</button>${storeMenu?`<span class="stmenu" role="menu">${STORES.map(([n])=>{const t=tot.shop?totalFor(n):0;return `<button type="button" role="menuitemradio" aria-checked="${curStore()===n}" data-st="${n}"><span>${n}</span>${t?`<span class="sttot">≈ ${euro(t)}</span>`:""}</button>`}).join("")}</span>`:""}</span></span><button type="button" class="infob" id="priceInfo" aria-expanded="${priceInfo}" aria-label="Откуда цены" title="Откуда цены">i</button></span><span class="shbtns">${list.length||(plan.extra||[]).length?`<button class="btn" type="button" id="copyList">${IC.copy} Скопировать</button>`:""}</span></div>${priceInfo?`<div class="pinfo"><b>Цены примерные.</b> EDEKA — по реальным ценам из открытых источников и моим оценкам, Lidl и Aldi — примерно на 15 % дешевле EDEKA, Kaufland — на 10 %. Сами цены не обновляются. Нажми на любую цену и впиши свою — она запомнится для выбранного магазина. Свои цены видны в профиле.</div>`:""}<p class="hint2 shhint">Отметь ✓ то, что <a href="#haveGrp" id="haveLink">уже есть дома</a></p><textarea id="copyArea" hidden readonly style="width:100%;min-height:160px;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:10px;background:var(--bg)"></textarea>
    <p class="muted shdesc" style="margin:0">Одинаковые продукты из разных рецептов сложены и посчитаны упаковками. Отметь то, что уже есть дома: продукт <span style="color:var(--bad);text-decoration:line-through">зачеркнётся</span> и не попадёт в сумму. Цены примерные — подробнее по значку «i».</p>
    ${(()=>{const rowG=g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");const c=costOf(g),isH=have.has(g.key);
       const pack=c.pr&&g.cat?`${c.packs>1?c.packs+" × ":""}${fmtU(c.pr.pack,c.pr.u)}${c.left>0.05*c.pr.pack&&!g.rough?` · останется ~${fmtU(c.left,c.pr.u)}`:""}`:"";
@@ -1267,7 +1278,8 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
   const pi=document.getElementById("priceInfo");if(pi)pi.onclick=()=>{priceInfo=!priceInfo;render()};
   view.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{planView=b.dataset.pv;try{localStorage.setItem("planView",planView)}catch(e){}render()});
   const mr=document.getElementById("moreR");if(mr)mr.onclick=()=>{moreR=!moreR;render()};
-  const ss=document.getElementById("storeSel");if(ss)ss.onchange=async()=>{const before=curTotal();plan={...plan,store:ss.value};priceEdit=null;render();toast(ss.value+": "+euro(curTotal())+(Math.abs(curTotal()-before)>=0.01?" ("+(curTotal()<before?"−":"+")+euro(Math.abs(curTotal()-before)).replace("€","€ ")+")":""));await savePlan(plan)};
+  const sbn=document.getElementById("storeBtn");if(sbn)sbn.onclick=e=>{e.stopPropagation();storeMenu=!storeMenu;render()};
+  view.querySelectorAll("[data-st]").forEach(b=>b.onclick=async()=>{const v=b.dataset.st;storeMenu=false;if(v===curStore()){render();return}const before=curTotal();plan={...plan,store:v};priceEdit=null;render();toast(v+": "+euro(curTotal())+(Math.abs(curTotal()-before)>=0.01?" ("+(curTotal()<before?"−":"+")+euro(Math.abs(curTotal()-before)).replace("€","€ ")+")":""));await savePlan(plan)});
   const sw=document.getElementById("shareWk");if(sw)sw.onclick=()=>openShareWeek();
   const sv=document.getElementById("saveWk");if(sv)sv.onclick=()=>openSaveWeek(mon);
   const mw=document.getElementById("myWks");if(mw)mw.onclick=()=>openMyWeeks();
@@ -1884,7 +1896,7 @@ view.addEventListener("click",e=>{const b=e.target.closest("[data-srcmore]");if(
 /* save inline edits on blur; Enter finishes a field; snapshots wait while someone is typing on the page */
 const busyTyping=()=>{const a=document.activeElement;return !!(a&&view.contains(a)&&(a.isContentEditable||/^(INPUT|TEXTAREA)$/.test(a.tagName)))};
 view.addEventListener("focusout",e=>{const el=e.target;if(el.dataset&&el.dataset.ed)saveEd(el);setTimeout(()=>{if(pendingRender&&!busyTyping()){pendingRender=false;render()}},0)});
-document.addEventListener("click",e=>{if(moreOpen&&!e.target.closest(".ract")){moreOpen=false;if(openId&&!editing)render()}});
+document.addEventListener("click",e=>{if(moreOpen&&!e.target.closest(".ract")){moreOpen=false;if(openId&&!editing)render()}if((storeMenu&&!e.target.closest(".stwrap"))||(poolMenu&&!e.target.closest(".poolhd"))){storeMenu=false;poolMenu=false;if(filter==="week"&&!openId&&!editing)render()}});
 view.addEventListener("keydown",e=>{const el=e.target;if(el.dataset&&el.dataset.ed){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();el.blur()}else if(e.key==="Escape"){el.blur()}}});
 window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
   [db,assets,sample,who]=[_db,_assets,_sample,_who];
@@ -1900,6 +1912,6 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
 };
 async function newRecipe(){try{toast("Создаю рецепт…");const ref=await db.collection("recipes").add({title:"Новый рецепт",status:"want",serves:2,ingredients:[],steps:[],stepTitles:[],tips:[],source:"",video:"",recipeUrl:"",photo:""});justCopied=ref.id;openId=ref.id;filter="all";render();window.scrollTo(0,0)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
 </script>
-<script src="backend.js?v=20261102230000000"></script>
+<script src="backend.js?v=202611022330000000"></script>
 
 </body></html>
