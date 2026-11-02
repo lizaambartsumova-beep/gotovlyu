@@ -607,6 +607,40 @@ form.edit textarea{min-height:120px;resize:vertical}
 .prow img,.prow .mini{width:52px;height:52px;border-radius:14px;object-fit:cover;flex:none;background:var(--soft);display:grid;place-items:center;font-family:var(--display);color:var(--muted)}
 .prow .t{flex:1;min-width:0;font-weight:600;cursor:pointer}
 .xbtn{border:0;background:var(--soft);border-radius:50%;width:32px;height:32px;cursor:pointer;flex:none}
+.budget{position:sticky;bottom:max(10px,env(safe-area-inset-bottom,0px));z-index:5;background:var(--ink);color:var(--paper);border-radius:var(--r-lg);padding:12px 16px 12px;margin:14px 0 16px;display:flex;flex-direction:column;gap:7px;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.budget .bline{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:.95rem}
+.budget .bline b{font-size:1.35rem;font-variant-numeric:tabular-nums}
+.budget .muted{color:rgba(255,255,255,.65)}
+.budget .budb{border:0;background:none;color:inherit;font:inherit;font-weight:700;padding:0;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.budget .bnote{font-size:.85rem;color:rgba(255,255,255,.75)}
+.budget .btrack{height:8px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden}
+.budget .btrack span{display:block;height:100%;border-radius:99px;background:var(--lime,#c8e66a);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.budget.near .btrack span{background:var(--sun,#f5c542)}
+.budget.over .btrack span{background:var(--coral,#ff6b4a)}
+.budget .bsub{font-size:.8rem;color:rgba(255,255,255,.7)}
+.budget.bump{animation:bump .5s ease}
+@keyframes bump{30%{transform:scale(1.025)}100%{transform:none}}
+ul.shop li{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:start;border-bottom:1px solid var(--soft)}
+ul.shop li label{border-bottom:0}
+ul.shop .pr{margin:9px 0 0 8px;border:0;background:var(--soft);border-radius:999px;padding:3px 9px;font:inherit;font-size:.82rem;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;color:var(--ink);white-space:nowrap}
+ul.shop .pr.own{background:var(--lime-soft,#eef6d3)}
+ul.shop .pr.none{color:var(--muted)}
+ul.shop li.have .pr{text-decoration:line-through;color:var(--bad);background:none}
+ul.shop .xact{display:flex;gap:2px;margin:7px 0 0 4px}
+ul.shop .xact button{border:0;background:none;cursor:pointer;font-size:.85rem;padding:3px 5px;border-radius:8px;opacity:.45}
+ul.shop .xact button[aria-pressed="true"]{opacity:1;background:var(--soft)}
+ul.shop .xact button:hover{opacity:1}
+ul.shop .pform{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:4px 0 12px 32px;font-size:.88rem}
+ul.shop .pform input{width:72px;border:1.5px solid var(--line);border-radius:10px;padding:6px 8px;font:inherit;background:var(--bg)}
+ul.shop .pform small{flex-basis:100%;color:var(--muted)}
+ul.shop .pform .btn{padding:6px 12px}
+.shbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.xadd{display:flex;gap:6px;align-items:center}
+.xadd #x_n{flex:1;min-width:0;border:1.5px dashed var(--line);border-radius:12px;padding:9px 12px;font:inherit;background:none}
+.xadd #x_p{width:62px;border:1.5px solid var(--line);border-radius:12px;padding:9px 8px;font:inherit;background:none}
+ul.shop .src .pk::before{content:" · "}
+@media (max-width:640px){ul.shop .src .fr{display:none}ul.shop .src .pk::before{content:""}.budget{padding:10px 14px;gap:6px}.budget .bline b{font-size:1.2rem}.budget .bsub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.75rem}}
+.amt .gq{display:block;font-size:.75rem;color:var(--muted);font-weight:400;text-align:right}
 ul.shop{list-style:none;margin:0;padding:0}
 ul.shop li label{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--soft);cursor:pointer}
 ul.shop input{width:18px;height:18px;margin-top:4px;accent-color:var(--ink)}
@@ -641,7 +675,7 @@ ul.shop li.have .src{color:var(--bad)}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Фото"><button class="lbx" type="button" id="lbx" aria-label="Закрыть">✕</button><div class="lbin" id="lbin"><img id="lbimg" alt=""></div><p class="lbhint">Нажми на фото, чтобы приблизить</p></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="i18n.js?v=202611020110"></script>
+<script src="i18n.js?v=202611021500"></script>
 <script>
 const IC={
  star:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -661,7 +695,7 @@ const STATUS={done:"Рекомендую 👍",tried:"Пробовали 👌",w
 const SORD={done:0,tried:1,want:2};const sOrd=r=>SORD[r.status]??3;
 const FILTERS=[["all","Все"],["done","Рекомендую"],["tried","Пробовали"],["want","Хочу попробовать"]];
 let hideStd=false,onlyGentle=false,importing=null;try{hideStd=localStorage.getItem("hideStd")==="1";onlyGentle=localStorage.getItem("onlyGentle")==="1"}catch(e){}
-let planQ="",planHelp=false;
+let planQ="",planHelp=false,priceEdit=null,hideHave=false;try{hideHave=localStorage.getItem("hideHave")==="1"}catch(e){}
 let editOn=false, focusAfter=null, pendingRender=false, showUrl=false, moreOpen=false, justCopied=null;
 let sample=null, pasteStep=null, pasteFor=null, who=null, notes=[], notesFor=null, nDraft=null;
 let db=null, assets=null, recipes=[], filter="all", openId=null, editing=null, plan={ids:[],have:[],need:[],slots:{}}, sel=null, quickSlot=null, templates=[], tplConfirm=null;
@@ -693,7 +727,7 @@ const DOT='<svg width="9" height="9" viewBox="0 0 10 10" aria-hidden="true"><cir
 function countViz(i){const m=String(i.amount).match(/^(\d)\s*шт\.?$/);if(!m)return"";const n=+m[1];if(n<1||n>6)return"";const g=/яйц|яйко|eier|\bei\b/i.test(i.name+" "+i.de)?EGG:DOT;return `<span class="dots" aria-hidden="true">${g.repeat(n)}</span>`}
 function ingLi(i){if(editOn)return `<li><span class="nm"><span${ed(`ing:${i._ix}:name`,"Продукт")}>${esc(i.name)}</span><span class="sub"><i${ed(`ing:${i._ix}:de`,"по-немецки")}>${esc(i.de)}</i> · <span${ed(`ing:${i._ix}:note`,"пояснение")}>${esc(i.note)}</span></span></span><span class="amt"><span${ed(`ing:${i._ix}:amount`,"кол-во")}>${esc(i.amount||"")}</span><button class="idel" type="button" data-idel="${i._ix}" aria-label="Удалить продукт">✕</button></span></li>`;
   const sub=[i.de?`<i>${esc(i.de)}</i>`:"",i.note?esc(i.note):""].filter(Boolean).join(" · ");
-  return `<li><span class="nm">${esc(i.name)}${i.optional?'<span class="optp">по желанию</span>':""}${sub?`<span class="sub">${sub}</span>`:""}</span><span class="amt">${esc(amtT(i.amount||""))}${countViz(i)}</span></li>`}
+  return `<li><span class="nm">${esc(i.name)}${i.optional?'<span class="optp">по желанию</span>':""}${sub?`<span class="sub">${sub}</span>`:""}</span><span class="amt">${esc(amtT(i.amount||""))}${countViz(i)}${(()=>{const h=gramHint(i.amount,i.name);return h?`<small class="gq">${h}</small>`:""})()}</span></li>`}
 const SP_RE=/^(соль|соль,? (и )?(чёрный |черный )?перец|(чёрный|черный|молотый) перец|перец (чёрный|черный)( молотый)?|salt|black pepper|salt,? (and |& )?(black )?pepper|ground black pepper)$/i;
 function ingRank(i){return SP_RE.test(String(i.name||"").trim())?2:i.optional?1:0}
 function ingHtml(list,fac){const n=list.map((x,ix)=>{const o={...normIng(x),_ix:ix};if(fac&&!editOn)o.amount=scaleAmt(o.amount,fac);return o}),main=(n.sort((a,b)=>ingRank(a)-ingRank(b)),n.filter(i=>!i.group)),groups=[...new Set(n.filter(i=>i.group).map(i=>i.group))];
@@ -731,7 +765,7 @@ function linkBtns(r){
 
 function inPlan(id){return (plan.ids||[]).includes(id)}
 function scheduled(){const out=[];Object.values(plan.slots||{}).forEach(a=>(a||[]).forEach(id=>{if(!out.includes(id)&&recipes.some(r=>r.id===id))out.push(id)}));return out}
-async function savePlan(next){if(!db)return;try{await db.doc("plan/week").set({ids:next.ids||[],have:next.have||[],need:next.need||[],slots:next.slots||{},opt:next.opt||[],portions:next.portions||{},people:next.people||2})}catch(e){toast("Не получилось сохранить план: "+(e.message||e.code))}}
+async function savePlan(next){if(!db)return;try{await db.doc("plan/week").set({ids:next.ids||[],have:next.have||[],need:next.need||[],slots:next.slots||{},opt:next.opt||[],portions:next.portions||{},people:next.people||2,prices:next.prices||{},extra:next.extra||[],budget:next.budget||80})}catch(e){toast("Не получилось сохранить план: "+(e.message||e.code))}}
 async function togglePlan(id){const was=inPlan(id);const ids=was?plan.ids.filter(x=>x!==id):[...(plan.ids||[]),id];plan={...plan,ids};render();await savePlan(plan);toast(inPlan(id)?"Добавлено в избранное недели":"Убрано из избранного")}
 function parseAmt(a){const m=String(a||"").replace(/(\d),(\d)/g,"$1.$2").match(/(\d+(?:\.\d+)?)\s*(кг|г|мл|л|шт\.?|ст\.\s?л\.|ч\.\s?л\.)/i);if(!m)return null;let q=+m[1],u=m[2].toLowerCase().replace(/\s/g,"");if(u==="кг"){q*=1000;u="г"}if(u==="л"){q*=1000;u="мл"}if(u.startsWith("шт"))u="шт.";if(u==="ст.л.")u="ст. л.";if(u==="ч.л.")u="ч. л.";return{q,u,approx:/[~–-]/.test(String(a))}}
 function ingKey(n){return String(n||"").toLowerCase().replace(/\(.*?\)/g,"").replace(/ё/g,"е").trim()}
@@ -744,9 +778,134 @@ function splitIng(i){const n=String(i.name||""),a=String(i.amount||"").trim();if
 function haveSet(list){const need=new Set(plan.need||[]),s=new Set(plan.have||[]);list.forEach(g=>{if(g.staple&&!need.has(g.key))s.add(g.key)});return s}
 function isOpt(i){return !!i.optional||/по желанию/i.test(String(i.amount||"")+" "+String(i.name||""))}
 const gN=g=>EN&&g.en?g.en:g.name;
-function shoppingList(optional){const inc=new Set(plan.opt||[]);const map=new Map();scheduled().forEach(id=>{const r=recipesRU.find(x=>x.id===id);if(!r)return;const rl=EN?locR(r):null,tt=rl?rl.title:r.title;const b=baseServes(r),fac=b?planPortions(r)/b:1;(r.ingredients||[]).map(normIng).map((i,k)=>({...i,amount:scaleAmt(i.amount,fac),_en:rl&&rl.ingredients&&rl.ingredients[k]?rl.ingredients[k].name:""})).flatMap(x=>{const sp=splitIng(x);return sp.length>1?sp.map(y=>({...y,_en:""})):sp}).forEach(i=>{const k=ingKey(i.name);if(!k||SKIP.has(k))return;const o=isOpt(i);if(optional?!o:(o&&!inc.has(k)))return;if(!map.has(k))map.set(k,{key:k,name:String(i.name).replace(/\s*\(.*?\)\s*/g," ").trim(),sums:{},other:[],from:[],approx:false,staple:isStaple(k),en:i._en||""});const g=map.get(k);const p=parseAmt(i.amount);if(p){g.sums[p.u]=(g.sums[p.u]||0)+p.q;if(p.approx)g.approx=true}else if(i.amount)g.other.push(String(i.amount).replace(/,?\s*по желанию/i,"").trim()||"по желанию");if(!g.from.includes(tt))g.from.push(tt)})});return [...map.values()].sort((a,b)=>a.name.localeCompare(b.name,"ru"))}
+/* ===== Price calculator =====
+   PCAT: approximate EDEKA prices (Berlin, Nov 2026). u: unit of the pack ("г","мл","шт"); pack: size; p: €.
+   pc: grams per piece (for things sold by weight); sp: [g per ст. л., g per ч. л.]; sachet/can/head/leaf/slice: grams (or pieces) per such word.
+   v:1 = price checked on edeka24.de / supermarktcheck.de / Wolt (EDEKA Berlin); others are estimates. */
+const PCAT=[
+["potato","Картофель","Speisekartoffeln",/картоф|картош|drilling/,"г",2500,2.99,{pc:150}],
+["onion","Лук","Zwiebeln",/(^|[^а-я])лук([^а-я]|$)|zwiebel(?!n?\s*röst)/,"г",1000,1.49,{pc:100,not:/зел[её]н|жарен|r[oö]st/}],
+["garlic","Чеснок","Knoblauch",/чеснок|knoblauch/,"шт",1,0.59,{clove:0.1}],
+["carrot","Морковь","Karotten",/морков|karott/,"г",1000,1.29,{pc:80}],
+["cherry","Помидоры черри","Cherrytomaten",/черри|мини-помид|cherry/,"г",250,1.49,{pc:15}],
+["tomato","Помидоры","Tomaten",/помидор|томат(?!н)|tomaten(?!mark)/,"г",500,1.99,{pc:120}],
+["pepper","Болгарский перец","Paprika",/болгарск|паприк|красный перец/,"г",500,2.49,{pc:170}],
+["cucumber","Огурец","Salatgurke",/огур|salatgurke/,"шт",1,0.79,{not:/корнишон|gewürz/}],
+["zucchini","Цукини","Zucchini",/цукини|zucchini/,"г",1000,2.49,{pc:250}],
+["cabbage","Белокочанная капуста","Weißkohl",/капуст|weißkohl|spitzkohl/,"г",1500,1.49,{head:1500}],
+["lettuce","Салат романо","Romana Salatherzen",/романо|айсберг|салат романо|салат айсберг|romana|eisberg/,"шт",2,1.49,{head:1,leaf:0.15}],
+["springonion","Зелёный лук","Frühlingszwiebeln",/зел[её]ный лук|зелень/,"шт",1,0.79],
+["basil","Базилик","Basilikum (Topf)",/базилик|basilik/,"шт",1,1.99,{leaf:0.05}],
+["thyme","Тимьян","Thymian",/тимьян|thymian/,"шт",1,1.49],
+["avocado","Авокадо","Avocado",/авокад/,"шт",1,1.19],
+["lemonjuice","Лимонный сок","Zitronensaft",/лимонный сок/,"мл",200,0.79],
+["lemon","Лимон","Zitronen",/лимон|zitrone/,"шт",1,0.45],
+["apple","Яблоки","Äpfel",/яблок|äpfel|apfel/,"г",1000,2.49,{pc:180}],
+["banana","Бананы","Bananen",/банан|banane/,"г",1000,1.39,{pc:120}],
+["berries","Ягоды (замороженные)","Beerenmischung TK",/ягод|beere/,"г",300,2.49],
+["egg","Яйца","Eier (10 Stück)",/яйц|яйцо|eier|^ei$/,"шт",10,2.99],
+["oatly","Oatly","Oatly Haferdrink",/oatly|овсяное молоко|haferdrink/,"мл",1000,2.55,{v:1}],
+["milk","Молоко","H-Milch 1,5 %",/молоко|milch/,"мл",1000,1.09],
+["butter","Сливочное масло","Butter",/сливочное масло|^масло сливоч|butter/,"г",250,2.29,{sp:[15,5]}],
+["cream","Сливки 30 %","Schlagsahne 30 %",/сливки(?! или сливочный)|schlagsahne|sahne/,"мл",200,1.19,{v:1}],
+["schmand","Сметана (Schmand)","Schmand",/сметан|schmand/,"г",200,0.99,{v:1,sp:[20,7]}],
+["cremefraiche","Crème fraîche","Crème fraîche",/cr[eè]me fra[iî]che/,"г",200,1.29],
+["creamcheese","Сливочный сыр","Frischkäse natur",/сливочный сыр|frischk/,"г",200,1.19,{sp:[20,7]}],
+["quark","Кварк","Speisequark",/кварк|quark/,"г",500,1.29,{sp:[20,7]}],
+["tvorog","Творог","Körniger Frischkäse / Topfen",/творог/,"г",500,2.49],
+["yogurt","Натуральный йогурт","Joghurt mild 3,5 %",/натуральный йогурт|^йогурт|joghurt(?! nach)/,"г",500,1.69,{v:1,sp:[20,7],not:/греческ/}],
+["greekyogurt","Греческий йогурт","Joghurt nach griechischer Art",/греческ/,"г",1000,3.59,{v:1}],
+["gratedcheese","Тёртый сыр","Reibekäse",/т[её]ртый сыр|л[её]гкий сыр|моцарел|reibek/,"г",200,1.99,{sp:[10,3]}],
+["hardcheese","Твёрдый сыр (Bergkäse)","Bergkäse am Stück",/тв[её]рдый сыр|bergk|грюйер|gruy/,"г",200,3.49],
+["parmesan","Пармезан","Parmesan",/пармезан|parmesan/,"г",100,2.49],
+["gouda","Гауда в нарезке","Gouda Scheiben",/гауда|gouda|сыр в нарезке/,"г",150,1.79,{slice:20}],
+["mince","Фарш смешанный","Hackfleisch gemischt",/фарш|hackfleisch/,"г",500,4.49],
+["chicken","Куриное филе","Hähnchenbrustfilet",/курин|куриц|hähnchen/,"г",600,6.99],
+["bacon","Бекон кубиками","Speckwürfel",/бекон|speck/,"г",200,1.99],
+["salmon","Копчёный лосось","Räucherlachs",/лосос|lachs/,"г",200,3.99],
+["pangasius","Пангасиус","Pangasiusfilet (TK)",/пангасиус|pangasius/,"г",800,5.49],
+["tuna","Тунец","Thunfisch (Dose)",/тунец|thunfisch/,"г",185,1.79,{can:185}],
+["flour","Мука 405","Weizenmehl Type 405",/мука|mehl(?!\s*pan)/,"г",1000,0.79,{sp:[10,3],not:/панировоч|paniermehl/}],
+["vanillasugar","Ванильный сахар","Vanillezucker",/ванильный сахар|vanill(in)?-?zucker/,"шт",10,0.59,{sachet:1,sp:[0.6,0.2]}],
+["vanilla","Ванильный экстракт","Vanilleextrakt",/ванильный экстракт/,"мл",30,2.99],
+["sugar","Сахар","Zucker",/сахар|zucker/,"г",1000,1.19,{sp:[15,5]}],
+["bakingpowder","Разрыхлитель","Backpulver",/разрыхл|backpulver/,"г",75,0.59,{sp:[10,4],sachet:15}],
+["yeast","Сухие дрожжи","Trockenhefe",/дрожж|hefe/,"г",21,0.49,{sp:[9,3],sachet:7}],
+["starch","Крахмал","Speisestärke",/крахмал|stärke/,"г",400,0.99,{sp:[10,3]}],
+["cocoa","Какао","Kakaopulver",/какао|kakao/,"г",250,2.49,{sp:[8,3]}],
+["cinnamon","Корица","Zimt",/корица|zimt/,"г",40,1.19,{sp:[8,3]}],
+["chili","Хлопья чили","Chiliflocken",/чили|chili/,"г",30,1.49,{sp:[6,2]}],
+["breadcrumbs","Панировочные сухари","Paniermehl",/панировоч|paniermehl/,"г",400,0.99,{sp:[8,3]}],
+["croutons","Сухарики","Croutons",/сухарик|crouton/,"г",100,1.29],
+["oats","Овсяные хлопья","Haferflocken",/овсян(ые|ых)? хлоп|haferflocken/,"г",500,0.69],
+["sushirice","Рис для суши","Sushi-Reis",/суши|sushi/,"г",500,2.49],
+["rice","Рис басмати","Basmati-Reis",/(^|[^а-я])рис([^а-я]|$)|basmati|reis/,"г",1000,2.99,{v:1}],
+["buckwheat","Гречка","Buchweizen",/гречк|buchweizen/,"г",500,2.49],
+["pasta","Макароны","Spaghetti / Penne",/(^|[^а-я])паст[аы]?([^а-я]|$)|спагет|пенне|макарон|spaghetti|penne/,"г",500,0.99,{not:/томатн|вода от/}],
+["tortilla","Тортильи","Weizen-Tortillas",/тортиль|лаваш|wrap/,"шт",6,1.69],
+["toast","Тостовый хлеб","Toastbrot",/тост|toast|белый хлеб/,"г",500,1.19,{slice:25}],
+["nori","Листы нори","Nori-Blätter",/нори|nori/,"шт",10,2.99,{leaf:1}],
+["dough","Готовое тесто","Quiche-/Blätterteig (Kühlregal)",/готовое тесто|teig/,"шт",1,1.79],
+["oliveoil","Оливковое масло","Olivenöl",/оливков|olivenöl/,"мл",500,5.99,{sp:[14,5]}],
+["oil","Растительное масло","Sonnenblumenöl",/подсолнеч|растительн|^масло$|sonnenblumen/,"мл",1000,1.99,{sp:[14,5]}],
+["ketchup","Кетчуп","Ketchup",/кетчуп|ketchup/,"мл",500,1.49,{sp:[17,6]}],
+["mayo","Майонез","Mayonnaise",/майонез|mayo/,"мл",250,1.29,{sp:[15,5]}],
+["mustard","Горчица","Senf",/горчиц|senf/,"мл",200,0.79,{sp:[15,5]}],
+["tomatopaste","Томатная паста","Tomatenmark",/томатн[а-я]* паст|tomatenmark/,"г",200,0.89,{sp:[16,5]}],
+["soy","Соевый соус","Sojasauce",/соев|soja/,"мл",150,1.99,{sp:[15,5]}],
+["honey","Мёд","Honig",/(^|[^а-я])м[её]д([^а-я]|$)|honig/,"г",500,3.99,{sp:[20,7]}],
+["chocolate","Горький шоколад","Zartbitterschokolade",/шоколад|schokolade/,"г",100,1.19],
+["raisins","Изюм","Rosinen",/изюм|rosinen/,"г",200,1.29],
+["olives","Оливки","Oliven",/оливк|oliven/,"шт",1,1.49,{can:1}],
+["roestzwiebeln","Жареный лук","Röstzwiebeln",/жарен[а-я]* лук|röstzw/,"г",150,1.29],
+["gherkins","Корнишоны","Gewürzgurken (Glas)",/корнишон|gewürzgurk/,"шт",25,1.59],
+["sesame","Кунжут","Sesam",/кунжут|sesam/,"г",100,1.29],
+["coffee","Кофе","Röstkaffee",/кофе|kaffee/,"г",500,9.29,{v:1}],
+["greentea","Зелёный чай","Grüner Tee",/зел[её]ный чай|grüner tee/,"шт",1,1.99],
+["salt","Соль","Salz",/соль|salz/,"г",500,0.39,{staple:1}],
+["blackpepper","Чёрный перец","Pfeffer schwarz",/перец|pfeffer/,"г",50,1.29,{staple:1,not:/болгарск|красный перец|паприк/}]
+].map(([k,n,de,re,u,pack,p,o])=>({k,n,de,re,u,pack,p,...(o||{})}));
+const nrmI=s=>String(s||"").toLowerCase().replace(/ё/g,"е").replace(/\s+/g," ").trim();
+function catOf(name){const n=String(name||"").toLowerCase();for(const c of PCAT){if(c.re.test(n)&&!(c.not&&c.not.test(n)))return c}return null}
+const FRAC={"½":.5,"¼":.25,"¾":.75,"⅓":1/3,"⅔":2/3};
+/* how much of the catalogue unit an amount string means; {q, rough} */
+function qtyOf(amount,c){let a=String(amount||"").toLowerCase().replace(/(\d)\s*([½¼¾⅓⅔])/g,(m,d,f)=>String(+d+FRAC[f])).replace(/[½¼¾⅓⅔]/g,f=>String(FRAC[f])).replace(/(\d),(\d)/g,"$1.$2");
+  const num=s=>{const m=s.match(/(\d+(?:\.\d+)?)(?:\s*[–-]\s*(\d+(?:\.\d+)?))?/);return m?+(m[2]||m[1]):null};
+  const ms=[...a.matchAll(/(\d+(?:\.\d+)?)(?:\s*[–-]\s*(\d+(?:\.\d+)?))?\s*(кг|г|мл|л|дл)(?![а-я])/g)];const metric=ms.find(m=>m[3]!=="дл")||ms[0];
+  if(metric&&c.u!=="шт"){let q=+(metric[2]||metric[1]);const u=metric[3];if(u==="кг"||u==="л")q*=1000;if(u==="дл")q*=100;return{q}}
+  const n=num(a);if(n==null)return{q:0,rough:true};
+  if(/ст\.?\s?л|ч\.?\s?л/.test(a)){if(c.u==="шт")return{q:0.1};return{q:n*((c.sp||[15,5])[/ст/.test(a)?0:1])}}
+  if(/зубч/.test(a))return{q:n*(c.clove||0.1)};
+  if(/пакет/.test(a))return{q:n*(c.sachet||1)};
+  if(/банк/.test(a))return{q:n*(c.can||1)};
+  if(/коч/.test(a))return{q:n*(c.head||1)};
+  if(/лист/.test(a))return{q:n*(c.leaf||1)};
+  if(/ломт|кусоч/.test(a))return{q:n*(c.slice||25)};
+  if(/рулон/.test(a))return{q:n};
+  if(metric&&c.u==="шт"){return{q:1}}
+  /* pieces: "3 шт.", "7 средних", "2 яйца", plain numbers */
+  return{q:c.u==="шт"?n:n*(c.pc||c.can||c.pack)};
+}
+/* "≈1 кг" hint for things counted in pieces but sold by weight */
+function gramHint(amount,name){const c=catOf(name);if(!c||c.u==="шт"||!c.pc)return"";const a=String(amount||"");if(/(\d)\s*(кг|г|мл|л)(?![а-я])/i.test(a)||/ст\.|ч\.|по вкусу|немного/i.test(a))return"";const r=qtyOf(a,c);if(!r.q||r.rough)return"";const g=r.q;return "≈ "+(g>=1000?String(Math.round(g/100)/10).replace(".",",")+" кг":(g>=100?Math.round(g/10)*10:Math.round(g))+" г")}
+const euro=x=>"€"+(Math.round(x*100)/100).toFixed(2).replace(".",",");
+const fmtU=(q,u)=>u==="шт"?(Math.round(q*10)/10).toString().replace(".",",")+" шт.":(q>=1000?String(Math.round(q/100)/10).replace(".",",")+(u==="г"?" кг":" л"):Math.round(q)+" "+u);
+function priceOf(key,c){const o=(plan.prices||{})[key];return{p:o&&o.p!=null?o.p:(c?c.p:null),pack:o&&o.pack?o.pack:(c?c.pack:1),u:c?c.u:"шт",at:o&&o.at,custom:!!o}}
+/* cost of one shopping group: packs to buy, what this week eats, what stays */
+function costOf(g){const pr=priceOf(g.key,g.cat);if(pr.p==null)return{unknown:true};
+  if(!g.cat)return{packs:1,cost:pr.p,used:pr.p,left:0,pr};
+  const need=g.need||0;const packs=Math.max(1,Math.ceil(need/pr.pack-1e-6));const cost=packs*pr.p;const used=g.rough&&!need?Math.min(cost,pr.p*0.15):Math.min(cost,need/pr.pack*pr.p);
+  return{packs,cost,used,left:Math.max(0,packs*pr.pack-need),pr}}
+function planTotals(list,have){let shop=0,used=0,unknown=0;list.forEach(g=>{if(have.has(g.key))return;const c=costOf(g);if(c.unknown){unknown++;return}shop+=c.cost;used+=c.used});
+  (plan.extra||[]).forEach(x=>{if(x.done)return;const p=x.p!=null?x.p:(catOf(x.name)||{}).p;if(p!=null){shop+=p;used+=p}else unknown++});
+  return{shop,used,left:Math.max(0,shop-used),unknown}}
+
+const SKIPRE=/^вода|пл[её]нк|фольг/;
+function shoppingList(optional){const inc=new Set(plan.opt||[]);const map=new Map();scheduled().forEach(id=>{const r=recipesRU.find(x=>x.id===id);if(!r)return;const rl=EN?locR(r):null,tt=rl?rl.title:r.title;const b=baseServes(r),fac=b?planPortions(r)/b:1;(r.ingredients||[]).map(normIng).map((i,k)=>({...i,amount:scaleAmt(i.amount,fac),_en:rl&&rl.ingredients&&rl.ingredients[k]?rl.ingredients[k].name:""})).flatMap(x=>{const sp=splitIng(x);return sp.length>1?sp.map(y=>({...y,_en:""})):sp}).forEach(i=>{const k0=ingKey(i.name);if(!k0||SKIP.has(k0)||SKIPRE.test(k0))return;const c=catOf(i.name),k=c?"c:"+c.k:k0;const o=isOpt(i);if(optional?!o:(o&&!inc.has(k)))return;if(!map.has(k))map.set(k,{key:k,name:c?c.n:String(i.name).replace(/\s*\(.*?\)\s*/g," ").trim(),sums:{},other:[],from:[],approx:false,staple:c?!!c.staple:isStaple(k0),en:i._en||"",cat:c,need:0,rough:false});const g=map.get(k);if(c){const qq=qtyOf(i.amount,c);g.need+=qq.q;if(qq.rough)g.rough=true}const p=parseAmt(i.amount);if(p){g.sums[p.u]=(g.sums[p.u]||0)+p.q;if(p.approx)g.approx=true}else if(i.amount)g.other.push(String(i.amount).replace(/,?\s*по желанию/i,"").trim()||"по желанию");if(!g.from.includes(tt))g.from.push(tt)})});return [...map.values()].sort((a,b)=>a.name.localeCompare(b.name,"ru"))}
 async function loadTpl(id){const t=templates.find(x=>x.id===id);if(!t)return;const sl={};for(const k in (t.slots||{}))sl[k]=(t.slots[k]||[]).filter(rid=>recipes.some(r=>r.id===rid));plan={...plan,slots:sl,opt:t.opt||[],have:[],need:[]};tplConfirm=null;render();await savePlan(plan);toast("Неделя «"+t.name+"» загружена")}
-function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan.opt||[]);const chosen=scheduled().map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const favs=(plan.ids||[]).map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const allR=[...recipes].sort((a,b)=>String(a.title).localeCompare(b.title,'ru'));const list=shoppingList(false);const have=haveSet(list);
+function priceForm(g,c){const pr=c.pr||{};const u=g.cat?g.cat.u:"шт";return `<div class="pform" data-pf="${esc(g.key)}"><span>Цена</span><input id="pf_p" inputmode="decimal" value="${pr.p!=null?String(pr.p).replace(".",","):""}" aria-label="Цена в евро"> €${g.cat?` <span>за</span><input id="pf_k" inputmode="decimal" value="${pr.pack||""}" aria-label="Размер упаковки"> ${u==="шт"?"шт.":u}`:""}<button class="btn primary" type="button" id="pf_ok">OK</button>${pr.custom?`<button class="btn link" type="button" id="pf_reset">как было</button>`:""}${g.cat?`<small>${esc(g.cat.de)}${pr.at?` · поправлено ${esc(new Date(pr.at).toLocaleDateString("ru-RU"))}`:" · примерная цена EDEKA"}</small>`:""}</div>`}
+function curTotal(){const l=shoppingList(false);return planTotals(l,haveSet(l)).shop}
+function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan.opt||[]);const chosen=scheduled().map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const favs=(plan.ids||[]).map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const allR=[...recipes].sort((a,b)=>String(a.title).localeCompare(b.title,'ru'));const list=shoppingList(false);const have=haveSet(list);const tot=planTotals(list,have),bud=plan.budget||80;
   const DAYS=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],MEALS=[["b","Завтрак"],["l","Обед"],["d","Ужин"]];
   const now=new Date(),mon=new Date(now);mon.setHours(0,0,0,0);mon.setDate(now.getDate()-((now.getDay()+6)%7));
   const slots=plan.slots||{};
@@ -762,15 +921,18 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
      return `<p class="label" style="margin:2px 0 0">${q?`Найдено: ${res.length}`:"Хочу попробовать"}</p><div class="pool all">${res.length?res.map(r=>chip(r.id,"pool")).join(""):`<span class="hint2">${q?"Ничего не нашлось.":"Пока пусто."}</span>`}</div>`})()}
    <div class="week">${DAYS.map((d,i)=>{const dt=new Date(mon);dt.setDate(mon.getDate()+i);const isT=dt.toDateString()===now.toDateString();
      return `<div class="day ${isT?"today":""}"><h3>${d}<small>${dt.getDate()}.${String(dt.getMonth()+1).padStart(2,"0")}</small></h3><div class="slots">${MEALS.map(([m,ml])=>{const key=i+"-"+m;return `<div class="slot ${sel?"target":""}" data-slot="${key}"><span class="sl">${ml}</span>${key==="0-b"?ghost:""}${(slots[key]||[]).map(id=>chip(id,key)).join("")}${quickSlot===key?`<div class="qform" data-qf="${key}"><input id="q_t" placeholder="Название, напр. Омлет"><textarea id="q_i" placeholder="Продукты (по желанию), по одному в строке: Яйца — 2 шт."></textarea><div class="row2"><button class="btn primary" type="button" id="q_ok">Добавить</button><button class="btn" type="button" id="q_no">Отмена</button></div></div>`:(sel?"":`<button class="qadd" type="button" data-qadd="${key}">＋ своё блюдо</button>`)}</div>`}).join("")}</div></div>`}).join("")}</div>`;
-  view.innerHTML=weekHtml+`<div class="planwrap">
+  view.innerHTML=weekHtml+`<div class="budget${tot.shop>bud?" over":tot.shop>bud*0.85?" near":""}" id="budgetBar" role="status" aria-live="polite"><div class="bline"><span><b>${euro(tot.shop)}</b> <span class="muted">из</span> <button type="button" class="budb" id="budEdit" title="Изменить бюджет">${euro(bud)}</button></span><span class="bnote">${tot.shop>bud?`больше на ${euro(tot.shop-bud)}`:`ещё ${euro(bud-tot.shop)}`}</span></div><div class="btrack"><span style="width:${Math.min(100,tot.shop/bud*100).toFixed(1)}%"></span></div>${tot.shop?`<div class="bsub">съедим на неделе ≈ ${euro(tot.used)} · останется на потом ≈ ${euro(tot.left)}${tot.unknown?` · без цены: ${tot.unknown}`:""}</div>`:""}</div><div class="planwrap">
   <section class="panel"><h2>В расписании</h2><div class="people"><span>Нас</span><span class="stp" role="group" aria-label="Сколько человек"><button type="button" data-ppl="-1" aria-label="Меньше" ${(plan.people||2)<=1?"disabled":""}>−</button><span><b>${plan.people||2}</b> ${(()=>{const n=plan.people||2,m=n%10,h=n%100;return m===1&&h!==11?"человек":(m>=2&&m<=4&&(h<12||h>14))?"человека":"человек"})()}</span><button type="button" data-ppl="1" aria-label="Больше">+</button></span></div>
    ${chosen.length?'<p class="hint2" style="margin:0">Число у блюда — порции для закупки: люди × сколько раз блюдо стоит в меню. Пироги и киши — целыми формами: вторая добавится, только когда одной не хватит на всех.</p>':""}
    ${chosen.length?chosen.map(r=>`<div class="prow">${r.photo?`<img src="${esc(blobUrl(r.photo))}" alt="">`:`<span class="mini">${esc(r.title.slice(0,1))}</span>`}<span class="t" data-open="${esc(r.id)}">${esc(r.title)}</span>${baseServes(r)?`<span class="stp sm" role="group" aria-label="Порции: ${esc(r.title)}"><button type="button" data-pp="${esc(r.id)}|-1" aria-label="Меньше">−</button><span>${planPortions(r)}${r.whole&&planPortions(r)>baseServes(r)&&planPortions(r)%baseServes(r)===0?` <small class="muted">· ${planPortions(r)/baseServes(r)} формы</small>`:""}</span><button type="button" data-pp="${esc(r.id)}|1" aria-label="Больше">+</button></span>`:""}<button class="xbtn" type="button" data-rm="${esc(r.id)}" aria-label="Убрать ${esc(r.title)} из расписания">✕</button></div>`).join(""):'<p class="muted">Пока пусто. Перетащи блюдо в любой день.</p>'}
    ${chosen.length?'<button class="btn link" type="button" id="clearPlan">Очистить неделю</button>':""}
   </section>
-  <section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Что купить</h2>${list.length?`<button class="btn" type="button" id="copyList">${IC.copy} Скопировать</button>`:""}</div><textarea id="copyArea" hidden readonly style="width:100%;min-height:160px;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:10px;background:var(--bg)"></textarea>
-   <p class="muted" style="margin:0">Одинаковые продукты сложены. Отметь то, что уже есть дома: продукт <span style="color:var(--bad);text-decoration:line-through">зачеркнётся</span> и не попадёт в скопированный список. Соль и перец уже зачёркнуты — сними отметку, если нужно купить.</p>
-   ${list.length?`<ul class="shop">${list.map(g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");return `<li class="${have.has(g.key)?"have":""}"><label><input type="checkbox" data-k="${esc(g.key)}" ${have.has(g.key)?"checked":""}><span class="nm">${esc(gN(g))}<span class="src">${esc(g.from.join(", "))}</span></span><span class="q">${g.approx?"≈ ":""}${esc(amtT(q))}</span></label></li>`}).join("")}</ul>`:'<p class="muted">Список появится, когда поставишь блюда в расписание.</p>'}
+  <section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Что купить</h2><span class="shbtns">${list.some(g=>have.has(g.key))||(plan.extra||[]).some(x=>x.done)?`<button class="btn link" type="button" id="hideHave" aria-pressed="${hideHave}">${hideHave?"Показать зачёркнутые":"Скрыть зачёркнутые"}</button>`:""}${list.length||(plan.extra||[]).length?`<button class="btn" type="button" id="copyList">${IC.copy} Скопировать</button>`:""}</span></div><textarea id="copyArea" hidden readonly style="width:100%;min-height:160px;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:10px;background:var(--bg)"></textarea>
+   <p class="muted" style="margin:0">Одинаковые продукты из разных рецептов сложены и посчитаны упаковками. Отметь то, что уже есть дома: продукт <span style="color:var(--bad);text-decoration:line-through">зачеркнётся</span> и не попадёт в сумму. Цены примерные (EDEKA) — нажми на цену, чтобы поправить.</p>
+   ${list.length||(plan.extra||[]).length?`<ul class="shop">${list.filter(g=>!(hideHave&&have.has(g.key))).map(g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");const c=costOf(g),isH=have.has(g.key);
+      const pack=c.pr&&g.cat?`${c.packs>1?c.packs+" × ":""}${fmtU(c.pr.pack,c.pr.u)}${c.left>0.05*c.pr.pack&&!g.rough?` · останется ~${fmtU(c.left,c.pr.u)}`:""}`:"";
+      return `<li class="${isH?"have":""}"><label><input type="checkbox" data-k="${esc(g.key)}" ${isH?"checked":""}><span class="nm">${esc(gN(g))}<span class="src"><span class="fr">${esc(g.from.join(", "))}</span>${pack?`<span class="pk">${esc(pack)}</span>`:""}</span></span><span class="q">${g.approx?"≈ ":""}${esc(amtT(q))}</span></label><button type="button" class="pr${c.unknown?" none":""}${c.pr&&c.pr.custom?" own":""}" data-pe="${esc(g.key)}" aria-label="Цена: ${esc(gN(g))}">${c.unknown?"€ ?":(c.pr.custom?"":"≈")+euro(c.cost)}</button>${priceEdit===g.key?priceForm(g,c):""}</li>`}).join("")}${(plan.extra||[]).filter(x=>!(hideHave&&x.done)).map(x=>{const p=x.p!=null?x.p:(catOf(x.name)||{}).p;return `<li class="xtr${x.done?" have":""}"><label><input type="checkbox" data-xd="${esc(x.id)}" ${x.done?"checked":""}><span class="nm">${esc(x.name)}<span class="src">${x.keep?"🔁 каждую неделю":"своё"}</span></span><span class="q"></span></label><button type="button" class="pr${p==null?" none":""}" data-xe="${esc(x.id)}">${p==null?"€ ?":(x.p==null?"≈":"")+euro(p)}</button><span class="xact"><button type="button" data-xk="${esc(x.id)}" aria-pressed="${!!x.keep}" title="${x.keep?"Не повторять каждую неделю":"Покупать каждую неделю"}">🔁</button><button type="button" data-xr="${esc(x.id)}" aria-label="Убрать ${esc(x.name)}">✕</button></span>${priceEdit==="x:"+x.id?priceForm({key:"x:"+x.id,cat:null,name:x.name},{pr:{p:p,pack:1,u:"шт"}}):""}</li>`}).join("")}</ul>`:'<p class="muted">Список появится, когда поставишь блюда в расписание.</p>'}
+   <form class="xadd" id="xAdd"><input id="x_n" placeholder="+ Своё: Oatly, кофе, бананы…" maxlength="60" aria-label="Добавить продукт в список"><input id="x_p" inputmode="decimal" placeholder="€" aria-label="Цена" maxlength="7"><button class="btn" type="submit">Добавить</button></form>
       ${optList.length?`<div class="optbox"><h3>По желанию</h3><p class="muted" style="margin:4px 0 8px">Отметь, что включить в список покупок — отмеченное добавится выше.</p><ul class="shop">${optList.map(g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");return `<li><label><input type="checkbox" data-opt="${esc(g.key)}" ${incOpt.has(g.key)?"checked":""}><span class="nm">${esc(gN(g))}<span class="src">${esc(g.from.join(", "))}</span></span><span class="q">${esc(amtT(q))}</span></label></li>`}).join("")}</ul></div>`:""}
   </section></div>
   <section class="panel tpl"><h2>Сохранённые недели</h2>
@@ -788,8 +950,8 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
   view.querySelectorAll("[data-tplyes]").forEach(b=>b.onclick=()=>loadTpl(b.dataset.tplyes));
   view.querySelectorAll("[data-tplno]").forEach(b=>b.onclick=()=>{tplConfirm=null;render()});
   view.querySelectorAll("[data-tpldel]").forEach(b=>b.onclick=async()=>{try{await db.collection("templates").doc(b.dataset.tpldel).delete();toast("Удалено")}catch(e){toast("Не получилось удалить")}});
-  const place=async(id,from,to)=>{const sl={...(plan.slots||{})};if(from&&from!=="pool"){sl[from]=(sl[from]||[]).filter((x,ix,arr)=>!(x===id&&ix===arr.indexOf(id)))}
-    if(to){sl[to]=[...(sl[to]||[]),id]}plan={...plan,slots:sl};sel=null;render();await savePlan(plan)};
+  const place=async(id,from,to)=>{const before=curTotal();const sl={...(plan.slots||{})};if(from&&from!=="pool"){sl[from]=(sl[from]||[]).filter((x,ix,arr)=>!(x===id&&ix===arr.indexOf(id)))}
+    if(to){sl[to]=[...(sl[to]||[]),id]}plan={...plan,slots:sl};sel=null;render();{const d=curTotal()-before;if(Math.abs(d)>=0.01){toast((d>0?"+":"−")+euro(Math.abs(d)).replace("€","€ ")+" · всего "+euro(curTotal()));const bb=document.getElementById("budgetBar");if(bb){bb.classList.remove("bump");void bb.offsetWidth;bb.classList.add("bump")}}else if(to)toast("+€ 0 — всё уже есть в списке")}await savePlan(plan)};
   view.querySelectorAll("[data-chip]").forEach(c=>{
     c.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",c.dataset.chip+"|"+c.dataset.from)});
     c.addEventListener("click",e=>{if(e.target.closest("[data-unslot]"))return;e.stopPropagation();sel=(sel&&sel.id===c.dataset.chip&&sel.from===c.dataset.from)?null:{id:c.dataset.chip,from:c.dataset.from};render()})});
@@ -808,11 +970,26 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
   view.querySelectorAll("[data-unslot]").forEach(b=>b.onclick=e=>{e.stopPropagation();const [k,id]=b.dataset.unslot.split("|");place(id,k,null)});
   view.querySelectorAll("[data-rm]").forEach(b=>b.onclick=async()=>{const id=b.dataset.rm;const sl={...(plan.slots||{})};for(const k in sl)sl[k]=sl[k].filter(x=>x!==id);plan={...plan,slots:sl};render();await savePlan(plan);toast("Убрано из расписания")});
   view.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{openId=b.dataset.open;filter="all";render();window.scrollTo(0,0)});
-  const cp=document.getElementById("clearPlan");if(cp)cp.onclick=async()=>{plan={...plan,have:[],need:[],slots:{}};render();await savePlan(plan);toast("Неделя очищена")};
-  const cl=document.getElementById("copyList");if(cl)cl.onclick=async()=>{const all=shoppingList(false);const have=haveSet(all);const txt=all.filter(g=>!have.has(g.key)).map(g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");return gN(g)+(q?" — "+(g.approx?"≈ ":"")+amtT(q):"")}).join("\n");
+  const cp=document.getElementById("clearPlan");if(cp)cp.onclick=async()=>{plan={...plan,have:[],need:[],slots:{},extra:(plan.extra||[]).filter(x=>x.keep).map(x=>({...x,done:false}))};render();await savePlan(plan);toast("Неделя очищена")};
+  const cl=document.getElementById("copyList");if(cl)cl.onclick=async()=>{const all=shoppingList(false);const have=haveSet(all);const txt=all.filter(g=>!have.has(g.key)).map(g=>{const q=Object.entries(g.sums).map(([u,v])=>fmtQ(v,u)).concat(g.other).join(" + ");return gN(g)+(q?" — "+(g.approx?"≈ ":"")+amtT(q):"")}).concat((plan.extra||[]).filter(x=>!x.done).map(x=>x.name)).join("\n");
     try{await navigator.clipboard.writeText(txt);toast("Список скопирован")}catch(e){const ta=document.getElementById("copyArea");ta.hidden=false;ta.value=txt;ta.focus();ta.select();toast("Выделено — нажми «Копировать»")}};
+  const hh=document.getElementById("hideHave");if(hh)hh.onclick=()=>{hideHave=!hideHave;try{localStorage.setItem("hideHave",hideHave?"1":"0")}catch(e){}render()};
+  const be=document.getElementById("budEdit");if(be)be.onclick=async()=>{const v=prompt("Бюджет на неделю, €",String(bud));if(v==null)return;const n=parseFloat(v.replace(",","."));if(!(n>0))return;plan={...plan,budget:n};render();await savePlan(plan)};
+  view.querySelectorAll("[data-pe],[data-xe]").forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const k=b.dataset.pe||("x:"+b.dataset.xe);priceEdit=priceEdit===k?null:k;render();const i=document.getElementById("pf_p");if(i){i.focus();i.select()}});
+  const pf=document.querySelector("[data-pf]");if(pf){const k=pf.dataset.pf;const num=v=>{const n=parseFloat(String(v||"").replace(",","."));return n>0?n:null};
+    const save=async()=>{const p=num(document.getElementById("pf_p").value);if(p==null){toast("Напиши цену, например 1,99");return}
+      if(k.startsWith("x:")){const id=k.slice(2);plan={...plan,extra:(plan.extra||[]).map(x=>x.id===id?{...x,p}:x)}}
+      else{const kk=document.getElementById("pf_k");const pack=kk?num(kk.value):null;plan={...plan,prices:{...(plan.prices||{}),[k]:{p,...(pack?{pack}:{}),at:Date.now()}}}}
+      priceEdit=null;render();await savePlan(plan);toast("Цена сохранена")};
+    document.getElementById("pf_ok").onclick=save;pf.querySelectorAll("input").forEach(i=>i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();save()}if(e.key==="Escape"){priceEdit=null;render()}});
+    const pr=document.getElementById("pf_reset");if(pr)pr.onclick=async()=>{const o={...(plan.prices||{})};delete o[k];plan={...plan,prices:o};priceEdit=null;render();await savePlan(plan)}}
+  const xa=document.getElementById("xAdd");if(xa)xa.onsubmit=async e=>{e.preventDefault();const n=document.getElementById("x_n").value.trim();if(!n)return;const pv=parseFloat(document.getElementById("x_p").value.replace(",","."));
+    const x={id:Math.random().toString(36).slice(2,9),name:n.charAt(0).toUpperCase()+n.slice(1),keep:false,done:false};if(pv>0)x.p=pv;plan={...plan,extra:[...(plan.extra||[]),x]};render();await savePlan(plan);const p=x.p!=null?x.p:(catOf(x.name)||{}).p;toast(p!=null?"+"+euro(p).replace("€","€ ")+" · всего "+euro(curTotal()):"Добавлено. Нажми «€ ?», чтобы указать цену")};
+  view.querySelectorAll("[data-xd]").forEach(cb=>cb.onchange=async()=>{const id=cb.dataset.xd;plan={...plan,extra:(plan.extra||[]).map(x=>x.id===id?{...x,done:cb.checked}:x)};render();await savePlan(plan)});
+  view.querySelectorAll("[data-xk]").forEach(b=>b.onclick=async()=>{const id=b.dataset.xk;plan={...plan,extra:(plan.extra||[]).map(x=>x.id===id?{...x,keep:!x.keep}:x)};render();await savePlan(plan)});
+  view.querySelectorAll("[data-xr]").forEach(b=>b.onclick=async()=>{const id=b.dataset.xr;plan={...plan,extra:(plan.extra||[]).filter(x=>x.id!==id)};render();await savePlan(plan)});
   view.querySelectorAll("[data-opt]").forEach(cb=>cb.onchange=async()=>{const s=new Set(plan.opt||[]);cb.checked?s.add(cb.dataset.opt):s.delete(cb.dataset.opt);plan={...plan,opt:[...s]};render();await savePlan(plan)});
-  view.querySelectorAll("ul.shop input[data-k]").forEach(cb=>cb.onchange=async()=>{const k=cb.dataset.k,g=list.find(x=>x.key===k);if(g&&g.staple){const n=new Set(plan.need||[]);cb.checked?n.delete(k):n.add(k);plan={...plan,need:[...n]}}else{const s=new Set(plan.have||[]);cb.checked?s.add(k):s.delete(k);plan={...plan,have:[...s]}}cb.closest("li").classList.toggle("have",cb.checked);await savePlan(plan)});
+  view.querySelectorAll("ul.shop input[data-k]").forEach(cb=>cb.onchange=async()=>{const k=cb.dataset.k,g=list.find(x=>x.key===k);if(g&&g.staple){const n=new Set(plan.need||[]);cb.checked?n.delete(k):n.add(k);plan={...plan,need:[...n]}}else{const s=new Set(plan.have||[]);cb.checked?s.add(k):s.delete(k);plan={...plan,have:[...s]}}render();await savePlan(plan)});
 }
 function chipsHtml(){const counts={all:recipes.length,done:0,tried:0,want:0};recipes.forEach(r=>{if(counts[r.status]!=null)counts[r.status]++});
   return `<div class="chips" role="group" aria-label="Фильтр">${FILTERS.map(([k,l])=>`<button class="chip" type="button" data-f="${k}" aria-pressed="${filter===k}">${l} <span class="n">${counts[k]}</span></button>`).join("")}${filter!=="week"?`<button class="chip gentle" type="button" id="genT" aria-pressed="${onlyGentle}">🌿 Бережно для желудка <span class="n">${recipes.filter(r=>r.gentle).length}</span></button><button class="chip std" type="button" id="stdT" aria-pressed="${hideStd}">${hideStd?"Базовые скрыты":"Скрыть базовые"} <span class="n">${recipes.filter(r=>r.standard).length}</span></button>`:""}</div>`}
@@ -1369,7 +1546,7 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
   const ib=document.getElementById("impBtn");ib.innerHTML=IC.plus+" Новый рецепт";ib.hidden=false;
   ib.onclick=()=>{if(sample){importing={};editing=null;render();window.scrollTo(0,0);return}newRecipe()};
   db.collection("templates").onSnapshot(sn=>{templates=sn.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created||0)-(a.created||0));if(!editing&&!importing&&filter==="week")render()},()=>{});
-  db.doc("plan/week").onSnapshot(d=>{const v=d.exists?d.data():{};plan={ids:v.ids||[],have:v.have||[],need:v.need||[],slots:v.slots||{},opt:v.opt||[],portions:v.portions||{},people:v.people||2};if(!editing&&!busyTyping())render()},()=>{});
+  db.doc("plan/week").onSnapshot(d=>{const v=d.exists?d.data():{};plan={ids:v.ids||[],have:v.have||[],need:v.need||[],slots:v.slots||{},opt:v.opt||[],portions:v.portions||{},people:v.people||2,prices:v.prices||{},extra:v.extra||[],budget:v.budget||80};if(!editing&&!busyTyping())render()},()=>{});
   db.collection("recipes").onSnapshot(snap=>{
     recipesRU=snap.docs.map(d=>({id:d.id,...d.data()}));recipes=recipesRU;recipesLoaded=true;
     if(editing)return;if(busyTyping()){pendingRender=true;return}render();
@@ -1377,6 +1554,6 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
 };
 async function newRecipe(){try{toast("Создаю рецепт…");const ref=await db.collection("recipes").add({title:"Новый рецепт",status:"want",serves:2,ingredients:[],steps:[],stepTitles:[],tips:[],source:"",video:"",recipeUrl:"",photo:""});justCopied=ref.id;openId=ref.id;filter="all";render();window.scrollTo(0,0)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
 </script>
-<script src="backend.js?v=202611020110"></script>
+<script src="backend.js?v=202611021500"></script>
 
 </body></html>
