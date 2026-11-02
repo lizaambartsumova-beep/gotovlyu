@@ -764,7 +764,10 @@ ul.shop li.have .nm,ul.shop li.have .q,ul.shop li.have .src{text-decoration:none
 .slot{margin-bottom:0;min-height:44px}
 .chipr span.n2{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.25}
 .chipr{align-items:center}
-@media (min-width:901px){.week{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (min-width:901px){.week{grid-template-columns:repeat(4,minmax(0,1fr))}.week>.day:nth-child(7){grid-column:4;grid-row:1/span 2}.week>.day:nth-child(7) .slots{flex:1}.week>.day:nth-child(7) .slot{flex:1}}
+.planv.simple .planwrap .panel{max-width:none}
+.planv.simple .budget{max-width:none;margin:16px 0}
+.wkact{max-width:none}
 @media (max-width:900px){.slot{flex-direction:row;align-items:center;flex-wrap:wrap;gap:6px;padding:6px 8px;min-height:42px}.slot .sl{width:70px;flex:none}.slot .chipr{flex:1 1 160px;max-width:100%}.slot .qform{flex-basis:100%}}
 .havegrp{border-top:0;background:var(--soft);border-radius:var(--r-md);padding:2px 14px;margin-top:10px}
 .havegrp>summary{padding:10px 0}
@@ -819,7 +822,7 @@ ul.shop li.have .src{color:var(--bad)}
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Фото"><button class="lbx" type="button" id="lbx" aria-label="Закрыть">✕</button><div class="lbin" id="lbin"><img id="lbimg" alt=""></div><p class="lbhint">Нажми на фото, чтобы приблизить</p></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="i18n.js?v=20261102200000"></script>
+<script src="i18n.js?v=202611022100000"></script>
 <script>
 const IC={
  star:'<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.6l1-5.8L3.5 9.7l5.9-.9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
@@ -1864,6 +1867,6 @@ window.__startApp=async({db:_db,assets:_assets,sample:_sample,who:_who})=>{
 };
 async function newRecipe(){try{toast("Создаю рецепт…");const ref=await db.collection("recipes").add({title:"Новый рецепт",status:"want",serves:2,ingredients:[],steps:[],stepTitles:[],tips:[],source:"",video:"",recipeUrl:"",photo:""});justCopied=ref.id;openId=ref.id;filter="all";render();window.scrollTo(0,0)}catch(e){toast("Не получилось: "+(e.message||e.code))}}
 </script>
-<script src="backend.js?v=20261102200000"></script>
+<script src="backend.js?v=202611022100000"></script>
 
 </body></html>
