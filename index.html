@@ -645,6 +645,26 @@ ul.shop .pform .btn{padding:6px 12px}
 .planv.simple .qadd{display:none}
 .planv.simple .slot{min-height:44px}
 .planv.simple .planwrap .panel{max-width:760px;width:100%;margin:0 auto}
+.slot{cursor:pointer}
+.slot .sl{cursor:pointer}
+.spov{position:fixed;inset:0;z-index:50;background:rgba(20,18,15,.38);display:flex;align-items:center;justify-content:center;padding:16px}
+.spanel{background:var(--paper);border-radius:var(--r-lg);width:min(520px,100%);max-height:min(640px,86vh);display:flex;flex-direction:column;gap:10px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.sphead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sphead b{font-size:1.05rem}
+#spQ{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;font:inherit;background:var(--bg);width:100%}
+.spres{overflow:auto;display:flex;flex-direction:column;gap:2px;margin:0 -6px;padding:0 6px}
+.spres .label{margin:10px 0 4px}
+.sprow{display:flex;align-items:center;gap:10px;border:0;background:none;font:inherit;text-align:left;padding:7px 6px;border-radius:10px;cursor:pointer;color:var(--ink)}
+.sprow:hover{background:var(--soft)}
+.sprow img,.sprow .mini{width:36px;height:36px;border-radius:9px;object-fit:cover;flex:none}
+.sprow.own{font-weight:600;margin-top:8px;border:1.5px dashed var(--line)}
+.prodc{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--soft);border-radius:12px;padding:10px 12px;margin:2px 0}
+.prodc .pct{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:.9rem}
+.prodc .pcr{font-size:.82rem}
+.prodc .pcr a{color:var(--ink);font-weight:600}
+.prodc .btn{flex:none;padding:7px 12px;font-size:.85rem}
+.sres.prods{display:flex;flex-direction:column;gap:6px}
+@media (max-width:640px){.spov{align-items:flex-end;padding:0}.spanel{border-radius:20px 20px 0 0;max-height:88vh;padding-bottom:max(16px,env(safe-area-inset-bottom,0px))}}
 .xsug{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .xsug .chip{font-size:.85rem;padding:5px 10px}
 .xadd{display:flex;gap:6px;align-items:center}
@@ -707,7 +727,7 @@ const STATUS={done:"Рекомендую 👍",tried:"Пробовали 👌",w
 const SORD={done:0,tried:1,want:2};const sOrd=r=>SORD[r.status]??3;
 const FILTERS=[["all","Все"],["done","Рекомендую"],["tried","Пробовали"],["want","Хочу попробовать"]];
 let hideStd=false,onlyGentle=false,importing=null;try{hideStd=localStorage.getItem("hideStd")==="1";onlyGentle=localStorage.getItem("onlyGentle")==="1"}catch(e){}
-let planQ="",planHelp=false,planView="simple",moreR=false,priceEdit=null,hideHave=false;try{hideHave=localStorage.getItem("hideHave")==="1";planView=localStorage.getItem("planView")||"simple"}catch(e){}
+let planQ="",planHelp=false,planView="simple",moreR=false,slotPick=null,quickTitle="",priceEdit=null,hideHave=false;try{hideHave=localStorage.getItem("hideHave")==="1";planView=localStorage.getItem("planView")||"simple"}catch(e){}
 let editOn=false, focusAfter=null, pendingRender=false, showUrl=false, moreOpen=false, justCopied=null;
 let sample=null, pasteStep=null, pasteFor=null, who=null, notes=[], notesFor=null, nDraft=null;
 let db=null, assets=null, recipes=[], filter="all", openId=null, editing=null, plan={ids:[],have:[],need:[],slots:{}}, sel=null, quickSlot=null, templates=[], tplConfirm=null;
@@ -920,6 +940,21 @@ function shoppingList(optional){const inc=new Set(plan.opt||[]);const map=new Ma
 async function loadTpl(id){const t=templates.find(x=>x.id===id);if(!t)return;const sl={};for(const k in (t.slots||{}))sl[k]=(t.slots[k]||[]).filter(rid=>recipes.some(r=>r.id===rid));plan={...plan,slots:sl,opt:t.opt||[],have:[],need:[]};tplConfirm=null;render();await savePlan(plan);toast("Неделя «"+t.name+"» загружена")}
 function priceForm(g,c){const pr=c.pr||{};const u=g.cat?g.cat.u:"шт";return `<div class="pform" data-pf="${esc(g.key)}"><span>Цена</span><input id="pf_p" inputmode="decimal" value="${pr.p!=null?String(pr.p).replace(".",","):""}" aria-label="Цена в евро"> €${g.cat?` <span>за</span><input id="pf_k" inputmode="decimal" value="${pr.pack||""}" aria-label="Размер упаковки"> ${u==="шт"?"шт.":u}`:""}<button class="btn primary" type="button" id="pf_ok">OK</button>${pr.custom?`<button class="btn link" type="button" id="pf_reset">как было</button>`:""}${g.cat?`<small>${esc(g.cat.de)}${pr.at?` · поправлено ${esc(new Date(pr.at).toLocaleDateString("ru-RU"))}`:" · примерная цена EDEKA"}</small>`:""}</div>`}
 function remember(x){const h=(plan.xhist||[]).filter(y=>y.name.toLowerCase()!==x.name.toLowerCase());return [{name:x.name,...(x.p!=null?{p:x.p}:{})},...h].slice(0,20)}
+
+/* product search: catalogue items matching a query, with price and the recipes that use them */
+function findProducts(q){q=String(q||"").trim().toLowerCase();if(q.length<2)return[];const nq=q.replace(/ё/g,"е");
+  return PCAT.filter(c=>c.re.test(q)&&!(c.not&&c.not.test(q))||c.n.toLowerCase().replace(/ё/g,"е").includes(nq)||c.de.toLowerCase().includes(q)).slice(0,4)}
+function recipesWith(c){return recipes.filter(r=>(r.ingredients||[]).map(normIng).some(i=>catOf(i.name)===c))}
+function prodCard(c){const pr=priceOf("c:"+c.k,c),rs=recipesWith(c);return `<div class="prodc"><div class="pct"><b>${esc(c.n)}</b><span class="muted">${esc(c.de)} · ${fmtU(pr.pack,pr.u)} · ${pr.custom?"":"≈ "}${euro(pr.p)}</span>${rs.length?`<span class="pcr">В рецептах: ${rs.slice(0,4).map(r=>`<a href="#" data-open="${esc(r.id)}">${esc(r.title)}</a>`).join(", ")}${rs.length>4?` и ещё ${rs.length-4}`:""}</span>`:`<span class="pcr muted">Пока ни в одном рецепте</span>`}</div><button type="button" class="btn" data-padd="${esc(c.k)}">＋ в покупки</button></div>`}
+const SLOTN={b:"Завтрак",l:"Обед",d:"Ужин"},DAYN=["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"];
+function spResults(q){const nq=nrm(q).trim();const row=r=>`<button type="button" class="sprow" data-spr="${esc(r.id)}">${r.photo?`<img src="${esc(blobUrl(r.photo))}" alt="">`:`<span class="mini">${esc(String(r.title).slice(0,1))}</span>`}<span>${esc(r.title)}</span></button>`;
+  const favs=(plan.ids||[]).map(id=>recipes.find(r=>r.id===id)).filter(Boolean);
+  if(!nq){const want=recipes.filter(r=>r.status==="want"&&!favs.includes(r));const rest=[...recipes].filter(r=>!favs.includes(r)&&!want.includes(r)).sort((a,b)=>String(a.title).localeCompare(b.title,"ru"));
+    return (favs.length?`<p class="label">★ Избранное</p>${favs.map(row).join("")}`:"")+(want.length?`<p class="label">Хочу попробовать</p>${want.map(row).join("")}`:"")+`<p class="label">Все рецепты</p>${rest.map(row).join("")}<button type="button" class="sprow own" data-spown>＋ Своё блюдо</button>`}
+  const prods=findProducts(q);const res=recipes.filter(r=>nrm(r.title).includes(nq)||(r.ingredients||[]).map(normIng).some(i=>ingHits(i,q))||prods.some(c=>(r.ingredients||[]).map(normIng).some(i=>catOf(i.name)===c)));
+  return (prods.length?`<p class="label">Продукт</p>${prods.map(prodCard).join("")}`:"")+`<p class="label">Рецепты: ${res.length}</p>${res.map(row).join("")||'<p class="hint2">Ничего не нашлось.</p>'}`+`<button type="button" class="sprow own" data-spown>＋ Своё блюдо${q.trim()?` «${esc(q.trim())}»`:""}</button>`}
+function pickerHtml(){const [d,m]=slotPick.split("-");return `<div class="spov" id="spOv" role="dialog" aria-modal="true" aria-label="Выбрать блюдо"><div class="spanel"><div class="sphead"><b>${SLOTN[m]||""} · ${DAYN[+d]||""}</b><button type="button" class="xbtn" id="spX" aria-label="Закрыть">✕</button></div><input id="spQ" type="search" autocomplete="off" placeholder="Блюдо или продукт: гратен, рис, Bergkäse…"><div class="spres" id="spRes">${spResults("")}</div></div></div>`}
+async function addProduct(k){const c=PCAT.find(x=>x.k===k);if(!c)return;const pr=priceOf("c:"+k,c);const x={id:Math.random().toString(36).slice(2,9),name:c.n,keep:false,done:false,p:pr.p};plan={...plan,extra:[...(plan.extra||[]),x],xhist:remember(x)};slotPick=null;render();await savePlan(plan);toast("+"+euro(pr.p).replace("€","€ ")+" · "+c.n+" в покупках")}
 function curTotal(){const l=shoppingList(false);return planTotals(l,haveSet(l)).shop}
 function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan.opt||[]);const chosen=scheduled().map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const favs=(plan.ids||[]).map(id=>recipes.find(r=>r.id===id)).filter(Boolean);const allR=[...recipes].sort((a,b)=>String(a.title).localeCompare(b.title,'ru'));const list=shoppingList(false);const have=haveSet(list);const tot=planTotals(list,have),bud=plan.budget||80;
   const DAYS=["Пн","Вт","Ср","Чт","Пт","Сб","Вс"],MEALS=[["b","Завтрак"],["l","Обед"],["d","Ужин"]];
@@ -934,10 +969,10 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
    <div class="pool">${favs.length?favs.map(r=>chip(r.id,"pool")).join(""):'<span class="hint2">Пусто. Нажми ☆ на карточке рецепта в списке — он появится здесь.</span>'}</div>
    ${(()=>{const w=allR.filter(r=>r.status==="want").slice(0,12);return `<p class="label want" style="margin:2px 0 0">Хочу попробовать</p><div class="pool all want">${w.length?w.map(r=>chip(r.id,"pool")).join(""):'<span class="hint2">Пока пусто.</span>'}</div>`})()}
    <div class="psearch sres0"><input id="planQ" type="search" autocomplete="off" placeholder="Найти рецепт: название или продукт…" value="${esc(planQ)}" aria-label="Найти рецепт"></div>
-   ${(()=>{const q=planQ.trim(),nq=nrm(q).trim();if(!q)return"";const res=allR.filter(r=>nrm(r.title).includes(nq)||(r.ingredients||[]).map(normIng).some(i=>ingHits(i,q))).slice(0,12);
-     return `<p class="label sres" style="margin:2px 0 0">Найдено: ${res.length}</p><div class="pool all sres">${res.length?res.map(r=>chip(r.id,"pool")).join(""):'<span class="hint2">Ничего не нашлось.</span>'}</div>`})()}
+   ${(()=>{const q=planQ.trim(),nq=nrm(q).trim();if(!q)return"";const prods=findProducts(q);const res=allR.filter(r=>nrm(r.title).includes(nq)||(r.ingredients||[]).map(normIng).some(i=>ingHits(i,q))||prods.some(c=>(r.ingredients||[]).map(normIng).some(i=>catOf(i.name)===c))).slice(0,12);
+     return `${prods.length?`<div class="sres prods">${prods.map(prodCard).join("")}</div>`:""}<p class="label sres" style="margin:2px 0 0">Найдено: ${res.length}</p><div class="pool all sres">${res.length?res.map(r=>chip(r.id,"pool")).join(""):'<span class="hint2">Ничего не нашлось.</span>'}</div>`})()}
    <div class="week">${DAYS.map((d,i)=>{const dt=new Date(mon);dt.setDate(mon.getDate()+i);const isT=dt.toDateString()===now.toDateString();
-     return `<div class="day ${isT?"today":""}"><h3>${d}<small>${dt.getDate()}.${String(dt.getMonth()+1).padStart(2,"0")}</small></h3><div class="slots">${MEALS.map(([m,ml])=>{const key=i+"-"+m;return `<div class="slot ${sel?"target":""}" data-slot="${key}"><span class="sl">${ml}</span>${key==="0-b"?ghost:""}${(slots[key]||[]).map(id=>chip(id,key)).join("")}${quickSlot===key?`<div class="qform" data-qf="${key}"><input id="q_t" placeholder="Название, напр. Омлет"><textarea id="q_i" placeholder="Продукты (по желанию), по одному в строке: Яйца — 2 шт."></textarea><div class="row2"><button class="btn primary" type="button" id="q_ok">Добавить</button><button class="btn" type="button" id="q_no">Отмена</button></div></div>`:(sel?"":`<button class="qadd" type="button" data-qadd="${key}">＋ своё блюдо</button>`)}</div>`}).join("")}</div></div>`}).join("")}</div>`;
+     return `<div class="day ${isT?"today":""}"><h3>${d}<small>${dt.getDate()}.${String(dt.getMonth()+1).padStart(2,"0")}</small></h3><div class="slots">${MEALS.map(([m,ml])=>{const key=i+"-"+m;return `<div class="slot ${sel?"target":""}" data-slot="${key}"><span class="sl">${ml}</span>${key==="0-b"?ghost:""}${(slots[key]||[]).map(id=>chip(id,key)).join("")}${quickSlot===key?`<div class="qform" data-qf="${key}"><input id="q_t" placeholder="Название, напр. Омлет" value="${esc(quickTitle)}"><textarea id="q_i" placeholder="Продукты (по желанию), по одному в строке: Яйца — 2 шт."></textarea><div class="row2"><button class="btn primary" type="button" id="q_ok">Добавить</button><button class="btn" type="button" id="q_no">Отмена</button></div></div>`:(sel?"":`<button class="qadd" type="button" data-qadd="${key}">＋ своё блюдо</button>`)}</div>`}).join("")}</div></div>`}).join("")}</div>`;
   view.innerHTML=`<div class="planv${planView==="simple"?" simple":""}${moreR?" more":""}"><div class="vrow"><div class="vseg" role="group" aria-label="Вид страницы"><button type="button" data-pv="simple" aria-pressed="${planView==="simple"}">Просто</button><button type="button" data-pv="full" aria-pressed="${planView!=="simple"}">Подробно</button></div>${planView==="simple"?`<button type="button" class="btn link moreR" id="moreR" aria-expanded="${moreR}">${moreR?"Скрыть другие рецепты":"＋ Другие рецепты и поиск"}</button>`:""}</div>`+weekHtml+`<div class="budget${tot.shop>bud?" over":tot.shop>bud*0.85?" near":""}" id="budgetBar" role="status" aria-live="polite"><div class="bline"><span><b>${euro(tot.shop)}</b> <span class="muted">из</span> <button type="button" class="budb" id="budEdit" title="Изменить бюджет">${euro(bud)}</button></span><span class="bnote">${tot.shop>bud?`больше на ${euro(tot.shop-bud)}`:`ещё ${euro(bud-tot.shop)}`}</span></div><div class="btrack"><span style="width:${Math.min(100,tot.shop/bud*100).toFixed(1)}%"></span></div>${tot.shop?`<div class="bsub">съедим на неделе ≈ ${euro(tot.used)} · останется на потом ≈ ${euro(tot.left)}${tot.unknown?` · без цены: ${tot.unknown}`:""}</div>`:""}</div><div class="planwrap">
   <section class="panel sched"><h2>В расписании</h2><div class="people"><span>Нас</span><span class="stp" role="group" aria-label="Сколько человек"><button type="button" data-ppl="-1" aria-label="Меньше" ${(plan.people||2)<=1?"disabled":""}>−</button><span><b>${plan.people||2}</b> ${(()=>{const n=plan.people||2,m=n%10,h=n%100;return m===1&&h!==11?"человек":(m>=2&&m<=4&&(h<12||h>14))?"человека":"человек"})()}</span><button type="button" data-ppl="1" aria-label="Больше">+</button></span></div>
    ${chosen.length?'<p class="hint2" style="margin:0">Число у блюда — порции для закупки: люди × сколько раз блюдо стоит в меню. Пироги и киши — целыми формами: вторая добавится, только когда одной не хватит на всех.</p>':""}
@@ -978,10 +1013,18 @@ function renderPlan(){const optList=shoppingList(true);const incOpt=new Set(plan
     z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("over")});
     z.addEventListener("dragleave",()=>z.classList.remove("over"));
     z.addEventListener("drop",e=>{e.preventDefault();const [id,from]=e.dataTransfer.getData("text/plain").split("|");if(id&&from!==z.dataset.slot)place(id,from,z.dataset.slot)});
-    z.addEventListener("click",()=>{if(sel&&sel.from!==z.dataset.slot)place(sel.id,sel.from,z.dataset.slot)})});
+    z.addEventListener("click",e=>{if(sel){if(sel.from!==z.dataset.slot)place(sel.id,sel.from,z.dataset.slot);return}if(e.target.closest("[data-chip],.qform,.qadd"))return;slotPick=z.dataset.slot;render();const i=document.getElementById("spQ");if(i)i.focus()})});
+  if(slotPick){view.insertAdjacentHTML("beforeend",pickerHtml());const ov=document.getElementById("spOv"),inp=document.getElementById("spQ"),box=document.getElementById("spRes");const close=()=>{slotPick=null;render()};
+    const bindRes=()=>{box.querySelectorAll("[data-spr]").forEach(b=>b.onclick=()=>{const k=slotPick;slotPick=null;place(b.dataset.spr,null,k)});
+      box.querySelectorAll("[data-spown]").forEach(b=>b.onclick=()=>{quickSlot=slotPick;quickTitle=inp.value.trim();slotPick=null;render();const t=document.getElementById("q_t");if(t){t.value=quickTitle;t.focus()}});
+      box.querySelectorAll("[data-padd]").forEach(b=>b.onclick=()=>addProduct(b.dataset.padd));
+      box.querySelectorAll("[data-open]").forEach(a=>a.onclick=e=>{e.preventDefault();slotPick=null;openId=a.dataset.open;filter="all";render();window.scrollTo(0,0)})};
+    bindRes();inp.oninput=()=>{clearTimeout(inp._t);inp._t=setTimeout(()=>{box.innerHTML=spResults(inp.value);bindRes()},120)};
+    document.getElementById("spX").onclick=close;ov.addEventListener("click",e=>{if(e.target===ov)close()});ov.addEventListener("keydown",e=>{if(e.key==="Escape")close()})}
+  view.querySelectorAll(".prods [data-padd]").forEach(b=>b.onclick=()=>addProduct(b.dataset.padd));
   view.querySelectorAll("[data-qadd]").forEach(b=>b.onclick=e=>{e.stopPropagation();quickSlot=b.dataset.qadd;render();const t=document.getElementById("q_t");if(t)t.focus()});
   const qf=document.querySelector("[data-qf]");if(qf){qf.addEventListener("click",e=>e.stopPropagation());
-    document.getElementById("q_no").onclick=()=>{quickSlot=null;render()};
+    document.getElementById("q_no").onclick=()=>{quickSlot=null;quickTitle="";render()};
     document.getElementById("q_ok").onclick=async()=>{const t=document.getElementById("q_t").value.trim();if(!t){toast("Напиши название");return}
       const ing=document.getElementById("q_i").value.split("\n").map(x=>x.trim()).filter(Boolean).map(lineToIng);
       const key=quickSlot;try{const ref=await db.collection("recipes").add({title:t,status:"done",standard:true,easy:true,source:"Быстро добавлено из расписания.",ingredients:ing,steps:[],photo:"",video:"",recipeUrl:"",oven:"",ovenNote:"",tips:[]});
